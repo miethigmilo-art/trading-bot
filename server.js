@@ -399,5 +399,77 @@ laden();
 </body>
 </html>`);
 });
+// ── Offene Position holen ─────────────────────────────
+async function getOpenPosition(konto, epic) {
+  const res = await axios.get(`${konto.baseUrl}/positions`, {
+    headers: {
+      'X-CAP-API-KEY':    konto.apiKey,
+      'CST':              konto.cst,
+      'X-SECURITY-TOKEN': konto.token
+    }
+  });
+  const positions = res.data.positions || [];
+  return positions.find(p => p.market.epic === epic) || null;
+}
 
+// ── SL Update Route ───────────────────────────────────
+app.post('/webhook/update_sl/:strategie', async (req, res) => {
+  const strategieName = req.params.strategie;
+  const { action, sl } = req.body;
+
+  console.log(`📨 SL Update [${strategieName}]:`, req.body);
+
+  if (action !== 'UPDATE_SL' || !sl) {
+    return res.status(400).json({ error: 'Fehlende Felder' });
+  }
+
+  const strategie = STRATEGIEN[strategieName];
+  if (!strategie) {
+    return res.status(400).json({ error: 'Unbekannte Strategie' });
+  }
+
+  const konto = strategie.konto;
+
+  try {
+    if (!konto.cst) await login(konto);
+
+    const position = await getOpenPosition(konto, strategie.epic);
+
+    if (!position) {
+      console.log(`⚠️ [${strategieName}] Keine offene Position gefunden`);
+      return res.json({ status: 'keine Position offen' });
+    }
+
+    const dealId = position.position.dealId;
+
+    await axios.put(`${konto.baseUrl}/positions/${dealId}`, {
+      stopLevel: parseFloat(sl)
+    }, {
+      headers: {
+        'X-CAP-API-KEY':    konto.apiKey,
+        'CST':              konto.cst,
+        'X-SECURITY-TOKEN': konto.token
+      }
+    });
+
+    console.log(`✅ [${strategieName}] SL aktualisiert auf ${sl}`);
+
+    await sendTelegram(
+      `🔄 <b>SL aktualisiert</b>\n` +
+      `Strategie: <b>${strategieName}</b>\n` +
+      `Neuer SL: <b>${sl}$</b>`
+    );
+
+    res.json({ status: 'ok', neuerSL: sl });
+
+  } catch (err) {
+    if (err.response?.status === 401) {
+      konto.cst = null;
+      await login(konto);
+      return res.status(500).json({ error: 'Session erneuert' });
+    }
+    console.error(`❌ SL Update Fehler:`, err.response?.data || err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 app.listen(3000, () => console.log('🚀 Server läuft auf http://localhost:3000'));
