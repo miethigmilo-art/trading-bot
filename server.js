@@ -129,7 +129,19 @@ function updatePerformance(strategieName, pnl) {
   if (pnl < p.schlechtestesTrade) p.schlechtestesTrade = pnl;
   letzteAktualisierung = new Date().toISOString();
 }
-
+// ── Telegram Benachrichtigung ─────────────────────────
+async function sendTelegram(nachricht) {
+  try {
+    await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
+      chat_id: process.env.TELEGRAM_CHAT_ID,
+      text: nachricht,
+      parse_mode: 'HTML'
+    });
+    console.log('📱 Telegram Nachricht gesendet');
+  } catch (err) {
+    console.error('❌ Telegram Fehler:', err.message);
+  }
+}
 // ── Webhook Handler ───────────────────────────────────
 async function handleWebhook(req, res, strategieName) {
   console.log(`📨 Signal [${strategieName}]:`, req.body);
@@ -177,6 +189,14 @@ async function handleWebhook(req, res, strategieName) {
     });
 
     console.log(`✅ [${strategieName}] Order platziert`);
+// Telegram Benachrichtigung
+await sendTelegram(
+  `${side === 'BUY' ? '🟢' : '🔴'} <b>${side === 'BUY' ? 'LONG' : 'SHORT'} eröffnet</b>\n` +
+  `Strategie: <b>${strategieName}</b>\n` +
+  `Größe: <b>${size} Units</b>\n` +
+  `SL: <b>${sl}$</b>\n` +
+  `TP: <b>${tp}$</b>`
+);
     res.json({ status: 'ok', strategie: strategieName, size });
 
   } catch (err) {
