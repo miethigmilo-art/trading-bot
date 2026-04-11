@@ -44,11 +44,11 @@ const STRATEGIEN = {
 };
 
 let performance = {
-  mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10500 },
-  aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10000 }
+  mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
+  aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 }
 };
 
-let letzteEquity = { mittel: 10000, aggressiv: 1000 };
+let letzteEquity = { mittel: 1000, aggressiv: 1000 };
 let letzteAktualisierung = new Date().toISOString();
 
 async function login(konto) {
