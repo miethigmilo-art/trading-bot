@@ -1,0 +1,375 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+const express = require('express');
+const axios = require('axios');
+const app = express();
+app.use(express.json());
+
+// ── Konto 1: Mittel ───────────────────────────────────
+const KONTO_MITTEL = {
+  apiKey:   process.env.API_KEY,
+  email:    process.env.EMAIL,
+  password: process.env.PASSWORD,
+  baseUrl:  process.env.BASE_URL,
+  cst:      null,
+  token:    null
+};
+
+// ── Konto 2: Aggressiv ────────────────────────────────
+const KONTO_AGGRESSIV = {
+  apiKey:   process.env.API_KEY_AGGRESSIV,
+  email:    process.env.EMAIL_AGGRESSIV,
+  password: process.env.PASSWORD_AGGRESSIV,
+  baseUrl:  process.env.BASE_URL,
+  cst:      null,
+  token:    null
+};
+
+// ── Strategien ────────────────────────────────────────
+const STRATEGIEN = {
+  mittel: {
+    konto:          KONTO_MITTEL,
+    epic:           'GOLD',
+    riskPct:        1.5,
+    reservePct:     100,
+    leverage:       5,
+    maxDrawdownPct: 20,
+    startEquity:    10500
+  },
+  aggressiv: {
+    konto:          KONTO_AGGRESSIV,
+    epic:           'GOLD',
+    riskPct:        3.1,
+    reservePct:     100,
+    leverage:       5,
+    maxDrawdownPct: 30,
+    startEquity:    10500
+  }
+};
+
+// ── Performance Tracking ──────────────────────────────
+let performance = {
+  mittel: {
+    trades: 0, gewinn: 0, verlust: 0,
+    gesamtPnL: 0, bestesTrade: 0,
+    schlechtestesTrade: 0, startEquity: 10500
+  },
+  aggressiv: {
+    trades: 0, gewinn: 0, verlust: 0,
+    gesamtPnL: 0, bestesTrade: 0,
+    schlechtestesTrade: 0, startEquity: 10500
+  }
+};
+
+let letzteEquity = { mittel: 10500, aggressiv: 10500 };
+let letzteAktualisierung = new Date().toISOString();
+
+// ── Login ─────────────────────────────────────────────
+async function login(konto) {
+  const res = await axios.post(`${konto.baseUrl}/session`, {
+    identifier: konto.email,
+    password:   konto.password
+  }, { headers: { 'X-CAP-API-KEY': konto.apiKey } });
+  konto.cst   = res.headers['cst'];
+  konto.token = res.headers['x-security-token'];
+  console.log(`✅ Login erfolgreich: ${konto.email}`);
+}
+
+// ── Equity holen ──────────────────────────────────────
+async function getEquity(konto) {
+  try {
+    const res = await axios.get(`${konto.baseUrl}/accounts`, {
+      headers: {
+        'X-CAP-API-KEY':    konto.apiKey,
+        'CST':              konto.cst,
+        'X-SECURITY-TOKEN': konto.token
+      }
+    });
+    const account = res.data.accounts[0];
+    const equity = account?.balance?.equity
+                || account?.balance?.available
+                || account?.balance?.balance
+                || account?.balance;
+    console.log(`💰 Equity (${konto.email}): ${equity}€`);
+    return equity;
+  } catch (err) {
+    if (err.response?.status === 401) {
+      await login(konto);
+      return getEquity(konto);
+    }
+    throw err;
+  }
+}
+
+// ── Drawdown prüfen ───────────────────────────────────
+function checkDrawdown(equity, strategie, strategieName) {
+  if (performance[strategieName].trades === 0) return false;
+  const drawdown = ((strategie.startEquity - equity) / strategie.startEquity) * 100;
+  console.log(`📉 [${strategieName}] Drawdown: ${drawdown.toFixed(2)}% (Max: ${strategie.maxDrawdownPct}%)`);
+  return drawdown >= strategie.maxDrawdownPct;
+}
+
+// ── Positionsgröße berechnen ──────────────────────────
+function calcSize(equity, sl, tp, strategie) {
+  const riskCapital = equity * (strategie.riskPct / 100) * strategie.leverage;
+  const slDistance  = Math.abs(parseFloat(tp) - parseFloat(sl));
+  let size = riskCapital / slDistance;
+  const maxSize = (equity * strategie.leverage) / parseFloat(sl);
+  size = Math.min(size, maxSize);
+  return Math.max(1, parseFloat(size.toFixed(1)));
+}
+
+// ── Performance updaten ───────────────────────────────
+function updatePerformance(strategieName, pnl) {
+  const p = performance[strategieName];
+  p.trades++;
+  p.gesamtPnL += pnl;
+  if (pnl > 0) p.gewinn++;
+  else p.verlust++;
+  if (pnl > p.bestesTrade) p.bestesTrade = pnl;
+  if (pnl < p.schlechtestesTrade) p.schlechtestesTrade = pnl;
+  letzteAktualisierung = new Date().toISOString();
+}
+
+// ── Webhook Handler ───────────────────────────────────
+async function handleWebhook(req, res, strategieName) {
+  console.log(`📨 Signal [${strategieName}]:`, req.body);
+  const { side, sl, tp } = req.body;
+
+  if (!side || !sl || !tp) {
+    return res.status(400).json({ error: 'Fehlende Felder' });
+  }
+
+  const strategie = STRATEGIEN[strategieName];
+  const konto     = strategie.konto;
+
+  try {
+    if (!konto.cst) await login(konto);
+
+    const equity = await getEquity(konto);
+
+    if (checkDrawdown(equity, strategie, strategieName)) {
+      console.log(`🛑 [${strategieName}] Max. Drawdown erreicht!`);
+      return res.json({ status: 'gestoppt', grund: 'Max. Drawdown erreicht' });
+    }
+
+    const pnl = equity - letzteEquity[strategieName];
+    if (pnl !== 0) updatePerformance(strategieName, pnl);
+    letzteEquity[strategieName] = equity;
+
+    const size  = calcSize(equity, sl, tp, strategie);
+    const order = {
+      epic:           strategie.epic,
+      direction:      side,
+      size:           size,
+      guaranteedStop: false,
+      stopLevel:      parseFloat(sl),
+      profitLevel:    parseFloat(tp)
+    };
+
+    console.log(`📤 [${strategieName}] Order:`, order);
+
+    const response = await axios.post(`${konto.baseUrl}/positions`, order, {
+      headers: {
+        'X-CAP-API-KEY':    konto.apiKey,
+        'CST':              konto.cst,
+        'X-SECURITY-TOKEN': konto.token
+      }
+    });
+
+    console.log(`✅ [${strategieName}] Order platziert`);
+    res.json({ status: 'ok', strategie: strategieName, size });
+
+  } catch (err) {
+    if (err.response?.status === 401) {
+      konto.cst = null;
+      await login(konto);
+      return res.status(500).json({ error: 'Session erneuert' });
+    }
+    console.error(`❌ Fehler:`, err.response?.data || err.message);
+    res.status(500).json({ error: err.message });
+  }
+}
+
+// ── Webhook Routen ────────────────────────────────────
+app.post('/webhook/mittel',    (req, res) => handleWebhook(req, res, 'mittel'));
+app.post('/webhook/aggressiv', (req, res) => handleWebhook(req, res, 'aggressiv'));
+
+// ── Performance API ───────────────────────────────────
+app.get('/api/performance', async (req, res) => {
+  try {
+    if (!KONTO_MITTEL.cst)    await login(KONTO_MITTEL);
+    if (!KONTO_AGGRESSIV.cst) await login(KONTO_AGGRESSIV);
+
+    const equityMittel    = await getEquity(KONTO_MITTEL);
+    const equityAggressiv = await getEquity(KONTO_AGGRESSIV);
+
+    res.json({
+      letzteAktualisierung,
+      mittel: {
+        ...performance.mittel,
+        aktuellesEquity: equityMittel,
+        gesamtPnL:       performance.mittel.gesamtPnL.toFixed(2),
+        drawdown:        performance.mittel.trades === 0 ? '0.00' : (((STRATEGIEN.mittel.startEquity - equityMittel) / STRATEGIEN.mittel.startEquity) * 100).toFixed(2),
+        winRate:         performance.mittel.trades > 0 ? ((performance.mittel.gewinn / performance.mittel.trades) * 100).toFixed(1) : '0'
+      },
+      aggressiv: {
+        ...performance.aggressiv,
+        aktuellesEquity: equityAggressiv,
+        gesamtPnL:       performance.aggressiv.gesamtPnL.toFixed(2),
+        drawdown:        performance.aggressiv.trades === 0 ? '0.00' : (((STRATEGIEN.aggressiv.startEquity - equityAggressiv) / STRATEGIEN.aggressiv.startEquity) * 100).toFixed(2),
+        winRate:         performance.aggressiv.trades > 0 ? ((performance.aggressiv.gewinn / performance.aggressiv.trades) * 100).toFixed(1) : '0'
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ fehler: err.message });
+  }
+});
+
+// ── Reset ─────────────────────────────────────────────
+app.post('/api/reset', (req, res) => {
+  performance = {
+    mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10500 },
+    aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10500 }
+  };
+  letzteEquity = { mittel: 10500, aggressiv: 10500 };
+  letzteAktualisierung = new Date().toISOString();
+  res.json({ status: 'ok' });
+});
+
+// ── Test ──────────────────────────────────────────────
+app.get('/test', async (req, res) => {
+  try {
+    if (!KONTO_MITTEL.cst)    await login(KONTO_MITTEL);
+    if (!KONTO_AGGRESSIV.cst) await login(KONTO_AGGRESSIV);
+    const equityMittel    = await getEquity(KONTO_MITTEL);
+    const equityAggressiv = await getEquity(KONTO_AGGRESSIV);
+    res.json({
+      status:           '✅ Beide Konten verbunden',
+      equityMittel:     equityMittel + '€',
+      equityAggressiv:  equityAggressiv + '€'
+    });
+  } catch (err) {
+    res.json({ status: '❌ Fehler', fehler: err.message });
+  }
+});
+
+// ── Dashboard ─────────────────────────────────────────
+app.get('/dashboard', (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Bot Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, sans-serif; background: #0f0f0f; color: #fff; padding: 24px; }
+  h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+  .subtitle { color: #666; font-size: 14px; margin-bottom: 32px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .card { background: #1a1a1a; border-radius: 12px; padding: 24px; border: 1px solid #222; }
+  .card h2 { font-size: 14px; color: #888; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+  .card.full { grid-column: 1 / -1; }
+  .equity { font-size: 36px; font-weight: 700; }
+  .stat { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; }
+  .stat:last-child { border-bottom: none; }
+  .stat-label { color: #888; font-size: 14px; }
+  .stat-value { font-size: 15px; font-weight: 600; }
+  .pos { color: #22c55e; }
+  .neg { color: #ef4444; }
+  .tag { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .tag-mittel { background: #1e3a5f; color: #60a5fa; }
+  .tag-aggressiv { background: #3b1f00; color: #fb923c; }
+  .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; margin-right: 8px; }
+  .btn-refresh { background: #222; color: #fff; }
+  .btn-reset { background: #2a0000; color: #ef4444; }
+</style>
+</head>
+<body>
+<h1>Trading Bot Dashboard</h1>
+<p class="subtitle" id="updatezeit">Wird geladen...</p>
+
+<div class="grid">
+  <div class="card">
+    <h2><span class="tag tag-mittel">Mittel</span></h2>
+    <div class="equity pos" id="m-equity">...</div>
+    <br>
+    <div class="stat"><span class="stat-label">Trades gesamt</span><span class="stat-value" id="m-trades">-</span></div>
+    <div class="stat"><span class="stat-label">Gewinn-Trades</span><span class="stat-value pos" id="m-gewinn">-</span></div>
+    <div class="stat"><span class="stat-label">Verlust-Trades</span><span class="stat-value neg" id="m-verlust">-</span></div>
+    <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="m-winrate">-</span></div>
+    <div class="stat"><span class="stat-label">Gesamt PnL</span><span class="stat-value" id="m-pnl">-</span></div>
+    <div class="stat"><span class="stat-label">Bester Trade</span><span class="stat-value pos" id="m-best">-</span></div>
+    <div class="stat"><span class="stat-label">Schlechtester Trade</span><span class="stat-value neg" id="m-worst">-</span></div>
+    <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="m-dd">-</span></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="tag tag-aggressiv">Aggressiv</span></h2>
+    <div class="equity pos" id="a-equity">...</div>
+    <br>
+    <div class="stat"><span class="stat-label">Trades gesamt</span><span class="stat-value" id="a-trades">-</span></div>
+    <div class="stat"><span class="stat-label">Gewinn-Trades</span><span class="stat-value pos" id="a-gewinn">-</span></div>
+    <div class="stat"><span class="stat-label">Verlust-Trades</span><span class="stat-value neg" id="a-verlust">-</span></div>
+    <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="a-winrate">-</span></div>
+    <div class="stat"><span class="stat-label">Gesamt PnL</span><span class="stat-value" id="a-pnl">-</span></div>
+    <div class="stat"><span class="stat-label">Bester Trade</span><span class="stat-value pos" id="a-best">-</span></div>
+    <div class="stat"><span class="stat-label">Schlechtester Trade</span><span class="stat-value neg" id="a-worst">-</span></div>
+    <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="a-dd">-</span></div>
+  </div>
+</div>
+
+<button class="btn btn-refresh" onclick="laden()">Aktualisieren</button>
+<button class="btn btn-reset" onclick="reset()">Statistik zurücksetzen</button>
+
+<script>
+function pnlFarbe(val) {
+  return val > 0 ? 'pos' : val < 0 ? 'neg' : '';
+}
+
+async function laden() {
+  const res  = await fetch('/api/performance');
+  const data = await res.json();
+
+  document.getElementById('updatezeit').textContent = 'Letzte Aktualisierung: ' + new Date(data.letzteAktualisierung).toLocaleString('de-DE');
+
+  const m = data.mittel;
+  document.getElementById('m-equity').textContent  = parseFloat(m.aktuellesEquity).toFixed(2) + ' €';
+  document.getElementById('m-trades').textContent  = m.trades;
+  document.getElementById('m-gewinn').textContent  = m.gewinn;
+  document.getElementById('m-verlust').textContent = m.verlust;
+  document.getElementById('m-winrate').textContent = m.winRate + '%';
+  const mPnl = document.getElementById('m-pnl');
+  mPnl.textContent = (m.gesamtPnL >= 0 ? '+' : '') + parseFloat(m.gesamtPnL).toFixed(2) + ' €';
+  mPnl.className   = 'stat-value ' + pnlFarbe(parseFloat(m.gesamtPnL));
+  document.getElementById('m-best').textContent    = '+' + parseFloat(m.bestesTrade).toFixed(2) + ' €';
+  document.getElementById('m-worst').textContent   = parseFloat(m.schlechtestesTrade).toFixed(2) + ' €';
+  document.getElementById('m-dd').textContent      = m.drawdown + '%';
+
+  const a = data.aggressiv;
+  document.getElementById('a-equity').textContent  = parseFloat(a.aktuellesEquity).toFixed(2) + ' €';
+  document.getElementById('a-trades').textContent  = a.trades;
+  document.getElementById('a-gewinn').textContent  = a.gewinn;
+  document.getElementById('a-verlust').textContent = a.verlust;
+  document.getElementById('a-winrate').textContent = a.winRate + '%';
+  const aPnl = document.getElementById('a-pnl');
+  aPnl.textContent = (a.gesamtPnL >= 0 ? '+' : '') + parseFloat(a.gesamtPnL).toFixed(2) + ' €';
+  aPnl.className   = 'stat-value ' + pnlFarbe(parseFloat(a.gesamtPnL));
+  document.getElementById('a-best').textContent    = '+' + parseFloat(a.bestesTrade).toFixed(2) + ' €';
+  document.getElementById('a-worst').textContent   = parseFloat(a.schlechtestesTrade).toFixed(2) + ' €';
+  document.getElementById('a-dd').textContent      = a.drawdown + '%';
+}
+
+async function reset() {
+  if (!confirm('Statistik wirklich zurücksetzen?')) return;
+  await fetch('/api/reset', { method: 'POST' });
+  laden();
+}
+
+laden();
+</script>
+</body>
+</html>`);
+});
+
+app.listen(3000, () => console.log('🚀 Server läuft auf http://localhost:3000'));
