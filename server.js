@@ -30,7 +30,7 @@ const STRATEGIEN = {
     reservePct:     100,
     leverage:       10,
     maxDrawdownPct: 20,
-    startEquity:    10500
+    startEquity:    1000
   },
   aggressiv: {
     konto:          KONTO_AGGRESSIV,
@@ -39,16 +39,16 @@ const STRATEGIEN = {
     reservePct:     100,
     leverage:       10,
     maxDrawdownPct: 30,
-    startEquity:    10500
+    startEquity:    1000
   }
 };
 
 let performance = {
   mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10500 },
-  aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10500 }
+  aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10000 }
 };
 
-let letzteEquity = { mittel: 10500, aggressiv: 10500 };
+let letzteEquity = { mittel: 10000, aggressiv: 1000 };
 let letzteAktualisierung = new Date().toISOString();
 
 async function login(konto) {
@@ -229,9 +229,9 @@ app.get('/api/performance', async (req, res) => {
 app.post('/api/reset', (req, res) => {
   performance = {
     mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10500 },
-    aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10500 }
+    aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 }
   };
-  letzteEquity = { mittel: 10500, aggressiv: 10500 };
+  letzteEquity = { mittel: 10500, aggressiv: 1000 };
   letzteAktualisierung = new Date().toISOString();
   res.json({ status: 'ok' });
 });
