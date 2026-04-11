@@ -26,9 +26,9 @@ const STRATEGIEN = {
   mittel: {
     konto:          KONTO_MITTEL,
     epic:           'GOLD',
-    riskPct:        1.5,
+    riskPct:        1.7,
     reservePct:     100,
-    leverage:       5,
+    leverage:       10,
     maxDrawdownPct: 20,
     startEquity:    10500
   },
@@ -37,7 +37,7 @@ const STRATEGIEN = {
     epic:           'GOLD',
     riskPct:        3.1,
     reservePct:     100,
-    leverage:       5,
+    leverage:       10,
     maxDrawdownPct: 30,
     startEquity:    10500
   }
