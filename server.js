@@ -356,10 +356,31 @@ app.get('/dashboard', (req, res) => {
     <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="a-dd">-</span></div>
   </div>
 </div>
+<div class="card" style="margin-bottom:16px;grid-column:1/-1">
+  <h2>Ein- / Auszahlung</h2>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+    <div>
+      <div style="color:#888;font-size:12px;margin-bottom:6px">Betrag (€)</div>
+      <input type="number" id="betrag" placeholder="z.B. 500" style="background:#222;border:1px solid #333;color:#fff;padding:10px;border-radius:8px;width:140px;font-size:14px">
+    </div>
+    <div>
+      <div style="color:#888;font-size:12px;margin-bottom:6px">Strategie</div>
+      <select id="strategie" style="background:#222;border:1px solid #333;color:#fff;padding:10px;border-radius:8px;font-size:14px">
+        <option value="mittel">Mittel</option>
+        <option value="aggressiv">Aggressiv</option>
+        <option value="beide">Beide</option>
+      </select>
+    </div>
+    <button class="btn" style="background:#1a3a1a;color:#22c55e" onclick="einzahlung()">Einzahlen</button>
+    <button class="btn" style="background:#3a1a1a;color:#ef4444" onclick="auszahlung()">Auszahlen</button>
+  </div>
+  <div id="zahlung-status" style="margin-top:12px;font-size:13px;color:#888"></div>
+</div>
 <button class="btn btn-refresh" onclick="laden()">Aktualisieren</button>
 <button class="btn btn-reset" onclick="reset()">Statistik zurücksetzen</button>
 <script>
 function pnlFarbe(val) { return val > 0 ? 'pos' : val < 0 ? 'neg' : ''; }
+
 async function laden() {
   const res  = await fetch('/api/performance');
   const data = await res.json();
@@ -389,11 +410,31 @@ async function laden() {
   document.getElementById('a-worst').textContent   = parseFloat(a.schlechtestesTrade).toFixed(2) + ' €';
   document.getElementById('a-dd').textContent      = a.drawdown + '%';
 }
+
 async function reset() {
   if (!confirm('Statistik wirklich zurücksetzen?')) return;
   await fetch('/api/reset', { method: 'POST' });
   laden();
 }
+
+async function einzahlung() {
+  const betrag    = document.getElementById('betrag').value;
+  const strategie = document.getElementById('strategie').value;
+  if (!betrag) return alert('Bitte Betrag eingeben!');
+  await fetch('/api/einzahlung?betrag=' + betrag + '&strategie=' + strategie);
+  document.getElementById('zahlung-status').textContent = '✅ Einzahlung: ' + betrag + '€ für ' + strategie;
+  laden();
+}
+
+async function auszahlung() {
+  const betrag    = document.getElementById('betrag').value;
+  const strategie = document.getElementById('strategie').value;
+  if (!betrag) return alert('Bitte Betrag eingeben!');
+  await fetch('/api/auszahlung?betrag=' + betrag + '&strategie=' + strategie);
+  document.getElementById('zahlung-status').textContent = '💸 Auszahlung: ' + betrag + '€ für ' + strategie;
+  laden();
+}
+
 laden();
 </script>
 </body>
