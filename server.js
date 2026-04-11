@@ -472,4 +472,69 @@ app.post('/webhook/update_sl/:strategie', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// ── Einzahlung ────────────────────────────────────────
+app.get('/api/einzahlung', (req, res) => {
+  const betrag    = parseFloat(req.query.betrag);
+  const strategie = req.query.strategie;
+
+  if (!betrag || betrag <= 0) {
+    return res.status(400).json({ error: 'Ungültiger Betrag' });
+  }
+
+  if (strategie === 'mittel' || strategie === 'beide') {
+    STRATEGIEN.mittel.startEquity    += betrag;
+    letzteEquity.mittel              += betrag;
+    performance.mittel.startEquity   += betrag;
+  }
+
+  if (strategie === 'aggressiv' || strategie === 'beide') {
+    STRATEGIEN.aggressiv.startEquity  += betrag;
+    letzteEquity.aggressiv            += betrag;
+    performance.aggressiv.startEquity += betrag;
+  }
+
+  sendTelegram(`💰 <b>Einzahlung</b>\nBetrag: <b>${betrag}€</b>\nStrategie: <b>${strategie}</b>`);
+
+  console.log(`💰 Einzahlung: ${betrag}€ für ${strategie}`);
+  res.json({
+    status: 'ok',
+    betrag,
+    strategie,
+    neuesStartkapitalMittel:    STRATEGIEN.mittel.startEquity,
+    neuesStartkapitalAggressiv: STRATEGIEN.aggressiv.startEquity
+  });
+});
+
+// ── Auszahlung ────────────────────────────────────────
+app.get('/api/auszahlung', (req, res) => {
+  const betrag    = parseFloat(req.query.betrag);
+  const strategie = req.query.strategie;
+
+  if (!betrag || betrag <= 0) {
+    return res.status(400).json({ error: 'Ungültiger Betrag' });
+  }
+
+  if (strategie === 'mittel' || strategie === 'beide') {
+    STRATEGIEN.mittel.startEquity    -= betrag;
+    letzteEquity.mittel              -= betrag;
+    performance.mittel.startEquity   -= betrag;
+  }
+
+  if (strategie === 'aggressiv' || strategie === 'beide') {
+    STRATEGIEN.aggressiv.startEquity  -= betrag;
+    letzteEquity.aggressiv            -= betrag;
+    performance.aggressiv.startEquity -= betrag;
+  }
+
+  sendTelegram(`💸 <b>Auszahlung</b>\nBetrag: <b>${betrag}€</b>\nStrategie: <b>${strategie}</b>`);
+
+  console.log(`💸 Auszahlung: ${betrag}€ für ${strategie}`);
+  res.json({
+    status: 'ok',
+    betrag,
+    strategie,
+    neuesStartkapitalMittel:    STRATEGIEN.mittel.startEquity,
+    neuesStartkapitalAggressiv: STRATEGIEN.aggressiv.startEquity
+  });
+});
 app.listen(3000, () => console.log('🚀 Server läuft auf http://localhost:3000'));
