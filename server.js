@@ -426,6 +426,41 @@ app.get('/test/trade', async (req, res) => {
         'X-SECURITY-TOKEN': KONTO_AGGRESSIV.token
       }
     });
+app.get('/test/trade', async (req, res) => {
+  try {
+    if (!KONTO_AGGRESSIV.cst) await login(KONTO_AGGRESSIV);
+
+    const equity = await getEquity(KONTO_AGGRESSIV);
+
+    const marketRes = await axios.get(`${KONTO_AGGRESSIV.baseUrl}/markets/GOLD`, {
+      headers: {
+        'X-CAP-API-KEY':    KONTO_AGGRESSIV.apiKey,
+        'CST':              KONTO_AGGRESSIV.cst,
+        'X-SECURITY-TOKEN': KONTO_AGGRESSIV.token
+      }
+    });
+
+    const currentPrice = marketRes.data.snapshot.offer;
+    const sl = (currentPrice * 0.99).toFixed(2);
+    const tp = (currentPrice * 1.02).toFixed(2);
+    const size = calcSize(equity, sl, tp, STRATEGIEN.aggressiv);
+
+    const order = {
+      epic:           'GOLD',
+      direction:      'BUY',
+      size:           size,
+      guaranteedStop: false,
+      stopLevel:      parseFloat(sl),
+      profitLevel:    parseFloat(tp)
+    };
+
+    const response = await axios.post(`${KONTO_AGGRESSIV.baseUrl}/positions`, order, {
+      headers: {
+        'X-CAP-API-KEY':    KONTO_AGGRESSIV.apiKey,
+        'CST':              KONTO_AGGRESSIV.cst,
+        'X-SECURITY-TOKEN': KONTO_AGGRESSIV.token
+      }
+    });
 
     await sendTelegram(
       `🟢 <b>TEST LONG eröffnet</b>\n` +
