@@ -4,7 +4,6 @@ const axios = require('axios');
 const app = express();
 app.use(express.json());
 
-// ── Konto 1: Mittel ───────────────────────────────────
 const KONTO_MITTEL = {
   apiKey:   process.env.API_KEY,
   email:    process.env.EMAIL,
@@ -14,7 +13,6 @@ const KONTO_MITTEL = {
   token:    null
 };
 
-// ── Konto 2: Aggressiv ────────────────────────────────
 const KONTO_AGGRESSIV = {
   apiKey:   process.env.API_KEY_AGGRESSIV,
   email:    process.env.EMAIL_AGGRESSIV,
@@ -24,7 +22,6 @@ const KONTO_AGGRESSIV = {
   token:    null
 };
 
-// ── Strategien ────────────────────────────────────────
 const STRATEGIEN = {
   mittel: {
     konto:          KONTO_MITTEL,
@@ -46,24 +43,14 @@ const STRATEGIEN = {
   }
 };
 
-// ── Performance Tracking ──────────────────────────────
 let performance = {
-  mittel: {
-    trades: 0, gewinn: 0, verlust: 0,
-    gesamtPnL: 0, bestesTrade: 0,
-    schlechtestesTrade: 0, startEquity: 10500
-  },
-  aggressiv: {
-    trades: 0, gewinn: 0, verlust: 0,
-    gesamtPnL: 0, bestesTrade: 0,
-    schlechtestesTrade: 0, startEquity: 10500
-  }
+  mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10500 },
+  aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10500 }
 };
 
 let letzteEquity = { mittel: 10500, aggressiv: 10500 };
 let letzteAktualisierung = new Date().toISOString();
 
-// ── Login ─────────────────────────────────────────────
 async function login(konto) {
   const res = await axios.post(`${konto.baseUrl}/session`, {
     identifier: konto.email,
@@ -74,7 +61,6 @@ async function login(konto) {
   console.log(`✅ Login erfolgreich: ${konto.email}`);
 }
 
-// ── Equity holen ──────────────────────────────────────
 async function getEquity(konto) {
   try {
     const res = await axios.get(`${konto.baseUrl}/accounts`, {
@@ -100,15 +86,13 @@ async function getEquity(konto) {
   }
 }
 
-// ── Drawdown prüfen ───────────────────────────────────
 function checkDrawdown(equity, strategie, strategieName) {
   if (performance[strategieName].trades === 0) return false;
   const drawdown = ((strategie.startEquity - equity) / strategie.startEquity) * 100;
-  console.log(`📉 [${strategieName}] Drawdown: ${drawdown.toFixed(2)}% (Max: ${strategie.maxDrawdownPct}%)`);
+  console.log(`📉 [${strategieName}] Drawdown: ${drawdown.toFixed(2)}%`);
   return drawdown >= strategie.maxDrawdownPct;
 }
 
-// ── Positionsgröße berechnen ──────────────────────────
 function calcSize(equity, sl, tp, strategie) {
   const riskCapital = equity * (strategie.riskPct / 100) * strategie.leverage;
   const slDistance  = Math.abs(parseFloat(tp) - parseFloat(sl));
@@ -118,7 +102,6 @@ function calcSize(equity, sl, tp, strategie) {
   return Math.max(1, parseFloat(size.toFixed(1)));
 }
 
-// ── Performance updaten ───────────────────────────────
 function updatePerformance(strategieName, pnl) {
   const p = performance[strategieName];
   p.trades++;
@@ -129,12 +112,12 @@ function updatePerformance(strategieName, pnl) {
   if (pnl < p.schlechtestesTrade) p.schlechtestesTrade = pnl;
   letzteAktualisierung = new Date().toISOString();
 }
-// ── Telegram Benachrichtigung ─────────────────────────
+
 async function sendTelegram(nachricht) {
   try {
     await axios.post(`https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`, {
-      chat_id: process.env.TELEGRAM_CHAT_ID,
-      text: nachricht,
+      chat_id:    process.env.TELEGRAM_CHAT_ID,
+      text:       nachricht,
       parse_mode: 'HTML'
     });
     console.log('📱 Telegram Nachricht gesendet');
@@ -142,7 +125,7 @@ async function sendTelegram(nachricht) {
     console.error('❌ Telegram Fehler:', err.message);
   }
 }
-// ── Webhook Handler ───────────────────────────────────
+
 async function handleWebhook(req, res, strategieName) {
   console.log(`📨 Signal [${strategieName}]:`, req.body);
   const { side, sl, tp } = req.body;
@@ -161,6 +144,7 @@ async function handleWebhook(req, res, strategieName) {
 
     if (checkDrawdown(equity, strategie, strategieName)) {
       console.log(`🛑 [${strategieName}] Max. Drawdown erreicht!`);
+      await sendTelegram(`🛑 <b>Bot gestoppt!</b>\nStrategie: <b>${strategieName}</b>\nMax. Drawdown erreicht!`);
       return res.json({ status: 'gestoppt', grund: 'Max. Drawdown erreicht' });
     }
 
@@ -180,7 +164,7 @@ async function handleWebhook(req, res, strategieName) {
 
     console.log(`📤 [${strategieName}] Order:`, order);
 
-    const response = await axios.post(`${konto.baseUrl}/positions`, order, {
+    await axios.post(`${konto.baseUrl}/positions`, order, {
       headers: {
         'X-CAP-API-KEY':    konto.apiKey,
         'CST':              konto.cst,
@@ -189,14 +173,15 @@ async function handleWebhook(req, res, strategieName) {
     });
 
     console.log(`✅ [${strategieName}] Order platziert`);
-// Telegram Benachrichtigung
-await sendTelegram(
-  `${side === 'BUY' ? '🟢' : '🔴'} <b>${side === 'BUY' ? 'LONG' : 'SHORT'} eröffnet</b>\n` +
-  `Strategie: <b>${strategieName}</b>\n` +
-  `Größe: <b>${size} Units</b>\n` +
-  `SL: <b>${sl}$</b>\n` +
-  `TP: <b>${tp}$</b>`
-);
+
+    await sendTelegram(
+      `${side === 'BUY' ? '🟢' : '🔴'} <b>${side === 'BUY' ? 'LONG' : 'SHORT'} eröffnet</b>\n` +
+      `Strategie: <b>${strategieName}</b>\n` +
+      `Größe: <b>${size} Units</b>\n` +
+      `SL: <b>${sl}$</b>\n` +
+      `TP: <b>${tp}$</b>`
+    );
+
     res.json({ status: 'ok', strategie: strategieName, size });
 
   } catch (err) {
@@ -210,19 +195,15 @@ await sendTelegram(
   }
 }
 
-// ── Webhook Routen ────────────────────────────────────
 app.post('/webhook/mittel',    (req, res) => handleWebhook(req, res, 'mittel'));
 app.post('/webhook/aggressiv', (req, res) => handleWebhook(req, res, 'aggressiv'));
 
-// ── Performance API ───────────────────────────────────
 app.get('/api/performance', async (req, res) => {
   try {
     if (!KONTO_MITTEL.cst)    await login(KONTO_MITTEL);
     if (!KONTO_AGGRESSIV.cst) await login(KONTO_AGGRESSIV);
-
     const equityMittel    = await getEquity(KONTO_MITTEL);
     const equityAggressiv = await getEquity(KONTO_AGGRESSIV);
-
     res.json({
       letzteAktualisierung,
       mittel: {
@@ -245,7 +226,6 @@ app.get('/api/performance', async (req, res) => {
   }
 });
 
-// ── Reset ─────────────────────────────────────────────
 app.post('/api/reset', (req, res) => {
   performance = {
     mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10500 },
@@ -256,7 +236,6 @@ app.post('/api/reset', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// ── Test ──────────────────────────────────────────────
 app.get('/test', async (req, res) => {
   try {
     if (!KONTO_MITTEL.cst)    await login(KONTO_MITTEL);
@@ -264,16 +243,58 @@ app.get('/test', async (req, res) => {
     const equityMittel    = await getEquity(KONTO_MITTEL);
     const equityAggressiv = await getEquity(KONTO_AGGRESSIV);
     res.json({
-      status:           '✅ Beide Konten verbunden',
-      equityMittel:     equityMittel + '€',
-      equityAggressiv:  equityAggressiv + '€'
+      status:          '✅ Beide Konten verbunden',
+      equityMittel:    equityMittel + '€',
+      equityAggressiv: equityAggressiv + '€'
     });
   } catch (err) {
     res.json({ status: '❌ Fehler', fehler: err.message });
   }
 });
 
-// ── Dashboard ─────────────────────────────────────────
+app.get('/test/trade', async (req, res) => {
+  try {
+    if (!KONTO_AGGRESSIV.cst) await login(KONTO_AGGRESSIV);
+    const equity = await getEquity(KONTO_AGGRESSIV);
+    const marketRes = await axios.get(`${KONTO_AGGRESSIV.baseUrl}/markets/GOLD`, {
+      headers: {
+        'X-CAP-API-KEY':    KONTO_AGGRESSIV.apiKey,
+        'CST':              KONTO_AGGRESSIV.cst,
+        'X-SECURITY-TOKEN': KONTO_AGGRESSIV.token
+      }
+    });
+    const currentPrice = marketRes.data.snapshot.offer;
+    const sl   = (currentPrice * 0.99).toFixed(2);
+    const tp   = (currentPrice * 1.02).toFixed(2);
+    const size = calcSize(equity, sl, tp, STRATEGIEN.aggressiv);
+    const order = {
+      epic:           'GOLD',
+      direction:      'BUY',
+      size:           size,
+      guaranteedStop: false,
+      stopLevel:      parseFloat(sl),
+      profitLevel:    parseFloat(tp)
+    };
+    await axios.post(`${KONTO_AGGRESSIV.baseUrl}/positions`, order, {
+      headers: {
+        'X-CAP-API-KEY':    KONTO_AGGRESSIV.apiKey,
+        'CST':              KONTO_AGGRESSIV.cst,
+        'X-SECURITY-TOKEN': KONTO_AGGRESSIV.token
+      }
+    });
+    await sendTelegram(
+      `🟢 <b>TEST LONG eröffnet</b>\n` +
+      `Strategie: <b>Aggressiv</b>\n` +
+      `Größe: <b>${size} Units</b>\n` +
+      `SL: <b>${sl}$</b>\n` +
+      `TP: <b>${tp}$</b>`
+    );
+    res.json({ status: '✅ Test Trade platziert!', size, sl, tp });
+  } catch (err) {
+    res.json({ fehler: err.response?.data || err.message });
+  }
+});
+
 app.get('/dashboard', (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="de">
@@ -289,7 +310,6 @@ app.get('/dashboard', (req, res) => {
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
   .card { background: #1a1a1a; border-radius: 12px; padding: 24px; border: 1px solid #222; }
   .card h2 { font-size: 14px; color: #888; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
-  .card.full { grid-column: 1 / -1; }
   .equity { font-size: 36px; font-weight: 700; }
   .stat { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; }
   .stat:last-child { border-bottom: none; }
@@ -308,7 +328,6 @@ app.get('/dashboard', (req, res) => {
 <body>
 <h1>Trading Bot Dashboard</h1>
 <p class="subtitle" id="updatezeit">Wird geladen...</p>
-
 <div class="grid">
   <div class="card">
     <h2><span class="tag tag-mittel">Mittel</span></h2>
@@ -323,7 +342,6 @@ app.get('/dashboard', (req, res) => {
     <div class="stat"><span class="stat-label">Schlechtester Trade</span><span class="stat-value neg" id="m-worst">-</span></div>
     <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="m-dd">-</span></div>
   </div>
-
   <div class="card">
     <h2><span class="tag tag-aggressiv">Aggressiv</span></h2>
     <div class="equity pos" id="a-equity">...</div>
@@ -338,21 +356,14 @@ app.get('/dashboard', (req, res) => {
     <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="a-dd">-</span></div>
   </div>
 </div>
-
 <button class="btn btn-refresh" onclick="laden()">Aktualisieren</button>
 <button class="btn btn-reset" onclick="reset()">Statistik zurücksetzen</button>
-
 <script>
-function pnlFarbe(val) {
-  return val > 0 ? 'pos' : val < 0 ? 'neg' : '';
-}
-
+function pnlFarbe(val) { return val > 0 ? 'pos' : val < 0 ? 'neg' : ''; }
 async function laden() {
   const res  = await fetch('/api/performance');
   const data = await res.json();
-
   document.getElementById('updatezeit').textContent = 'Letzte Aktualisierung: ' + new Date(data.letzteAktualisierung).toLocaleString('de-DE');
-
   const m = data.mittel;
   document.getElementById('m-equity').textContent  = parseFloat(m.aktuellesEquity).toFixed(2) + ' €';
   document.getElementById('m-trades').textContent  = m.trades;
@@ -365,7 +376,6 @@ async function laden() {
   document.getElementById('m-best').textContent    = '+' + parseFloat(m.bestesTrade).toFixed(2) + ' €';
   document.getElementById('m-worst').textContent   = parseFloat(m.schlechtestesTrade).toFixed(2) + ' €';
   document.getElementById('m-dd').textContent      = m.drawdown + '%';
-
   const a = data.aggressiv;
   document.getElementById('a-equity').textContent  = parseFloat(a.aktuellesEquity).toFixed(2) + ' €';
   document.getElementById('a-trades').textContent  = a.trades;
@@ -379,101 +389,15 @@ async function laden() {
   document.getElementById('a-worst').textContent   = parseFloat(a.schlechtestesTrade).toFixed(2) + ' €';
   document.getElementById('a-dd').textContent      = a.drawdown + '%';
 }
-
 async function reset() {
   if (!confirm('Statistik wirklich zurücksetzen?')) return;
   await fetch('/api/reset', { method: 'POST' });
   laden();
 }
-
 laden();
 </script>
 </body>
 </html>`);
 });
-app.get('/test/trade', async (req, res) => {
-  try {
-    if (!KONTO_AGGRESSIV.cst) await login(KONTO_AGGRESSIV);
 
-    const equity = await getEquity(KONTO_AGGRESSIV);
-
-    const marketRes = await axios.get(`${KONTO_AGGRESSIV.baseUrl}/markets/GOLD`, {
-      headers: {
-        'X-CAP-API-KEY':    KONTO_AGGRESSIV.apiKey,
-        'CST':              KONTO_AGGRESSIV.cst,
-        'X-SECURITY-TOKEN': KONTO_AGGRESSIV.token
-      }
-    });
-
-    const currentPrice = marketRes.data.snapshot.offer;
-    const sl = (currentPrice * 0.99).toFixed(2);
-    const tp = (currentPrice * 1.02).toFixed(2);
-    const size = calcSize(equity, sl, tp, STRATEGIEN.aggressiv);
-
-    const order = {
-      epic:           'GOLD',
-      direction:      'BUY',
-      size:           size,
-      guaranteedStop: false,
-      stopLevel:      parseFloat(sl),
-      profitLevel:    parseFloat(tp)
-    };
-
-    const response = await axios.post(`${KONTO_AGGRESSIV.baseUrl}/positions`, order, {
-      headers: {
-        'X-CAP-API-KEY':    KONTO_AGGRESSIV.apiKey,
-        'CST':              KONTO_AGGRESSIV.cst,
-        'X-SECURITY-TOKEN': KONTO_AGGRESSIV.token
-      }
-    });
-app.get('/test/trade', async (req, res) => {
-  try {
-    if (!KONTO_AGGRESSIV.cst) await login(KONTO_AGGRESSIV);
-
-    const equity = await getEquity(KONTO_AGGRESSIV);
-
-    const marketRes = await axios.get(`${KONTO_AGGRESSIV.baseUrl}/markets/GOLD`, {
-      headers: {
-        'X-CAP-API-KEY':    KONTO_AGGRESSIV.apiKey,
-        'CST':              KONTO_AGGRESSIV.cst,
-        'X-SECURITY-TOKEN': KONTO_AGGRESSIV.token
-      }
-    });
-
-    const currentPrice = marketRes.data.snapshot.offer;
-    const sl = (currentPrice * 0.99).toFixed(2);
-    const tp = (currentPrice * 1.02).toFixed(2);
-    const size = calcSize(equity, sl, tp, STRATEGIEN.aggressiv);
-
-    const order = {
-      epic:           'GOLD',
-      direction:      'BUY',
-      size:           size,
-      guaranteedStop: false,
-      stopLevel:      parseFloat(sl),
-      profitLevel:    parseFloat(tp)
-    };
-
-    const response = await axios.post(`${KONTO_AGGRESSIV.baseUrl}/positions`, order, {
-      headers: {
-        'X-CAP-API-KEY':    KONTO_AGGRESSIV.apiKey,
-        'CST':              KONTO_AGGRESSIV.cst,
-        'X-SECURITY-TOKEN': KONTO_AGGRESSIV.token
-      }
-    });
-
-    await sendTelegram(
-      `🟢 <b>TEST LONG eröffnet</b>\n` +
-      `Strategie: <b>Aggressiv</b>\n` +
-      `Größe: <b>${size} Units</b>\n` +
-      `SL: <b>${sl}$</b>\n` +
-      `TP: <b>${tp}$</b>`
-    );
-
-    res.json({ status: '✅ Test Trade platziert!', size, sl, tp });
-
-  } catch (err) {
-    res.json({ fehler: err.response?.data || err.message });
-  }
-});
 app.listen(3000, () => console.log('🚀 Server läuft auf http://localhost:3000'));
