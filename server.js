@@ -35,7 +35,7 @@ const STRATEGIEN = {
   aggressiv: {
     konto:          KONTO_AGGRESSIV,
     epic:           'GOLD',
-    riskPct:        3.1,
+    riskPct:        3.7,
     reservePct:     100,
     leverage:       10,
     maxDrawdownPct: 30,
