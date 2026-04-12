@@ -228,7 +228,7 @@ app.get('/api/performance', async (req, res) => {
 
 app.post('/api/reset', (req, res) => {
   performance = {
-    mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 10500 },
+    mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
     aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 }
   };
   letzteEquity = { mittel: 10500, aggressiv: 1000 };
