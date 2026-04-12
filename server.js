@@ -362,6 +362,11 @@ app.get('/dashboard', (req, res) => {
 <body>
 <h1>Trading Bot Dashboard</h1>
 <p class="subtitle" id="updatezeit">Wird geladen...</p>
+
+<div class="card" style="margin-bottom:16px">
+  <h2>Equity Kurve</h2>
+  <canvas id="equityChart" height="80"></canvas>
+</div>
 <div class="grid">
   <div class="card">
     <h2><span class="tag tag-mittel">Mittel</span></h2>
@@ -449,6 +454,54 @@ async function reset() {
   if (!confirm('Statistik wirklich zurücksetzen?')) return;
   await fetch('/api/reset', { method: 'POST' });
   laden();
+async function ladeChart() {
+  const res  = await fetch('/api/equity');
+  const data = await res.json();
+
+  const mittelDaten    = data.mittel    || [];
+  const aggressivDaten = data.aggressiv || [];
+
+  const labels = [...new Set([
+    ...mittelDaten.map(p => new Date(p.datum).toLocaleDateString('de-DE')),
+    ...aggressivDaten.map(p => new Date(p.datum).toLocaleDateString('de-DE'))
+  ])].sort();
+
+  const ctx = document.getElementById('equityChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label:           'Mittel',
+          data:            mittelDaten.map(p => p.equity),
+          borderColor:     '#60a5fa',
+          backgroundColor: 'rgba(96,165,250,0.1)',
+          tension:         0.3,
+          fill:            true
+        },
+        {
+          label:           'Aggressiv',
+          data:            aggressivDaten.map(p => p.equity),
+          borderColor:     '#fb923c',
+          backgroundColor: 'rgba(251,146,60,0.1)',
+          tension:         0.3,
+          fill:            true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#fff' } }
+      },
+      scales: {
+        x: { ticks: { color: '#888' }, grid: { color: '#222' } },
+        y: { ticks: { color: '#888', callback: v => v + '€' }, grid: { color: '#222' } }
+      }
+    }
+  });
+}
 }
 
 async function einzahlung() {
@@ -470,6 +523,7 @@ async function auszahlung() {
 }
 
 laden();
+ladeChart();
 </script>
 </body>
 </html>`);
