@@ -103,7 +103,41 @@ function calcSize(equity, sl, tp, strategie) {
 }
 
 function updatePerformance(strategieName, pnl) {
-  const p = performance[strategieName];
+  // ── Equity Kurve speichern ────────────────────────────
+const fs   = require('fs');
+const path = require('path');
+const EQUITY_FILE = '/data/equity.json';
+
+function ladeEquityDaten() {
+  try {
+    if (fs.existsSync(EQUITY_FILE)) {
+      return JSON.parse(fs.readFileSync(EQUITY_FILE, 'utf8'));
+    }
+  } catch (err) {
+    console.error('❌ Equity Datei laden fehlgeschlagen:', err.message);
+  }
+  return { mittel: [], aggressiv: [] };
+}
+
+function speichereEquityDaten(daten) {
+  try {
+    fs.writeFileSync(EQUITY_FILE, JSON.stringify(daten, null, 2));
+  } catch (err) {
+    console.error('❌ Equity Datei speichern fehlgeschlagen:', err.message);
+  }
+}
+
+let equityVerlauf = ladeEquityDaten();
+
+function equityPunktHinzufuegen(strategieName, equity) {
+  equityVerlauf[strategieName].push({
+    datum: new Date().toISOString(),
+    equity: parseFloat(equity)
+  });
+  speichereEquityDaten(equityVerlauf);
+  console.log(`📈 Equity Punkt gespeichert [${strategieName}]: ${equity}€`);
+}
+const p = performance[strategieName];
   p.trades++;
   p.gesamtPnL += pnl;
   if (pnl > 0) p.gewinn++;
@@ -151,7 +185,7 @@ async function handleWebhook(req, res, strategieName) {
     const pnl = equity - letzteEquity[strategieName];
     if (pnl !== 0) updatePerformance(strategieName, pnl);
     letzteEquity[strategieName] = equity;
-
+equityPunktHinzufuegen(strategieName, equity);
     const size  = calcSize(equity, sl, tp, strategie);
     const order = {
       epic:           strategie.epic,
@@ -577,5 +611,8 @@ app.get('/api/auszahlung', (req, res) => {
     neuesStartkapitalMittel:    STRATEGIEN.mittel.startEquity,
     neuesStartkapitalAggressiv: STRATEGIEN.aggressiv.startEquity
   });
+});
+app.get('/api/equity', (req, res) => {
+  res.json(equityVerlauf);
 });
 app.listen(3000, () => console.log('🚀 Server läuft auf http://localhost:3000'));
