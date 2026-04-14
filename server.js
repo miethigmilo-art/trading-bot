@@ -53,7 +53,8 @@ let letzteEquity         = { mittel: 1000, aggressiv: 1000 };
 let letzteAktualisierung = new Date().toISOString();
 
 // ── Equity Kurve ──────────────────────────────────────
-const EQUITY_FILE = '/data/equity.json';
+const EQUITY_FILE  = '/data/equity.json';
+const TRADES_FILE  = '/data/trades.json';
 
 function ladeEquityDaten() {
   try {
@@ -75,6 +76,67 @@ function speichereEquityDaten(daten) {
 }
 
 let equityVerlauf = ladeEquityDaten();
+
+// ── Trade History (persistent) ────────────────────────
+function ladeTradeHistory() {
+  try {
+    if (fs.existsSync(TRADES_FILE)) {
+      return JSON.parse(fs.readFileSync(TRADES_FILE, 'utf8'));
+    }
+  } catch (err) {
+    console.error('❌ Trade History laden fehlgeschlagen:', err.message);
+  }
+  return { mittel: [], aggressiv: [] };
+}
+
+function speichereTradeHistory(daten) {
+  try {
+    fs.writeFileSync(TRADES_FILE, JSON.stringify(daten, null, 2));
+  } catch (err) {
+    console.error('❌ Trade History speichern fehlgeschlagen:', err.message);
+  }
+}
+
+let tradeHistory = ladeTradeHistory();
+
+// ── Adaptiver Risiko-Rechner ───────────────────────────
+// Basis: Vereinfachtes Kelly Criterion
+// Multiplier bleibt zwischen 0.5x und 1.5x des Basisrisikos
+function adaptiveRisk(strategieName, baseRisk) {
+  const trades = tradeHistory[strategieName];
+  if (trades.length < 10) {
+    console.log(`🧠 [${strategieName}] Noch zu wenig Trades (${trades.length}/10) → Basisrisiko ${baseRisk}%`);
+    return baseRisk;
+  }
+
+  // Verlust-Streak Schutz: letzte 3 alle Verluste → Risiko halbieren
+  const letzte3 = trades.slice(-3);
+  if (letzte3.length === 3 && letzte3.every(t => t.pnl <= 0)) {
+    const reduziert = parseFloat((baseRisk * 0.5).toFixed(2));
+    console.log(`⚠️  [${strategieName}] 3er Verlust-Streak → Risiko auf ${reduziert}% reduziert`);
+    return reduziert;
+  }
+
+  const recent      = trades.slice(-20);
+  const gewinnT     = recent.filter(t => t.pnl > 0);
+  const verlustT    = recent.filter(t => t.pnl <= 0);
+  const winRate     = gewinnT.length / recent.length;
+
+  if (gewinnT.length === 0 || verlustT.length === 0) return baseRisk;
+
+  const avgWin  = gewinnT.reduce((s, t) => s + t.pnl, 0)              / gewinnT.length;
+  const avgLoss = Math.abs(verlustT.reduce((s, t) => s + t.pnl, 0))   / verlustT.length;
+  const ratio   = avgWin / avgLoss;
+
+  // Kelly: f* = WR - (1-WR)/ratio
+  const kelly      = winRate - (1 - winRate) / ratio;
+  // Multiplier: 0.5x bis 1.5x
+  const multiplier = Math.max(0.5, Math.min(1.5, 0.5 + kelly * 2));
+  const adjusted   = parseFloat((baseRisk * multiplier).toFixed(2));
+
+  console.log(`🧠 [${strategieName}] WR=${(winRate*100).toFixed(0)}% Ratio=${ratio.toFixed(2)} Kelly=${kelly.toFixed(3)} Mult=${multiplier.toFixed(2)}x → Risiko: ${baseRisk}% → ${adjusted}%`);
+  return adjusted;
+}
 
 function equityPunktHinzufuegen(strategieName, equity) {
   equityVerlauf[strategieName].push({
@@ -190,11 +252,16 @@ async function handleWebhook(req, res, strategieName) {
     }
 
     const pnl = equity - letzteEquity[strategieName];
-    if (pnl !== 0) updatePerformance(strategieName, pnl);
+    if (pnl !== 0) {
+      updatePerformance(strategieName, pnl);
+      tradeHistory[strategieName].push({ datum: new Date().toISOString(), pnl: parseFloat(pnl.toFixed(2)) });
+      speichereTradeHistory(tradeHistory);
+    }
     letzteEquity[strategieName] = equity;
     equityPunktHinzufuegen(strategieName, equity);
 
-    const size  = calcSize(equity, sl, tp, strategie);
+    const aktuellesRisiko = adaptiveRisk(strategieName, strategie.riskPct);
+    const size  = calcSize(equity, sl, tp, { ...strategie, riskPct: aktuellesRisiko });
     const order = {
       epic:           strategie.epic,
       direction:      side,
@@ -221,7 +288,8 @@ async function handleWebhook(req, res, strategieName) {
       `Strategie: <b>${strategieName}</b>\n` +
       `Größe: <b>${size} Units</b>\n` +
       `SL: <b>${sl}$</b>\n` +
-      `TP: <b>${tp}$</b>`
+      `TP: <b>${tp}$</b>\n` +
+      `🧠 Risiko: <b>${aktuellesRisiko}%</b> (Basis: ${strategie.riskPct}%)`
     );
 
     res.json({ status: 'ok', strategie: strategieName, size });
@@ -329,6 +397,28 @@ app.get('/api/performance', async (req, res) => {
 // ── Equity API ────────────────────────────────────────
 app.get('/api/equity', (req, res) => {
   res.json(equityVerlauf);
+});
+
+// ── Adaptive API ─────────────────────────────────────
+app.get('/api/adaptive', (req, res) => {
+  const result = {};
+  for (const name of ['mittel', 'aggressiv']) {
+    const strategie   = STRATEGIEN[name];
+    const trades      = tradeHistory[name];
+    const recent      = trades.slice(-20);
+    const gewinnT     = recent.filter(t => t.pnl > 0);
+    const letzte5     = trades.slice(-5).map(t => t.pnl > 0 ? 'W' : 'L').join('') || '-';
+    const adjusted    = adaptiveRisk(name, strategie.riskPct);
+    result[name] = {
+      basisRisiko:     strategie.riskPct,
+      aktuellesRisiko: adjusted,
+      multiplikator:   parseFloat((adjusted / strategie.riskPct).toFixed(2)),
+      gesamtTrades:    trades.length,
+      recentWinRate:   recent.length > 0 ? ((gewinnT.length / recent.length) * 100).toFixed(1) : '0',
+      letzte5Trades:   letzte5
+    };
+  }
+  res.json(result);
 });
 
 // ── Reset ─────────────────────────────────────────────
@@ -456,6 +546,28 @@ app.get('/dashboard', (req, res) => {
 <div class="card" style="margin-bottom:16px">
   <h2>Equity Kurve</h2>
   <canvas id="equityChart" height="80"></canvas>
+</div>
+
+<div class="card" style="margin-bottom:16px" id="adaptive-card">
+  <h2>🧠 Adaptives Risiko</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+    <div>
+      <div style="color:#60a5fa;font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Mittel</div>
+      <div class="stat"><span class="stat-label">Aktuelles Risiko</span><span class="stat-value" id="ad-m-risk">-</span></div>
+      <div class="stat"><span class="stat-label">Basis</span><span class="stat-value" id="ad-m-base">-</span></div>
+      <div class="stat"><span class="stat-label">Multiplikator</span><span class="stat-value" id="ad-m-mult">-</span></div>
+      <div class="stat"><span class="stat-label">Win Rate (letzte 20)</span><span class="stat-value" id="ad-m-wr">-</span></div>
+      <div class="stat"><span class="stat-label">Letzte 5 Trades</span><span class="stat-value" id="ad-m-streak">-</span></div>
+    </div>
+    <div>
+      <div style="color:#fb923c;font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Aggressiv</div>
+      <div class="stat"><span class="stat-label">Aktuelles Risiko</span><span class="stat-value" id="ad-a-risk">-</span></div>
+      <div class="stat"><span class="stat-label">Basis</span><span class="stat-value" id="ad-a-base">-</span></div>
+      <div class="stat"><span class="stat-label">Multiplikator</span><span class="stat-value" id="ad-a-mult">-</span></div>
+      <div class="stat"><span class="stat-label">Win Rate (letzte 20)</span><span class="stat-value" id="ad-a-wr">-</span></div>
+      <div class="stat"><span class="stat-label">Letzte 5 Trades</span><span class="stat-value" id="ad-a-streak">-</span></div>
+    </div>
+  </div>
 </div>
 
 <div class="grid">
@@ -598,8 +710,30 @@ async function ladeChart() {
   });
 }
 
+async function ladeAdaptiv() {
+  const res  = await fetch('/api/adaptive');
+  const data = await res.json();
+  const m = data.mittel, a = data.aggressiv;
+  function multFarbe(v) { return v > 1 ? 'pos' : v < 1 ? 'neg' : ''; }
+  document.getElementById('ad-m-risk').textContent   = m.aktuellesRisiko + '%';
+  document.getElementById('ad-m-base').textContent   = m.basisRisiko + '%';
+  const mMult = document.getElementById('ad-m-mult');
+  mMult.textContent = m.multiplikator + 'x';
+  mMult.className   = 'stat-value ' + multFarbe(m.multiplikator);
+  document.getElementById('ad-m-wr').textContent     = m.recentWinRate + '%';
+  document.getElementById('ad-m-streak').textContent = m.letzte5Trades;
+  document.getElementById('ad-a-risk').textContent   = a.aktuellesRisiko + '%';
+  document.getElementById('ad-a-base').textContent   = a.basisRisiko + '%';
+  const aMult = document.getElementById('ad-a-mult');
+  aMult.textContent = a.multiplikator + 'x';
+  aMult.className   = 'stat-value ' + multFarbe(a.multiplikator);
+  document.getElementById('ad-a-wr').textContent     = a.recentWinRate + '%';
+  document.getElementById('ad-a-streak').textContent = a.letzte5Trades;
+}
+
 laden();
 ladeChart();
+ladeAdaptiv();
 </script>
 </body>
 </html>`);
