@@ -388,39 +388,38 @@ app.post('/webhook/update_sl/:strategie', async (req, res) => {
 
 // ── Performance API ───────────────────────────────────
 app.get('/api/performance', async (req, res) => {
-  try {
-    if (!KONTO_MITTEL.cst)    await login(KONTO_MITTEL);
-    if (!KONTO_AGGRESSIV.cst) await login(KONTO_AGGRESSIV);
-    if (KONTO_GOLDGLOBE.apiKey && !KONTO_GOLDGLOBE.cst) await login(KONTO_GOLDGLOBE);
-
-    const [equityMittel, equityAggressiv] = await Promise.all([
-      getEquity(KONTO_MITTEL),
-      getEquity(KONTO_AGGRESSIV)
-    ]);
-    let equityGoldglobe = 1000;
-    if (KONTO_GOLDGLOBE.apiKey) equityGoldglobe = await getEquity(KONTO_GOLDGLOBE);
-
-    function kontoStats(name, equity) {
-      const p = performance[name];
-      const s = STRATEGIEN[name];
-      return {
-        ...p,
-        aktuellesEquity: equity,
-        gesamtPnL:  p.gesamtPnL.toFixed(2),
-        drawdown:   p.trades === 0 ? '0.00' : (((s.startEquity - equity) / s.startEquity) * 100).toFixed(2),
-        winRate:    p.trades > 0 ? ((p.gewinn / p.trades) * 100).toFixed(1) : '0'
-      };
-    }
-
-    res.json({
-      letzteAktualisierung,
-      mittel:    kontoStats('mittel',    equityMittel),
-      aggressiv: kontoStats('aggressiv', equityAggressiv),
-      goldglobe: kontoStats('goldglobe', equityGoldglobe)
-    });
-  } catch (err) {
-    res.status(500).json({ fehler: err.message });
+  function kontoStats(name, equity) {
+    const p = performance[name] || { trades:0, gewinn:0, verlust:0, gesamtPnL:0, bestesTrade:0, schlechtestesTrade:0, startEquity:1000 };
+    const s = STRATEGIEN[name];
+    return {
+      ...p,
+      aktuellesEquity: equity,
+      gesamtPnL:  p.gesamtPnL.toFixed(2),
+      drawdown:   p.trades === 0 ? '0.00' : (((s.startEquity - equity) / s.startEquity) * 100).toFixed(2),
+      winRate:    p.trades > 0 ? ((p.gewinn / p.trades) * 100).toFixed(1) : '0'
+    };
   }
+
+  async function safeEquity(konto, fallback) {
+    try {
+      if (!konto.apiKey) return fallback;
+      if (!konto.cst) await login(konto);
+      return await getEquity(konto);
+    } catch { return fallback; }
+  }
+
+  const [equityMittel, equityAggressiv, equityGoldglobe] = await Promise.all([
+    safeEquity(KONTO_MITTEL,    1000),
+    safeEquity(KONTO_AGGRESSIV, 1000),
+    safeEquity(KONTO_GOLDGLOBE, 1000)
+  ]);
+
+  res.json({
+    letzteAktualisierung,
+    mittel:    kontoStats('mittel',    equityMittel),
+    aggressiv: kontoStats('aggressiv', equityAggressiv),
+    goldglobe: kontoStats('goldglobe', equityGoldglobe)
+  });
 });
 
 // ── Equity API ────────────────────────────────────────
