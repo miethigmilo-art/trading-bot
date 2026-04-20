@@ -23,6 +23,15 @@ const KONTO_AGGRESSIV = {
   token:    null
 };
 
+const KONTO_GOLDGLOBE = {
+  apiKey:   process.env.API_KEY_GOLDGLOBE,
+  email:    process.env.EMAIL_GOLDGLOBE,
+  password: process.env.PASSWORD_GOLDGLOBE,
+  baseUrl:  process.env.BASE_URL,
+  cst:      null,
+  token:    null
+};
+
 const STRATEGIEN = {
   mittel: {
     konto:          KONTO_MITTEL,
@@ -36,20 +45,30 @@ const STRATEGIEN = {
   aggressiv: {
     konto:          KONTO_AGGRESSIV,
     epic:           'GOLD',
-    riskPct:        3.7,
+    riskPct:        5.5,
     reservePct:     100,
     leverage:       10,
     maxDrawdownPct: 30,
+    startEquity:    1000
+  },
+  goldglobe: {
+    konto:          KONTO_GOLDGLOBE,
+    epic:           'GOLD',
+    riskPct:        1.7,
+    reservePct:     100,
+    leverage:       10,
+    maxDrawdownPct: 20,
     startEquity:    1000
   }
 };
 
 let performance = {
   mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
-  aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 }
+  aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
+  goldglobe: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 }
 };
 
-let letzteEquity         = { mittel: 1000, aggressiv: 1000 };
+let letzteEquity = { mittel: 1000, aggressiv: 1000, goldglobe: 1000 };
 let letzteAktualisierung = new Date().toISOString();
 
 // ── Equity Kurve ──────────────────────────────────────
@@ -64,7 +83,7 @@ function ladeEquityDaten() {
   } catch (err) {
     console.error('❌ Equity Datei laden fehlgeschlagen:', err.message);
   }
-  return { mittel: [], aggressiv: [] };
+  return { mittel: [], aggressiv: [], goldglobe: [] };
 }
 
 function speichereEquityDaten(daten) {
@@ -86,7 +105,7 @@ function ladeTradeHistory() {
   } catch (err) {
     console.error('❌ Trade History laden fehlgeschlagen:', err.message);
   }
-  return { mittel: [], aggressiv: [] };
+  return { mittel: [], aggressiv: [], goldglobe: [] };
 }
 
 function speichereTradeHistory(daten) {
@@ -308,6 +327,7 @@ async function handleWebhook(req, res, strategieName) {
 // ── Webhook Routen ────────────────────────────────────
 app.post('/webhook/mittel',    (req, res) => handleWebhook(req, res, 'mittel'));
 app.post('/webhook/aggressiv', (req, res) => handleWebhook(req, res, 'aggressiv'));
+app.post('/webhook/goldglobe', (req, res) => handleWebhook(req, res, 'goldglobe'));
 
 // ── Offene Position holen ─────────────────────────────
 async function getOpenPosition(konto, epic) {
@@ -370,24 +390,32 @@ app.get('/api/performance', async (req, res) => {
   try {
     if (!KONTO_MITTEL.cst)    await login(KONTO_MITTEL);
     if (!KONTO_AGGRESSIV.cst) await login(KONTO_AGGRESSIV);
-    const equityMittel    = await getEquity(KONTO_MITTEL);
-    const equityAggressiv = await getEquity(KONTO_AGGRESSIV);
+    if (KONTO_GOLDGLOBE.apiKey && !KONTO_GOLDGLOBE.cst) await login(KONTO_GOLDGLOBE);
+
+    const [equityMittel, equityAggressiv] = await Promise.all([
+      getEquity(KONTO_MITTEL),
+      getEquity(KONTO_AGGRESSIV)
+    ]);
+    let equityGoldglobe = 1000;
+    if (KONTO_GOLDGLOBE.apiKey) equityGoldglobe = await getEquity(KONTO_GOLDGLOBE);
+
+    function kontoStats(name, equity) {
+      const p = performance[name];
+      const s = STRATEGIEN[name];
+      return {
+        ...p,
+        aktuellesEquity: equity,
+        gesamtPnL:  p.gesamtPnL.toFixed(2),
+        drawdown:   p.trades === 0 ? '0.00' : (((s.startEquity - equity) / s.startEquity) * 100).toFixed(2),
+        winRate:    p.trades > 0 ? ((p.gewinn / p.trades) * 100).toFixed(1) : '0'
+      };
+    }
+
     res.json({
       letzteAktualisierung,
-      mittel: {
-        ...performance.mittel,
-        aktuellesEquity: equityMittel,
-        gesamtPnL:       performance.mittel.gesamtPnL.toFixed(2),
-        drawdown:        performance.mittel.trades === 0 ? '0.00' : (((STRATEGIEN.mittel.startEquity - equityMittel) / STRATEGIEN.mittel.startEquity) * 100).toFixed(2),
-        winRate:         performance.mittel.trades > 0 ? ((performance.mittel.gewinn / performance.mittel.trades) * 100).toFixed(1) : '0'
-      },
-      aggressiv: {
-        ...performance.aggressiv,
-        aktuellesEquity: equityAggressiv,
-        gesamtPnL:       performance.aggressiv.gesamtPnL.toFixed(2),
-        drawdown:        performance.aggressiv.trades === 0 ? '0.00' : (((STRATEGIEN.aggressiv.startEquity - equityAggressiv) / STRATEGIEN.aggressiv.startEquity) * 100).toFixed(2),
-        winRate:         performance.aggressiv.trades > 0 ? ((performance.aggressiv.gewinn / performance.aggressiv.trades) * 100).toFixed(1) : '0'
-      }
+      mittel:    kontoStats('mittel',    equityMittel),
+      aggressiv: kontoStats('aggressiv', equityAggressiv),
+      goldglobe: kontoStats('goldglobe', equityGoldglobe)
     });
   } catch (err) {
     res.status(500).json({ fehler: err.message });
@@ -515,225 +543,178 @@ app.get('/dashboard', (req, res) => {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trading Bot Dashboard</title>
+<script src="https://unpkg.com/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, sans-serif; background: #0f0f0f; color: #fff; padding: 24px; }
-  h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
-  .subtitle { color: #666; font-size: 14px; margin-bottom: 32px; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-  .card { background: #1a1a1a; border-radius: 12px; padding: 24px; border: 1px solid #222; }
-  .card h2 { font-size: 14px; color: #888; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
-  .equity { font-size: 36px; font-weight: 700; }
-  .stat { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; }
+  body { font-family: -apple-system, sans-serif; background: #0a0e1a; color: #e0e6f0; padding: 16px; }
+  h1 { font-size: 20px; font-weight: 700; color: #f0c040; margin-bottom: 2px; }
+  .subtitle { color: #4a6080; font-size: 11px; margin-bottom: 14px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .card { background: #111827; border-radius: 10px; padding: 14px; border: 1px solid #1e2d45; }
+  .card-title { font-size: 10px; color: #4a6080; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .equity { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+  .stat { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #1a2540; font-size: 12px; }
   .stat:last-child { border-bottom: none; }
-  .stat-label { color: #888; font-size: 14px; }
-  .stat-value { font-size: 15px; font-weight: 600; }
+  .label { color: #4a6080; }
+  .val { font-weight: 600; }
   .pos { color: #22c55e; }
   .neg { color: #ef4444; }
-  .tag { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-  .tag-mittel { background: #1e3a5f; color: #60a5fa; }
-  .tag-aggressiv { background: #3b1f00; color: #fb923c; }
-  .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; margin-right: 8px; }
-  .btn-refresh { background: #222; color: #fff; }
-  .btn-reset { background: #2a0000; color: #ef4444; }
+  .tag { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .tag-m { background:#1e3a5f33;color:#60a5fa;border:1px solid #1e3a5f; }
+  .tag-a { background:#3b1f0033;color:#fb923c;border:1px solid #3b2000; }
+  .tag-g { background:#0f3a2033;color:#44cc88;border:1px solid #1a4a30; }
+  .btn { padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  a.expand { position:fixed;top:12px;right:12px;background:#1a2a4a;border:1px solid #2a4a6a;color:#6090c0;padding:6px 10px;border-radius:6px;font-size:11px;text-decoration:none; }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
 <body>
+<a href="/dashboard" target="_blank" class="expand">⛶ Vollbild</a>
 <h1>Trading Bot Dashboard</h1>
 <p class="subtitle" id="updatezeit">Wird geladen...</p>
 
-<div class="card" style="margin-bottom:16px">
-  <h2>Equity Kurve</h2>
-  <canvas id="equityChart" height="80"></canvas>
+<div class="card" style="margin-bottom:12px">
+  <div class="card-title">Equity Kurve</div>
+  <canvas id="equityChart" height="55"></canvas>
 </div>
 
-<div class="card" style="margin-bottom:16px" id="adaptive-card">
-  <h2>🧠 Adaptives Risiko</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
-    <div>
-      <div style="color:#60a5fa;font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Mittel</div>
-      <div class="stat"><span class="stat-label">Aktuelles Risiko</span><span class="stat-value" id="ad-m-risk">-</span></div>
-      <div class="stat"><span class="stat-label">Basis</span><span class="stat-value" id="ad-m-base">-</span></div>
-      <div class="stat"><span class="stat-label">Multiplikator</span><span class="stat-value" id="ad-m-mult">-</span></div>
-      <div class="stat"><span class="stat-label">Win Rate (letzte 20)</span><span class="stat-value" id="ad-m-wr">-</span></div>
-      <div class="stat"><span class="stat-label">Letzte 5 Trades</span><span class="stat-value" id="ad-m-streak">-</span></div>
-    </div>
-    <div>
-      <div style="color:#fb923c;font-size:12px;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Aggressiv</div>
-      <div class="stat"><span class="stat-label">Aktuelles Risiko</span><span class="stat-value" id="ad-a-risk">-</span></div>
-      <div class="stat"><span class="stat-label">Basis</span><span class="stat-value" id="ad-a-base">-</span></div>
-      <div class="stat"><span class="stat-label">Multiplikator</span><span class="stat-value" id="ad-a-mult">-</span></div>
-      <div class="stat"><span class="stat-label">Win Rate (letzte 20)</span><span class="stat-value" id="ad-a-wr">-</span></div>
-      <div class="stat"><span class="stat-label">Letzte 5 Trades</span><span class="stat-value" id="ad-a-streak">-</span></div>
-    </div>
-  </div>
+<div class="grid3" id="konto-grid"></div>
+
+<div class="card" style="margin-bottom:12px" id="adaptive-card">
+  <div class="card-title">🧠 Adaptives Risiko</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="adaptive-grid"></div>
 </div>
 
-<div class="grid">
-  <div class="card">
-    <h2><span class="tag tag-mittel">Mittel</span></h2>
-    <div class="equity pos" id="m-equity">...</div>
-    <br>
-    <div class="stat"><span class="stat-label">Trades gesamt</span><span class="stat-value" id="m-trades">-</span></div>
-    <div class="stat"><span class="stat-label">Gewinn-Trades</span><span class="stat-value pos" id="m-gewinn">-</span></div>
-    <div class="stat"><span class="stat-label">Verlust-Trades</span><span class="stat-value neg" id="m-verlust">-</span></div>
-    <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="m-winrate">-</span></div>
-    <div class="stat"><span class="stat-label">Gesamt PnL</span><span class="stat-value" id="m-pnl">-</span></div>
-    <div class="stat"><span class="stat-label">Bester Trade</span><span class="stat-value pos" id="m-best">-</span></div>
-    <div class="stat"><span class="stat-label">Schlechtester Trade</span><span class="stat-value neg" id="m-worst">-</span></div>
-    <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="m-dd">-</span></div>
+<div class="card" style="margin-bottom:12px">
+  <div class="card-title">Ein- / Auszahlung</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+    <input type="number" id="betrag" placeholder="Betrag €" style="background:#0d1b2a;border:1px solid #1e3a5a;color:#e0e6f0;padding:8px;border-radius:6px;width:110px;font-size:12px">
+    <select id="strategie" style="background:#0d1b2a;border:1px solid #1e3a5a;color:#e0e6f0;padding:8px;border-radius:6px;font-size:12px">
+      <option value="mittel">Mittel</option>
+      <option value="aggressiv">Aggressiv</option>
+      <option value="goldglobe">GoldGlobe</option>
+      <option value="beide">Alle</option>
+    </select>
+    <button class="btn" style="background:#1a3a1a;color:#22c55e" onclick="einzahlung()">+ Einzahlen</button>
+    <button class="btn" style="background:#3a1a1a;color:#ef4444" onclick="auszahlung()">- Auszahlen</button>
   </div>
-  <div class="card">
-    <h2><span class="tag tag-aggressiv">Aggressiv</span></h2>
-    <div class="equity pos" id="a-equity">...</div>
-    <br>
-    <div class="stat"><span class="stat-label">Trades gesamt</span><span class="stat-value" id="a-trades">-</span></div>
-    <div class="stat"><span class="stat-label">Gewinn-Trades</span><span class="stat-value pos" id="a-gewinn">-</span></div>
-    <div class="stat"><span class="stat-label">Verlust-Trades</span><span class="stat-value neg" id="a-verlust">-</span></div>
-    <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="a-winrate">-</span></div>
-    <div class="stat"><span class="stat-label">Gesamt PnL</span><span class="stat-value" id="a-pnl">-</span></div>
-    <div class="stat"><span class="stat-label">Bester Trade</span><span class="stat-value pos" id="a-best">-</span></div>
-    <div class="stat"><span class="stat-label">Schlechtester Trade</span><span class="stat-value neg" id="a-worst">-</span></div>
-    <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="a-dd">-</span></div>
-  </div>
+  <div id="zahlung-status" style="margin-top:8px;font-size:11px;color:#4a6080"></div>
 </div>
 
-<div class="card" style="margin-bottom:16px">
-  <h2>Ein- / Auszahlung</h2>
-  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
-    <div>
-      <div style="color:#888;font-size:12px;margin-bottom:6px">Betrag (€)</div>
-      <input type="number" id="betrag" placeholder="z.B. 500" style="background:#222;border:1px solid #333;color:#fff;padding:10px;border-radius:8px;width:140px;font-size:14px">
-    </div>
-    <div>
-      <div style="color:#888;font-size:12px;margin-bottom:6px">Strategie</div>
-      <select id="strategie" style="background:#222;border:1px solid #333;color:#fff;padding:10px;border-radius:8px;font-size:14px">
-        <option value="mittel">Mittel</option>
-        <option value="aggressiv">Aggressiv</option>
-        <option value="beide">Beide</option>
-      </select>
-    </div>
-    <button class="btn" style="background:#1a3a1a;color:#22c55e" onclick="einzahlung()">Einzahlen</button>
-    <button class="btn" style="background:#3a1a1a;color:#ef4444" onclick="auszahlung()">Auszahlen</button>
-  </div>
-  <div id="zahlung-status" style="margin-top:12px;font-size:13px;color:#888"></div>
-</div>
-
-<button class="btn btn-refresh" onclick="laden()">Aktualisieren</button>
-<button class="btn btn-reset" onclick="reset()">Statistik zurücksetzen</button>
+<button class="btn" style="background:#1a2a3a;color:#e0e6f0" onclick="laden()">↻ Refresh</button>
+<button class="btn" style="background:#2a0a0a;color:#ef4444" onclick="reset()">Reset Stats</button>
 
 <script>
-function pnlFarbe(val) { return val > 0 ? 'pos' : val < 0 ? 'neg' : ''; }
+let chartInstance = null;
+function pc(v) { return v > 0 ? '#22c55e' : v < 0 ? '#ef4444' : '#e0e6f0'; }
 
 async function laden() {
-  const res  = await fetch('/api/performance');
-  const data = await res.json();
-  document.getElementById('updatezeit').textContent = 'Letzte Aktualisierung: ' + new Date(data.letzteAktualisierung).toLocaleString('de-DE');
-  const m = data.mittel;
-  document.getElementById('m-equity').textContent  = parseFloat(m.aktuellesEquity).toFixed(2) + ' €';
-  document.getElementById('m-trades').textContent  = m.trades;
-  document.getElementById('m-gewinn').textContent  = m.gewinn;
-  document.getElementById('m-verlust').textContent = m.verlust;
-  document.getElementById('m-winrate').textContent = m.winRate + '%';
-  const mPnl = document.getElementById('m-pnl');
-  mPnl.textContent = (m.gesamtPnL >= 0 ? '+' : '') + parseFloat(m.gesamtPnL).toFixed(2) + ' €';
-  mPnl.className   = 'stat-value ' + pnlFarbe(parseFloat(m.gesamtPnL));
-  document.getElementById('m-best').textContent    = '+' + parseFloat(m.bestesTrade).toFixed(2) + ' €';
-  document.getElementById('m-worst').textContent   = parseFloat(m.schlechtestesTrade).toFixed(2) + ' €';
-  document.getElementById('m-dd').textContent      = m.drawdown + '%';
-  const a = data.aggressiv;
-  document.getElementById('a-equity').textContent  = parseFloat(a.aktuellesEquity).toFixed(2) + ' €';
-  document.getElementById('a-trades').textContent  = a.trades;
-  document.getElementById('a-gewinn').textContent  = a.gewinn;
-  document.getElementById('a-verlust').textContent = a.verlust;
-  document.getElementById('a-winrate').textContent = a.winRate + '%';
-  const aPnl = document.getElementById('a-pnl');
-  aPnl.textContent = (a.gesamtPnL >= 0 ? '+' : '') + parseFloat(a.gesamtPnL).toFixed(2) + ' €';
-  aPnl.className   = 'stat-value ' + pnlFarbe(parseFloat(a.gesamtPnL));
-  document.getElementById('a-best').textContent    = '+' + parseFloat(a.bestesTrade).toFixed(2) + ' €';
-  document.getElementById('a-worst').textContent   = parseFloat(a.schlechtestesTrade).toFixed(2) + ' €';
-  document.getElementById('a-dd').textContent      = a.drawdown + '%';
-}
+  try {
+    const res  = await fetch('/api/performance');
+    const data = await res.json();
+    if (data.fehler) throw new Error(data.fehler);
+    document.getElementById('updatezeit').textContent = 'Aktualisiert: ' + new Date(data.letzteAktualisierung).toLocaleString('de-DE');
 
-async function reset() {
-  if (!confirm('Statistik wirklich zurücksetzen?')) return;
-  await fetch('/api/reset', { method: 'POST' });
-  laden();
-}
+    const konten = [
+      { key:'mittel',    label:'Mittel',       tag:'tag-m', risiko:'1.7%'    },
+      { key:'aggressiv', label:'Aggressiv',    tag:'tag-a', risiko:'5.5%'    },
+      { key:'goldglobe', label:'🤖 GoldGlobe', tag:'tag-g', risiko:'1.7%+KI' }
+    ];
+    document.getElementById('konto-grid').innerHTML = konten.map(k => {
+      const s = data[k.key];
+      if (!s) return '<div class="card"><div class="card-title">'+k.label+'</div><div style="color:#4a6080;font-size:11px">Nicht verfügbar</div></div>';
+      const eq  = parseFloat(s.aktuellesEquity||0);
+      const pnl = parseFloat(s.gesamtPnL||0);
+      const dd  = parseFloat(s.drawdown||0);
+      return \`<div class="card">
+        <div class="card-title" style="display:flex;justify-content:space-between"><span class="tag \${k.tag}">\${k.label}</span><span>\${k.risiko}</span></div>
+        <div class="equity" style="color:\${eq>=1000?'#22c55e':'#ef4444'}">\${eq.toFixed(2)} €</div>
+        <div class="stat"><span class="label">Trades</span><span class="val">\${s.trades}</span></div>
+        <div class="stat"><span class="label">Win-Rate</span><span class="val">\${s.winRate}%</span></div>
+        <div class="stat"><span class="label">PnL</span><span class="val" style="color:\${pc(pnl)}">\${pnl>=0?'+':''}\${pnl.toFixed(2)}€</span></div>
+        <div class="stat"><span class="label">Drawdown</span><span class="val" style="color:\${dd>15?'#ef4444':'#fb923c'}">\${dd.toFixed(1)}%</span></div>
+        <div class="stat"><span class="label">Best</span><span class="val pos">+\${parseFloat(s.bestesTrade||0).toFixed(2)}€</span></div>
+        <div class="stat"><span class="label">Worst</span><span class="val neg">\${parseFloat(s.schlechtestesTrade||0).toFixed(2)}€</span></div>
+      </div>\`;
+    }).join('');
 
-async function einzahlung() {
-  const betrag    = document.getElementById('betrag').value;
-  const strategie = document.getElementById('strategie').value;
-  if (!betrag) return alert('Bitte Betrag eingeben!');
-  await fetch('/api/einzahlung?betrag=' + betrag + '&strategie=' + strategie);
-  document.getElementById('zahlung-status').textContent = '✅ Einzahlung: ' + betrag + '€ für ' + strategie;
-  laden();
-}
-
-async function auszahlung() {
-  const betrag    = document.getElementById('betrag').value;
-  const strategie = document.getElementById('strategie').value;
-  if (!betrag) return alert('Bitte Betrag eingeben!');
-  await fetch('/api/auszahlung?betrag=' + betrag + '&strategie=' + strategie);
-  document.getElementById('zahlung-status').textContent = '💸 Auszahlung: ' + betrag + '€ für ' + strategie;
-  laden();
+    await ladeChart();
+    await ladeAdaptiv();
+  } catch(err) {
+    document.getElementById('updatezeit').textContent = 'Fehler: ' + err.message;
+  }
 }
 
 async function ladeChart() {
-  const res  = await fetch('/api/equity');
-  const data = await res.json();
-  const mittelDaten    = data.mittel    || [];
-  const aggressivDaten = data.aggressiv || [];
-  const labels = [...new Set([
-    ...mittelDaten.map(p => new Date(p.datum).toLocaleDateString('de-DE')),
-    ...aggressivDaten.map(p => new Date(p.datum).toLocaleDateString('de-DE'))
-  ])].sort();
-  const ctx = document.getElementById('equityChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Mittel', data: mittelDaten.map(p => p.equity), borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.1)', tension: 0.3, fill: true },
-        { label: 'Aggressiv', data: aggressivDaten.map(p => p.equity), borderColor: '#fb923c', backgroundColor: 'rgba(251,146,60,0.1)', tension: 0.3, fill: true }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: '#fff' } } },
-      scales: {
-        x: { ticks: { color: '#888' }, grid: { color: '#222' } },
-        y: { ticks: { color: '#888', callback: v => v + '€' }, grid: { color: '#222' } }
+  try {
+    const res  = await fetch('/api/equity');
+    const data = await res.json();
+    const m = data.mittel||[], a = data.aggressiv||[], g = data.goldglobe||[];
+    const src = m.length ? m : a.length ? a : [];
+    const labels = src.map(p => new Date(p.datum).toLocaleDateString('de-DE'));
+    const ctx = document.getElementById('equityChart').getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: [
+        { label:'Mittel',      data:m.map(p=>p.equity), borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,0.08)',  tension:0.3, pointRadius:0, fill:true },
+        { label:'Aggressiv',  data:a.map(p=>p.equity), borderColor:'#fb923c', backgroundColor:'rgba(251,146,60,0.08)',  tension:0.3, pointRadius:0, fill:true },
+        { label:'GoldGlobe',  data:g.map(p=>p.equity), borderColor:'#44cc88', backgroundColor:'rgba(68,204,136,0.08)',  tension:0.3, pointRadius:0, fill:true }
+      ]},
+      options: {
+        responsive:true,
+        plugins:{ legend:{ labels:{ color:'#6080a0', font:{size:10}, boxWidth:10 } } },
+        scales:{
+          x:{ ticks:{color:'#4a6080',font:{size:9},maxTicksLimit:5}, grid:{color:'#111827'} },
+          y:{ ticks:{color:'#4a6080',font:{size:9},callback:v=>v+'€'}, grid:{color:'#111827'} }
+        }
       }
-    }
-  });
+    });
+  } catch(e){}
 }
 
 async function ladeAdaptiv() {
-  const res  = await fetch('/api/adaptive');
-  const data = await res.json();
-  const m = data.mittel, a = data.aggressiv;
-  function multFarbe(v) { return v > 1 ? 'pos' : v < 1 ? 'neg' : ''; }
-  document.getElementById('ad-m-risk').textContent   = m.aktuellesRisiko + '%';
-  document.getElementById('ad-m-base').textContent   = m.basisRisiko + '%';
-  const mMult = document.getElementById('ad-m-mult');
-  mMult.textContent = m.multiplikator + 'x';
-  mMult.className   = 'stat-value ' + multFarbe(m.multiplikator);
-  document.getElementById('ad-m-wr').textContent     = m.recentWinRate + '%';
-  document.getElementById('ad-m-streak').textContent = m.letzte5Trades;
-  document.getElementById('ad-a-risk').textContent   = a.aktuellesRisiko + '%';
-  document.getElementById('ad-a-base').textContent   = a.basisRisiko + '%';
-  const aMult = document.getElementById('ad-a-mult');
-  aMult.textContent = a.multiplikator + 'x';
-  aMult.className   = 'stat-value ' + multFarbe(a.multiplikator);
-  document.getElementById('ad-a-wr').textContent     = a.recentWinRate + '%';
-  document.getElementById('ad-a-streak').textContent = a.letzte5Trades;
+  try {
+    const res  = await fetch('/api/adaptive');
+    const data = await res.json();
+    const namen = ['mittel','aggressiv'];
+    document.getElementById('adaptive-grid').innerHTML = namen.map(name => {
+      const d = data[name]; if (!d) return '';
+      const farbe = name==='mittel'?'#60a5fa':'#fb923c';
+      const mc = d.multiplikator > 1 ? '#22c55e' : d.multiplikator < 1 ? '#ef4444' : '#e0e6f0';
+      return \`<div>
+        <div style="color:\${farbe};font-size:11px;font-weight:600;margin-bottom:6px">\${name.toUpperCase()}</div>
+        <div class="stat"><span class="label">Risiko</span><span class="val">\${d.aktuellesRisiko}%</span></div>
+        <div class="stat"><span class="label">Multiplikator</span><span class="val" style="color:\${mc}">\${d.multiplikator}x</span></div>
+        <div class="stat"><span class="label">Win Rate</span><span class="val">\${d.recentWinRate}%</span></div>
+        <div class="stat"><span class="label">Letzte 5</span><span class="val" style="font-size:10px">\${d.letzte5Trades}</span></div>
+      </div>\`;
+    }).join('');
+  } catch(e){}
+}
+
+async function reset() {
+  if (!confirm('Statistik zurücksetzen?')) return;
+  await fetch('/api/reset', { method:'POST' });
+  laden();
+}
+async function einzahlung() {
+  const b=document.getElementById('betrag').value, s=document.getElementById('strategie').value;
+  if (!b) return alert('Betrag eingeben!');
+  await fetch('/api/einzahlung?betrag='+b+'&strategie='+s);
+  document.getElementById('zahlung-status').textContent = '✅ +'+b+'€ für '+s;
+  laden();
+}
+async function auszahlung() {
+  const b=document.getElementById('betrag').value, s=document.getElementById('strategie').value;
+  if (!b) return alert('Betrag eingeben!');
+  await fetch('/api/auszahlung?betrag='+b+'&strategie='+s);
+  document.getElementById('zahlung-status').textContent = '💸 -'+b+'€ für '+s;
+  laden();
 }
 
 laden();
-ladeChart();
-ladeAdaptiv();
+setInterval(laden, 30000);
 </script>
 </body>
 </html>`);
