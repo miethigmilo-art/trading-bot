@@ -4,6 +4,7 @@ const axios   = require('axios');
 const fs      = require('fs');
 const app     = express();
 app.use(express.json());
+app.use((req, res, next) => { res.setHeader('X-Frame-Options', 'ALLOWALL'); next(); });
 
 const KONTO_MITTEL = {
   apiKey:   process.env.API_KEY,
