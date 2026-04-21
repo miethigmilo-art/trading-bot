@@ -23,10 +23,19 @@ const KONTO_AGGRESSIV = {
   token:    null
 };
 
+const KONTO_GOLDGLOBE = {
+  apiKey:   process.env.API_KEY_GOLDGLOBE,
+  email:    process.env.EMAIL_GOLDGLOBE,
+  password: process.env.PASSWORD_GOLDGLOBE,
+  baseUrl:  process.env.BASE_URL,
+  cst:      null,
+  token:    null
+};
+
 const KONTO_TEST = {
-  apiKey:   process.env.API_KEY_TEST   || process.env.API_KEY,
-  email:    process.env.EMAIL_TEST     || process.env.EMAIL,
-  password: process.env.PASSWORD_TEST  || process.env.PASSWORD,
+  apiKey:   process.env.API_KEY_TEST,
+  email:    process.env.EMAIL_TEST,
+  password: process.env.PASSWORD_TEST,
   baseUrl:  process.env.BASE_URL,
   cst:      null,
   token:    null
@@ -51,6 +60,15 @@ const STRATEGIEN = {
     maxDrawdownPct: 30,
     startEquity:    1000
   },
+  goldglobe: {
+    konto:          KONTO_GOLDGLOBE,
+    epic:           'GOLD',
+    riskPct:        1.7,
+    reservePct:     100,
+    leverage:       10,
+    maxDrawdownPct: 20,
+    startEquity:    1000
+  },
   test: {
     konto:          KONTO_TEST,
     epic:           'GOLD',
@@ -63,12 +81,13 @@ const STRATEGIEN = {
 };
 
 let performance = {
-  mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
-  aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
-  test:      { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 }
+  mittel:     { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
+  aggressiv:  { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
+  goldglobe:  { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
+  test:       { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 }
 };
 
-let letzteEquity         = { mittel: 1000, aggressiv: 1000, test: 1000 };
+let letzteEquity         = { mittel: 1000, aggressiv: 1000, goldglobe: 1000, test: 1000 };
 let letzteAktualisierung = new Date().toISOString();
 
 // ── Equity Kurve ──────────────────────────────────────
@@ -82,7 +101,7 @@ function ladeEquityDaten() {
   } catch (err) {
     console.error('❌ Equity Datei laden fehlgeschlagen:', err.message);
   }
-  return { mittel: [], aggressiv: [], test: [] };
+  return { mittel: [], aggressiv: [], goldglobe: [], test: [] };
 }
 
 function speichereEquityDaten(daten) {
@@ -257,9 +276,10 @@ async function handleWebhook(req, res, strategieName) {
 }
 
 // ── Webhook Routen ────────────────────────────────────
-app.post('/webhook/mittel',    (req, res) => handleWebhook(req, res, 'mittel'));
-app.post('/webhook/aggressiv', (req, res) => handleWebhook(req, res, 'aggressiv'));
-app.post('/webhook/test',      (req, res) => handleWebhook(req, res, 'test'));
+app.post('/webhook/mittel',     (req, res) => handleWebhook(req, res, 'mittel'));
+app.post('/webhook/aggressiv',  (req, res) => handleWebhook(req, res, 'aggressiv'));
+app.post('/webhook/goldglobe',  (req, res) => handleWebhook(req, res, 'goldglobe'));
+app.post('/webhook/test',       (req, res) => handleWebhook(req, res, 'test'));
 
 // ── Offene Position holen ─────────────────────────────
 async function getOpenPosition(konto, epic) {
@@ -320,11 +340,13 @@ app.post('/webhook/update_sl/:strategie', async (req, res) => {
 // ── Performance API ───────────────────────────────────
 app.get('/api/performance', async (req, res) => {
   try {
-    if (!KONTO_MITTEL.cst)    await login(KONTO_MITTEL);
-    if (!KONTO_AGGRESSIV.cst) await login(KONTO_AGGRESSIV);
-    if (!KONTO_TEST.cst)      await login(KONTO_TEST);
+    if (!KONTO_MITTEL.cst)     await login(KONTO_MITTEL);
+    if (!KONTO_AGGRESSIV.cst)  await login(KONTO_AGGRESSIV);
+    if (!KONTO_GOLDGLOBE.cst)  await login(KONTO_GOLDGLOBE);
+    if (!KONTO_TEST.cst)       await login(KONTO_TEST);
     const equityMittel    = await getEquity(KONTO_MITTEL);
     const equityAggressiv = await getEquity(KONTO_AGGRESSIV);
+    const equityGoldglobe = await getEquity(KONTO_GOLDGLOBE);
     const equityTest      = await getEquity(KONTO_TEST);
     res.json({
       letzteAktualisierung,
@@ -341,6 +363,13 @@ app.get('/api/performance', async (req, res) => {
         gesamtPnL:       performance.aggressiv.gesamtPnL.toFixed(2),
         drawdown:        performance.aggressiv.trades === 0 ? '0.00' : (((STRATEGIEN.aggressiv.startEquity - equityAggressiv) / STRATEGIEN.aggressiv.startEquity) * 100).toFixed(2),
         winRate:         performance.aggressiv.trades > 0 ? ((performance.aggressiv.gewinn / performance.aggressiv.trades) * 100).toFixed(1) : '0'
+      },
+      goldglobe: {
+        ...performance.goldglobe,
+        aktuellesEquity: equityGoldglobe,
+        gesamtPnL:       performance.goldglobe.gesamtPnL.toFixed(2),
+        drawdown:        performance.goldglobe.trades === 0 ? '0.00' : (((STRATEGIEN.goldglobe.startEquity - equityGoldglobe) / STRATEGIEN.goldglobe.startEquity) * 100).toFixed(2),
+        winRate:         performance.goldglobe.trades > 0 ? ((performance.goldglobe.gewinn / performance.goldglobe.trades) * 100).toFixed(1) : '0'
       },
       test: {
         ...performance.test,
@@ -365,9 +394,10 @@ app.post('/api/reset', (req, res) => {
   performance = {
     mittel:    { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
     aggressiv: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
+    goldglobe: { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 },
     test:      { trades: 0, gewinn: 0, verlust: 0, gesamtPnL: 0, bestesTrade: 0, schlechtestesTrade: 0, startEquity: 1000 }
   };
-  letzteEquity = { mittel: 1000, aggressiv: 1000, test: 1000 };
+  letzteEquity = { mittel: 1000, aggressiv: 1000, goldglobe: 1000, test: 1000 };
   letzteAktualisierung = new Date().toISOString();
   res.json({ status: 'ok' });
 });
@@ -518,6 +548,22 @@ app.get('/dashboard', (req, res) => {
   </div>
 </div>
 
+<div class="grid" style="margin-bottom:16px">
+  <div class="card" style="border:1px solid #2d1f5e">
+    <h2><span class="tag" style="background:#2d1f5e;color:#a78bfa">GoldGlobe</span></h2>
+    <div class="equity pos" id="g-equity">...</div>
+    <br>
+    <div class="stat"><span class="stat-label">Trades gesamt</span><span class="stat-value" id="g-trades">-</span></div>
+    <div class="stat"><span class="stat-label">Gewinn-Trades</span><span class="stat-value pos" id="g-gewinn">-</span></div>
+    <div class="stat"><span class="stat-label">Verlust-Trades</span><span class="stat-value neg" id="g-verlust">-</span></div>
+    <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="g-winrate">-</span></div>
+    <div class="stat"><span class="stat-label">Gesamt PnL</span><span class="stat-value" id="g-pnl">-</span></div>
+    <div class="stat"><span class="stat-label">Bester Trade</span><span class="stat-value pos" id="g-best">-</span></div>
+    <div class="stat"><span class="stat-label">Schlechtester Trade</span><span class="stat-value neg" id="g-worst">-</span></div>
+    <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="g-dd">-</span></div>
+  </div>
+</div>
+
 <div class="card" style="margin-bottom:16px;border:1px solid #1a3a1a">
   <h2><span class="tag tag-test">Test 1M</span></h2>
   <div class="equity pos" id="t-equity">...</div>
@@ -588,6 +634,18 @@ async function laden() {
   document.getElementById('a-best').textContent    = '+' + parseFloat(a.bestesTrade).toFixed(2) + ' €';
   document.getElementById('a-worst').textContent   = parseFloat(a.schlechtestesTrade).toFixed(2) + ' €';
   document.getElementById('a-dd').textContent      = a.drawdown + '%';
+  const g = data.goldglobe;
+  document.getElementById('g-equity').textContent  = parseFloat(g.aktuellesEquity).toFixed(2) + ' €';
+  document.getElementById('g-trades').textContent  = g.trades;
+  document.getElementById('g-gewinn').textContent  = g.gewinn;
+  document.getElementById('g-verlust').textContent = g.verlust;
+  document.getElementById('g-winrate').textContent = g.winRate + '%';
+  const gPnl = document.getElementById('g-pnl');
+  gPnl.textContent = (g.gesamtPnL >= 0 ? '+' : '') + parseFloat(g.gesamtPnL).toFixed(2) + ' €';
+  gPnl.className   = 'stat-value ' + pnlFarbe(parseFloat(g.gesamtPnL));
+  document.getElementById('g-best').textContent    = '+' + parseFloat(g.bestesTrade).toFixed(2) + ' €';
+  document.getElementById('g-worst').textContent   = parseFloat(g.schlechtestesTrade).toFixed(2) + ' €';
+  document.getElementById('g-dd').textContent      = g.drawdown + '%';
   const t = data.test;
   document.getElementById('t-equity').textContent  = parseFloat(t.aktuellesEquity).toFixed(2) + ' €';
   document.getElementById('t-trades').textContent  = t.trades;
@@ -645,6 +703,7 @@ async function ladeChart() {
       datasets: [
         { label: 'Mittel', data: mittelDaten.map(p => p.equity), borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.1)', tension: 0.3, fill: true },
         { label: 'Aggressiv', data: aggressivDaten.map(p => p.equity), borderColor: '#fb923c', backgroundColor: 'rgba(251,146,60,0.1)', tension: 0.3, fill: true },
+        { label: 'GoldGlobe', data: (data.goldglobe||[]).map(p => p.equity), borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,0.1)', tension: 0.3, fill: true },
         { label: 'Test 1M', data: testDaten.map(p => p.equity), borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', tension: 0.3, fill: true }
       ]
     },
