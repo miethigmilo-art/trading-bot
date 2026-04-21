@@ -37,7 +37,7 @@ const STRATEGIEN = {
   mittel: {
     konto:          KONTO_MITTEL,
     epic:           'GOLD',
-    riskPct:        1.7,
+    riskPct:        2.7,
     reservePct:     100,
     leverage:       10,
     maxDrawdownPct: 20,
