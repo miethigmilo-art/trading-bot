@@ -115,10 +115,11 @@ function speichereEquityDaten(daten) {
 let equityVerlauf = ladeEquityDaten();
 
 function equityPunktHinzufuegen(strategieName, equity) {
-  equityVerlauf[strategieName].push({
-    datum:  new Date().toISOString(),
-    equity: parseFloat(equity)
-  });
+    if (!equityVerlauf[strategieName]) equityVerlauf[strategieName] = [];
+    equityVerlauf[strategieName].push({
+      datum:  new Date().toISOString(),
+      equity: parseFloat(equity)
+    });
   speichereEquityDaten(equityVerlauf);
   console.log(`📈 Equity Punkt gespeichert [${strategieName}]: ${equity}€`);
 }
