@@ -137,6 +137,28 @@ function speichereTradeDaten(daten) {
 
 let tradeVerlauf = ladeTradeDaten();
 
+// Performance + letzteEquity beim Start aus gespeicherten Daten wiederherstellen
+(function initAusDaten() {
+  // letzteEquity = letzter Wert aus equity.json
+  for (const [name, punkte] of Object.entries(equityVerlauf)) {
+    if (punkte.length > 0) letzteEquity[name] = punkte[punkte.length - 1].equity;
+  }
+  // performance aus trades.json aufbauen
+  for (const [name, trades] of Object.entries(tradeVerlauf)) {
+    if (!performance[name] || !trades.length) continue;
+    const p = performance[name];
+    for (const t of trades) {
+      p.trades++;
+      p.gesamtPnL += t.pnl;
+      if (t.pnl > 0) p.gewinn++; else p.verlust++;
+      if (t.pnl > p.bestesTrade)           p.bestesTrade          = t.pnl;
+      if (t.pnl < p.schlechtestesTrade)    p.schlechtestesTrade   = t.pnl;
+    }
+    if (trades.length > 0) letzteAktualisierung = trades[trades.length - 1].datum;
+  }
+  console.log('📊 Performance wiederhergestellt:', Object.entries(performance).map(([k,v]) => k+':'+v.trades+'T').join(' '));
+})();
+
 function tradeHinzufuegen(strategieName, trade) {
   if (!tradeVerlauf[strategieName]) tradeVerlauf[strategieName] = [];
   tradeVerlauf[strategieName].push(trade);
