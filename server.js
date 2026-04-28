@@ -340,49 +340,44 @@ app.post('/webhook/update_sl/:strategie', async (req, res) => {
 
 // ── Performance API ───────────────────────────────────
 app.get('/api/performance', async (req, res) => {
-  try {
-    if (!KONTO_MITTEL.cst)     await login(KONTO_MITTEL);
-    if (!KONTO_AGGRESSIV.cst)  await login(KONTO_AGGRESSIV);
-    if (!KONTO_GOLDGLOBE.cst)  await login(KONTO_GOLDGLOBE);
-    if (!KONTO_TEST.cst)       await login(KONTO_TEST);
-    const equityMittel    = await getEquity(KONTO_MITTEL);
-    const equityAggressiv = await getEquity(KONTO_AGGRESSIV);
-    const equityGoldglobe = await getEquity(KONTO_GOLDGLOBE);
-    const equityTest      = await getEquity(KONTO_TEST);
-    res.json({
-      letzteAktualisierung,
-      mittel: {
-        ...performance.mittel,
-        aktuellesEquity: equityMittel,
-        gesamtPnL:       performance.mittel.gesamtPnL.toFixed(2),
-        drawdown:        performance.mittel.trades === 0 ? '0.00' : (((STRATEGIEN.mittel.startEquity - equityMittel) / STRATEGIEN.mittel.startEquity) * 100).toFixed(2),
-        winRate:         performance.mittel.trades > 0 ? ((performance.mittel.gewinn / performance.mittel.trades) * 100).toFixed(1) : '0'
-      },
-      aggressiv: {
-        ...performance.aggressiv,
-        aktuellesEquity: equityAggressiv,
-        gesamtPnL:       performance.aggressiv.gesamtPnL.toFixed(2),
-        drawdown:        performance.aggressiv.trades === 0 ? '0.00' : (((STRATEGIEN.aggressiv.startEquity - equityAggressiv) / STRATEGIEN.aggressiv.startEquity) * 100).toFixed(2),
-        winRate:         performance.aggressiv.trades > 0 ? ((performance.aggressiv.gewinn / performance.aggressiv.trades) * 100).toFixed(1) : '0'
-      },
-      goldglobe: {
-        ...performance.goldglobe,
-        aktuellesEquity: equityGoldglobe,
-        gesamtPnL:       performance.goldglobe.gesamtPnL.toFixed(2),
-        drawdown:        performance.goldglobe.trades === 0 ? '0.00' : (((STRATEGIEN.goldglobe.startEquity - equityGoldglobe) / STRATEGIEN.goldglobe.startEquity) * 100).toFixed(2),
-        winRate:         performance.goldglobe.trades > 0 ? ((performance.goldglobe.gewinn / performance.goldglobe.trades) * 100).toFixed(1) : '0'
-      },
-      test: {
-        ...performance.test,
-        aktuellesEquity: equityTest,
-        gesamtPnL:       performance.test.gesamtPnL.toFixed(2),
-        drawdown:        performance.test.trades === 0 ? '0.00' : (((STRATEGIEN.test.startEquity - equityTest) / STRATEGIEN.test.startEquity) * 100).toFixed(2),
-        winRate:         performance.test.trades > 0 ? ((performance.test.gewinn / performance.test.trades) * 100).toFixed(1) : '0'
-      }
-    });
-  } catch (err) {
-    res.status(500).json({ fehler: err.message });
+  async function tryEquity(konto) {
+    try {
+      if (!konto.cst) await login(konto);
+      return await getEquity(konto);
+    } catch (err) {
+      console.error(`❌ Equity Fehler (${konto.email}):`, err.message);
+      return null;
+    }
   }
+
+  function buildStats(name, strat, equity) {
+    const p  = performance[name];
+    const dd = equity != null && p.trades > 0
+      ? (((strat.startEquity - equity) / strat.startEquity) * 100).toFixed(2)
+      : '0.00';
+    return {
+      ...p,
+      aktuellesEquity: equity,
+      gesamtPnL:       p.gesamtPnL.toFixed(2),
+      drawdown:        dd,
+      winRate:         p.trades > 0 ? ((p.gewinn / p.trades) * 100).toFixed(1) : '0'
+    };
+  }
+
+  const [equityMittel, equityAggressiv, equityGoldglobe, equityTest] = await Promise.all([
+    tryEquity(KONTO_MITTEL),
+    tryEquity(KONTO_AGGRESSIV),
+    tryEquity(KONTO_GOLDGLOBE),
+    tryEquity(KONTO_TEST)
+  ]);
+
+  res.json({
+    letzteAktualisierung,
+    mittel:    buildStats('mittel',    STRATEGIEN.mittel,    equityMittel),
+    aggressiv: buildStats('aggressiv', STRATEGIEN.aggressiv, equityAggressiv),
+    goldglobe: buildStats('goldglobe', STRATEGIEN.goldglobe, equityGoldglobe),
+    test:      buildStats('test',      STRATEGIEN.test,      equityTest)
+  });
 });
 
 // ── Equity API ────────────────────────────────────────
@@ -607,58 +602,34 @@ app.get('/dashboard', (req, res) => {
 <script>
 function pnlFarbe(val) { return val > 0 ? 'pos' : val < 0 ? 'neg' : ''; }
 
+function fillKarte(prefix, d) {
+  const eq = d.aktuellesEquity;
+  document.getElementById(prefix + '-equity').textContent  = eq != null ? parseFloat(eq).toFixed(2) + ' €' : '—';
+  document.getElementById(prefix + '-trades').textContent  = d.trades;
+  document.getElementById(prefix + '-gewinn').textContent  = d.gewinn;
+  document.getElementById(prefix + '-verlust').textContent = d.verlust;
+  document.getElementById(prefix + '-winrate').textContent = d.winRate + '%';
+  const pnlEl = document.getElementById(prefix + '-pnl');
+  pnlEl.textContent = (d.gesamtPnL >= 0 ? '+' : '') + parseFloat(d.gesamtPnL).toFixed(2) + ' €';
+  pnlEl.className   = 'stat-value ' + pnlFarbe(parseFloat(d.gesamtPnL));
+  document.getElementById(prefix + '-best').textContent    = '+' + parseFloat(d.bestesTrade).toFixed(2) + ' €';
+  document.getElementById(prefix + '-worst').textContent   = parseFloat(d.schlechtestesTrade).toFixed(2) + ' €';
+  document.getElementById(prefix + '-dd').textContent      = d.drawdown + '%';
+}
+
 async function laden() {
-  const res  = await fetch('/api/performance');
-  const data = await res.json();
-  document.getElementById('updatezeit').textContent = 'Letzte Aktualisierung: ' + new Date(data.letzteAktualisierung).toLocaleString('de-DE');
-  const m = data.mittel;
-  document.getElementById('m-equity').textContent  = parseFloat(m.aktuellesEquity).toFixed(2) + ' €';
-  document.getElementById('m-trades').textContent  = m.trades;
-  document.getElementById('m-gewinn').textContent  = m.gewinn;
-  document.getElementById('m-verlust').textContent = m.verlust;
-  document.getElementById('m-winrate').textContent = m.winRate + '%';
-  const mPnl = document.getElementById('m-pnl');
-  mPnl.textContent = (m.gesamtPnL >= 0 ? '+' : '') + parseFloat(m.gesamtPnL).toFixed(2) + ' €';
-  mPnl.className   = 'stat-value ' + pnlFarbe(parseFloat(m.gesamtPnL));
-  document.getElementById('m-best').textContent    = '+' + parseFloat(m.bestesTrade).toFixed(2) + ' €';
-  document.getElementById('m-worst').textContent   = parseFloat(m.schlechtestesTrade).toFixed(2) + ' €';
-  document.getElementById('m-dd').textContent      = m.drawdown + '%';
-  const a = data.aggressiv;
-  document.getElementById('a-equity').textContent  = parseFloat(a.aktuellesEquity).toFixed(2) + ' €';
-  document.getElementById('a-trades').textContent  = a.trades;
-  document.getElementById('a-gewinn').textContent  = a.gewinn;
-  document.getElementById('a-verlust').textContent = a.verlust;
-  document.getElementById('a-winrate').textContent = a.winRate + '%';
-  const aPnl = document.getElementById('a-pnl');
-  aPnl.textContent = (a.gesamtPnL >= 0 ? '+' : '') + parseFloat(a.gesamtPnL).toFixed(2) + ' €';
-  aPnl.className   = 'stat-value ' + pnlFarbe(parseFloat(a.gesamtPnL));
-  document.getElementById('a-best').textContent    = '+' + parseFloat(a.bestesTrade).toFixed(2) + ' €';
-  document.getElementById('a-worst').textContent   = parseFloat(a.schlechtestesTrade).toFixed(2) + ' €';
-  document.getElementById('a-dd').textContent      = a.drawdown + '%';
-  const g = data.goldglobe;
-  document.getElementById('g-equity').textContent  = parseFloat(g.aktuellesEquity).toFixed(2) + ' €';
-  document.getElementById('g-trades').textContent  = g.trades;
-  document.getElementById('g-gewinn').textContent  = g.gewinn;
-  document.getElementById('g-verlust').textContent = g.verlust;
-  document.getElementById('g-winrate').textContent = g.winRate + '%';
-  const gPnl = document.getElementById('g-pnl');
-  gPnl.textContent = (g.gesamtPnL >= 0 ? '+' : '') + parseFloat(g.gesamtPnL).toFixed(2) + ' €';
-  gPnl.className   = 'stat-value ' + pnlFarbe(parseFloat(g.gesamtPnL));
-  document.getElementById('g-best').textContent    = '+' + parseFloat(g.bestesTrade).toFixed(2) + ' €';
-  document.getElementById('g-worst').textContent   = parseFloat(g.schlechtestesTrade).toFixed(2) + ' €';
-  document.getElementById('g-dd').textContent      = g.drawdown + '%';
-  const t = data.test;
-  document.getElementById('t-equity').textContent  = parseFloat(t.aktuellesEquity).toFixed(2) + ' €';
-  document.getElementById('t-trades').textContent  = t.trades;
-  document.getElementById('t-gewinn').textContent  = t.gewinn;
-  document.getElementById('t-verlust').textContent = t.verlust;
-  document.getElementById('t-winrate').textContent = t.winRate + '%';
-  const tPnl = document.getElementById('t-pnl');
-  tPnl.textContent = (t.gesamtPnL >= 0 ? '+' : '') + parseFloat(t.gesamtPnL).toFixed(2) + ' €';
-  tPnl.className   = 'stat-value ' + pnlFarbe(parseFloat(t.gesamtPnL));
-  document.getElementById('t-best').textContent    = '+' + parseFloat(t.bestesTrade).toFixed(2) + ' €';
-  document.getElementById('t-worst').textContent   = parseFloat(t.schlechtestesTrade).toFixed(2) + ' €';
-  document.getElementById('t-dd').textContent      = t.drawdown + '%';
+  try {
+    const res = await fetch('/api/performance');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    document.getElementById('updatezeit').textContent = 'Letzte Aktualisierung: ' + new Date(data.letzteAktualisierung).toLocaleString('de-DE');
+    fillKarte('m', data.mittel);
+    fillKarte('a', data.aggressiv);
+    fillKarte('g', data.goldglobe);
+    fillKarte('t', data.test);
+  } catch (err) {
+    document.getElementById('updatezeit').textContent = '❌ Ladefehler: ' + err.message;
+  }
 }
 
 async function reset() {
@@ -686,37 +657,58 @@ async function auszahlung() {
 }
 
 async function ladeChart() {
-  const res  = await fetch('/api/equity');
-  const data = await res.json();
-  const mittelDaten    = data.mittel    || [];
-  const aggressivDaten = data.aggressiv || [];
-  const testDaten      = data.test      || [];
-  const labels = [...new Set([
-    ...mittelDaten.map(p => new Date(p.datum).toLocaleDateString('de-DE')),
-    ...aggressivDaten.map(p => new Date(p.datum).toLocaleDateString('de-DE')),
-    ...testDaten.map(p => new Date(p.datum).toLocaleDateString('de-DE'))
-  ])].sort();
-  const ctx = document.getElementById('equityChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        { label: 'Mittel', data: mittelDaten.map(p => p.equity), borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.1)', tension: 0.3, fill: true },
-        { label: 'Aggressiv', data: aggressivDaten.map(p => p.equity), borderColor: '#fb923c', backgroundColor: 'rgba(251,146,60,0.1)', tension: 0.3, fill: true },
-        { label: 'GoldGlobe', data: (data.goldglobe||[]).map(p => p.equity), borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,0.1)', tension: 0.3, fill: true },
-        { label: 'Test 1M', data: testDaten.map(p => p.equity), borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', tension: 0.3, fill: true }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { labels: { color: '#fff' } } },
-      scales: {
-        x: { ticks: { color: '#888' }, grid: { color: '#222' } },
-        y: { ticks: { color: '#888', callback: v => v + '€' }, grid: { color: '#222' } }
-      }
+  try {
+    const res  = await fetch('/api/equity');
+    const data = await res.json();
+
+    // Alle Zeitstempel als ISO-Strings sammeln und sortieren
+    const alleTimestamps = [...new Set([
+      ...(data.mittel    || []).map(p => p.datum),
+      ...(data.aggressiv || []).map(p => p.datum),
+      ...(data.goldglobe || []).map(p => p.datum),
+      ...(data.test      || []).map(p => p.datum)
+    ])].sort();
+
+    const labels = alleTimestamps.map(d => {
+      const dt = new Date(d);
+      return dt.toLocaleDateString('de-DE') + ' ' + dt.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    });
+
+    // Für jeden Timestamp den letzten bekannten Equity-Wert pro Strategie (forward-fill)
+    function buildSeries(punkte) {
+      if (!punkte || punkte.length === 0) return alleTimestamps.map(() => null);
+      const map = new Map(punkte.map(p => [p.datum, p.equity]));
+      let last = null;
+      return alleTimestamps.map(ts => {
+        if (map.has(ts)) last = map.get(ts);
+        return last;
+      });
     }
-  });
+
+    const ctx = document.getElementById('equityChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Mittel',    data: buildSeries(data.mittel),    borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.1)',  tension: 0.3, fill: true, spanGaps: true },
+          { label: 'Aggressiv', data: buildSeries(data.aggressiv), borderColor: '#fb923c', backgroundColor: 'rgba(251,146,60,0.1)',   tension: 0.3, fill: true, spanGaps: true },
+          { label: 'GoldGlobe', data: buildSeries(data.goldglobe), borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,0.1)', tension: 0.3, fill: true, spanGaps: true },
+          { label: 'Test 1M',   data: buildSeries(data.test),      borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)',  tension: 0.3, fill: true, spanGaps: true }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#fff' } } },
+        scales: {
+          x: { ticks: { color: '#888', maxTicksLimit: 12 }, grid: { color: '#222' } },
+          y: { ticks: { color: '#888', callback: v => v + '€' }, grid: { color: '#222' } }
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Chart Fehler:', err.message);
+  }
 }
 
 laden();
