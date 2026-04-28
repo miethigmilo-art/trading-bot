@@ -163,11 +163,18 @@ async function getEquity(konto) {
 
 // ── Trades von Capital.com holen ─────────────────────
 async function getClosedTrades(konto, von, bis) {
-  // Standard: letzte 30 Tage
-  const fromMs = von ? new Date(von).getTime() : Date.now() - 30 * 24 * 60 * 60 * 1000;
-  const params = { detailed: true, pageSize: 500, from: fromMs };
-  if (bis) params.to = new Date(bis).getTime();
+  const fromDate = von ? new Date(von) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const toDate   = bis ? new Date(bis) : new Date();
 
+  // Capital.com erwartet ISO-Format: "2026-03-29T00:00:00"
+  const params = {
+    from:              fromDate.toISOString().slice(0, 19),
+    to:                toDate.toISOString().slice(0, 19),
+    lastNumberOfItems: 500,
+    detailed:          true
+  };
+
+  console.log(`📋 History Params:`, params);
   const res = await axios.get(`${konto.baseUrl}/history/activity`, {
     headers: {
       'X-CAP-API-KEY':    konto.apiKey,
@@ -176,9 +183,10 @@ async function getClosedTrades(konto, von, bis) {
     },
     params
   });
-  const alle = res.data.activityHistory || res.data.activities || res.data || [];
-  console.log(`📋 Capital.com History: ${alle.length} Einträge, Keys: ${Object.keys(res.data).join(', ')}`);
-  if (alle.length > 0) console.log('📋 Erster Eintrag:', JSON.stringify(alle[0]).slice(0, 300));
+
+  const alle = res.data.activityHistory || res.data.activities || (Array.isArray(res.data) ? res.data : []);
+  console.log(`📋 Capital.com History: ${alle.length} Einträge, Response-Keys: ${Object.keys(res.data).join(', ')}`);
+  if (alle.length > 0) console.log('📋 Erster Eintrag:', JSON.stringify(alle[0]).slice(0, 400));
   return alle;
 }
 
