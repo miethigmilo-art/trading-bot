@@ -136,6 +136,8 @@ async function login(konto) {
 }
 
 // ── Equity holen ──────────────────────────────────────
+// Capital.com balance: { balance (kontostand), deposit, profitLoss (floating), available (freie Margin) }
+// balance.balance = echter Kontostand (wie auf Capital.com angezeigt)
 async function getEquity(konto) {
   try {
     const res = await axios.get(`${konto.baseUrl}/accounts`, {
@@ -146,11 +148,9 @@ async function getEquity(konto) {
       }
     });
     const account = res.data.accounts[0];
-    const equity  = account?.balance?.equity
-                 || account?.balance?.available
-                 || account?.balance?.balance
-                 || account?.balance;
-    console.log(`💰 Equity (${konto.email}): ${equity}€`);
+    const bal     = account?.balance;
+    const equity  = bal?.balance ?? bal?.available ?? bal;
+    console.log(`💰 Equity (${konto.email}): ${equity}€ | available: ${bal?.available} | profitLoss: ${bal?.profitLoss}`);
     return equity;
   } catch (err) {
     if (err.response?.status === 401) {
@@ -159,6 +159,25 @@ async function getEquity(konto) {
     }
     throw err;
   }
+}
+
+// ── Closed Trades von Capital.com holen ───────────────
+async function getClosedTrades(konto, von, bis) {
+  const params = { detailed: true, pageSize: 500 };
+  if (von) params.from = von;
+  if (bis) params.to   = bis;
+  const res = await axios.get(`${konto.baseUrl}/history/activity`, {
+    headers: {
+      'X-CAP-API-KEY':    konto.apiKey,
+      'CST':              konto.cst,
+      'X-SECURITY-TOKEN': konto.token
+    },
+    params
+  });
+  // Nur geschlossene Positionen mit P&L
+  return (res.data.activityHistory || []).filter(a =>
+    a.details?.actions?.some(x => x.actionType === 'POSITION_CLOSED')
+  );
 }
 
 // ── Drawdown prüfen ───────────────────────────────────
@@ -380,9 +399,30 @@ app.get('/api/performance', async (req, res) => {
   });
 });
 
-// ── Equity API ────────────────────────────────────────
+// ── Equity API (legacy) ───────────────────────────────
 app.get('/api/equity', (req, res) => {
   res.json(equityVerlauf);
+});
+
+// ── Trades API (direkt von Capital.com) ───────────────
+app.get('/api/trades/:strategie', async (req, res) => {
+  const strategieName = req.params.strategie;
+  const strategie     = STRATEGIEN[strategieName];
+  if (!strategie) return res.status(400).json({ error: 'Unbekannte Strategie' });
+
+  const konto = strategie.konto;
+  try {
+    if (!konto.cst) await login(konto);
+    const trades = await getClosedTrades(konto);
+    res.json({ strategie: strategieName, trades });
+  } catch (err) {
+    if (err.response?.status === 401) {
+      konto.cst = null;
+      await login(konto);
+      return res.redirect(req.originalUrl);
+    }
+    res.status(500).json({ error: err.message, raw: err.response?.data });
+  }
 });
 
 // ── Reset ─────────────────────────────────────────────
@@ -656,34 +696,32 @@ async function auszahlung() {
   laden();
 }
 
+// Baut Equity-Kurve aus geschlossenen Trades (startEquity + kumuliertes P&L)
+function buildEquityCurve(trades, startEquity) {
+  let equity = startEquity;
+  return trades
+    .filter(t => t.date)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .map(t => {
+      const pnl = parseFloat(t.details?.profitAndLoss || t.details?.profit || 0);
+      equity += pnl;
+      return { datum: t.date, equity: parseFloat(equity.toFixed(2)) };
+    });
+}
+
 async function ladeChart() {
   try {
-    const res  = await fetch('/api/equity');
+    const res  = await fetch('/api/trades/test');
     const data = await res.json();
 
-    // Alle Zeitstempel als ISO-Strings sammeln und sortieren
-    const alleTimestamps = [...new Set([
-      ...(data.mittel    || []).map(p => p.datum),
-      ...(data.aggressiv || []).map(p => p.datum),
-      ...(data.goldglobe || []).map(p => p.datum),
-      ...(data.test      || []).map(p => p.datum)
-    ])].sort();
+    const kurve = buildEquityCurve(data.trades || [], 1000);
+    // Startpunkt hinzufügen
+    kurve.unshift({ datum: kurve[0]?.datum || new Date().toISOString(), equity: 1000 });
 
-    const labels = alleTimestamps.map(d => {
-      const dt = new Date(d);
+    const labels = kurve.map(p => {
+      const dt = new Date(p.datum);
       return dt.toLocaleDateString('de-DE') + ' ' + dt.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
     });
-
-    // Für jeden Timestamp den letzten bekannten Equity-Wert pro Strategie (forward-fill)
-    function buildSeries(punkte) {
-      if (!punkte || punkte.length === 0) return alleTimestamps.map(() => null);
-      const map = new Map(punkte.map(p => [p.datum, p.equity]));
-      let last = null;
-      return alleTimestamps.map(ts => {
-        if (map.has(ts)) last = map.get(ts);
-        return last;
-      });
-    }
 
     const ctx = document.getElementById('equityChart').getContext('2d');
     new Chart(ctx, {
@@ -691,18 +729,15 @@ async function ladeChart() {
       data: {
         labels,
         datasets: [
-          { label: 'Mittel',    data: buildSeries(data.mittel),    borderColor: '#60a5fa', backgroundColor: 'rgba(96,165,250,0.1)',  tension: 0.3, fill: true, spanGaps: true },
-          { label: 'Aggressiv', data: buildSeries(data.aggressiv), borderColor: '#fb923c', backgroundColor: 'rgba(251,146,60,0.1)',   tension: 0.3, fill: true, spanGaps: true },
-          { label: 'GoldGlobe', data: buildSeries(data.goldglobe), borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,0.1)', tension: 0.3, fill: true, spanGaps: true },
-          { label: 'Test 1M',   data: buildSeries(data.test),      borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)',  tension: 0.3, fill: true, spanGaps: true }
+          { label: 'Test 1M', data: kurve.map(p => p.equity), borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', tension: 0.3, fill: true, pointRadius: 3 }
         ]
       },
       options: {
         responsive: true,
         plugins: { legend: { labels: { color: '#fff' } } },
         scales: {
-          x: { ticks: { color: '#888', maxTicksLimit: 12 }, grid: { color: '#222' } },
-          y: { ticks: { color: '#888', callback: v => v + '€' }, grid: { color: '#222' } }
+          x: { ticks: { color: '#888', maxTicksLimit: 15 }, grid: { color: '#222' } },
+          y: { ticks: { color: '#888', callback: v => v.toFixed(0) + '€' }, grid: { color: '#222' } }
         }
       }
     });
