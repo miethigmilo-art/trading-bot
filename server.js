@@ -161,11 +161,13 @@ async function getEquity(konto) {
   }
 }
 
-// ── Closed Trades von Capital.com holen ───────────────
+// ── Trades von Capital.com holen ─────────────────────
 async function getClosedTrades(konto, von, bis) {
-  const params = { detailed: true, pageSize: 500 };
-  if (von) params.from = von;
-  if (bis) params.to   = bis;
+  // Standard: letzte 30 Tage
+  const fromMs = von ? new Date(von).getTime() : Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const params = { detailed: true, pageSize: 500, from: fromMs };
+  if (bis) params.to = new Date(bis).getTime();
+
   const res = await axios.get(`${konto.baseUrl}/history/activity`, {
     headers: {
       'X-CAP-API-KEY':    konto.apiKey,
@@ -174,10 +176,10 @@ async function getClosedTrades(konto, von, bis) {
     },
     params
   });
-  // Nur geschlossene Positionen mit P&L
-  return (res.data.activityHistory || []).filter(a =>
-    a.details?.actions?.some(x => x.actionType === 'POSITION_CLOSED')
-  );
+  const alle = res.data.activityHistory || res.data.activities || res.data || [];
+  console.log(`📋 Capital.com History: ${alle.length} Einträge, Keys: ${Object.keys(res.data).join(', ')}`);
+  if (alle.length > 0) console.log('📋 Erster Eintrag:', JSON.stringify(alle[0]).slice(0, 300));
+  return alle;
 }
 
 // ── Drawdown prüfen ───────────────────────────────────
