@@ -449,13 +449,39 @@ app.get('/api/debug/activity/:strategie', async (req, res) => {
   const konto = strategie.konto;
   try {
     if (!konto.cst) await login(konto);
-    const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 19);
-    const to   = new Date().toISOString().slice(0, 19);
-    const res2 = await axios.get(`${konto.baseUrl}/history/activity`, {
-      headers: { 'X-CAP-API-KEY': konto.apiKey, 'CST': konto.cst, 'X-SECURITY-TOKEN': konto.token },
-      params: { from, to, lastNumberOfItems: 10, detailed: true }
-    });
-    res.json({ responseKeys: Object.keys(res2.data), paramsGesendet: { from, to }, rawData: res2.data });
+    const headers = { 'X-CAP-API-KEY': konto.apiKey, 'CST': konto.cst, 'X-SECURITY-TOKEN': konto.token };
+
+    const fromMs  = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const fromIso = new Date(fromMs).toISOString().slice(0, 19);
+    const toIso   = new Date().toISOString().slice(0, 19);
+
+    const ergebnisse = {};
+
+    // Versuch 1: ISO-Format
+    try {
+      const r = await axios.get(`${konto.baseUrl}/history/activity`, {
+        headers, params: { from: fromIso, to: toIso, lastNumberOfItems: 5, detailed: true }
+      });
+      ergebnisse.iso = { keys: Object.keys(r.data), count: (r.data.activityHistory || []).length, sample: (r.data.activityHistory || [])[0] || null };
+    } catch (e) { ergebnisse.iso = { error: e.message, status: e.response?.status }; }
+
+    // Versuch 2: Millisekunden
+    try {
+      const r = await axios.get(`${konto.baseUrl}/history/activity`, {
+        headers, params: { from: fromMs, to: Date.now(), lastNumberOfItems: 5, detailed: true }
+      });
+      ergebnisse.ms = { keys: Object.keys(r.data), count: (r.data.activityHistory || []).length, sample: (r.data.activityHistory || [])[0] || null };
+    } catch (e) { ergebnisse.ms = { error: e.message, status: e.response?.status }; }
+
+    // Versuch 3: Transactions (für P&L)
+    try {
+      const r = await axios.get(`${konto.baseUrl}/history/transactions`, {
+        headers, params: { from: fromIso, to: toIso, type: 'ALL', pageSize: 5 }
+      });
+      ergebnisse.transactions = { keys: Object.keys(r.data), sample: r.data };
+    } catch (e) { ergebnisse.transactions = { error: e.message, status: e.response?.status }; }
+
+    res.json(ergebnisse);
   } catch (err) {
     res.status(500).json({ error: err.message, status: err.response?.status, data: err.response?.data });
   }
