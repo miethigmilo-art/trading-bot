@@ -473,13 +473,27 @@ app.get('/api/debug/activity/:strategie', async (req, res) => {
       ergebnisse.ms = { keys: Object.keys(r.data), count: (r.data.activityHistory || []).length, sample: (r.data.activityHistory || [])[0] || null };
     } catch (e) { ergebnisse.ms = { error: e.message, status: e.response?.status }; }
 
-    // Versuch 3: Transactions (für P&L)
+    // Versuch 3: Transactions ohne Datum
     try {
       const r = await axios.get(`${konto.baseUrl}/history/transactions`, {
-        headers, params: { from: fromIso, to: toIso, type: 'ALL', pageSize: 5 }
+        headers, params: { type: 'ALL', pageSize: 10 }
       });
-      ergebnisse.transactions = { keys: Object.keys(r.data), sample: r.data };
-    } catch (e) { ergebnisse.transactions = { error: e.message, status: e.response?.status }; }
+      ergebnisse.tx_kein_datum = { keys: Object.keys(r.data), count: (r.data.transactions||[]).length, sample: (r.data.transactions||[])[0] || null };
+    } catch (e) { ergebnisse.tx_kein_datum = { error: e.message, status: e.response?.status }; }
+
+    // Versuch 4: Transactions mit Millisekunden
+    try {
+      const r = await axios.get(`${konto.baseUrl}/history/transactions`, {
+        headers, params: { from: fromMs, to: Date.now(), type: 'ALL', pageSize: 10 }
+      });
+      ergebnisse.tx_ms = { count: (r.data.transactions||[]).length, sample: (r.data.transactions||[])[0] || null };
+    } catch (e) { ergebnisse.tx_ms = { error: e.message, status: e.response?.status }; }
+
+    // Versuch 5: Positions direkt
+    try {
+      const r = await axios.get(`${konto.baseUrl}/positions`, { headers });
+      ergebnisse.positions_offen = { count: (r.data.positions||[]).length, sample: (r.data.positions||[])[0] || null };
+    } catch (e) { ergebnisse.positions_offen = { error: e.message, status: e.response?.status }; }
 
     res.json(ergebnisse);
   } catch (err) {
