@@ -420,18 +420,44 @@ app.get('/api/trades/:strategie', async (req, res) => {
   const strategie     = STRATEGIEN[strategieName];
   if (!strategie) return res.status(400).json({ error: 'Unbekannte Strategie' });
 
+  const { datum } = req.query; // Optional: ?datum=2026-04-28
   const konto = strategie.konto;
   try {
     if (!konto.cst) await login(konto);
-    const trades = await getClosedTrades(konto);
-    res.json({ strategie: strategieName, trades });
+
+    let von, bis;
+    if (datum) {
+      von = datum + 'T00:00:00';
+      bis = datum + 'T23:59:59';
+    }
+    const trades = await getClosedTrades(konto, von, bis);
+    res.json({ strategie: strategieName, trades, count: trades.length });
   } catch (err) {
     if (err.response?.status === 401) {
       konto.cst = null;
       await login(konto);
       return res.redirect(req.originalUrl);
     }
-    res.status(500).json({ error: err.message, raw: err.response?.data });
+    res.status(500).json({ error: err.message, capitalResponse: err.response?.data });
+  }
+});
+
+// ── Debug: Rohe Capital.com History ───────────────────
+app.get('/api/debug/activity/:strategie', async (req, res) => {
+  const strategie = STRATEGIEN[req.params.strategie];
+  if (!strategie) return res.status(400).json({ error: 'Unbekannte Strategie' });
+  const konto = strategie.konto;
+  try {
+    if (!konto.cst) await login(konto);
+    const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 19);
+    const to   = new Date().toISOString().slice(0, 19);
+    const res2 = await axios.get(`${konto.baseUrl}/history/activity`, {
+      headers: { 'X-CAP-API-KEY': konto.apiKey, 'CST': konto.cst, 'X-SECURITY-TOKEN': konto.token },
+      params: { from, to, lastNumberOfItems: 10, detailed: true }
+    });
+    res.json({ responseKeys: Object.keys(res2.data), paramsGesendet: { from, to }, rawData: res2.data });
+  } catch (err) {
+    res.status(500).json({ error: err.message, status: err.response?.status, data: err.response?.data });
   }
 });
 
