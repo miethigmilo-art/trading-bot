@@ -115,13 +115,33 @@ function speichereEquityDaten(daten) {
 let equityVerlauf = ladeEquityDaten();
 
 function equityPunktHinzufuegen(strategieName, equity) {
-    if (!equityVerlauf[strategieName]) equityVerlauf[strategieName] = [];
-    equityVerlauf[strategieName].push({
-      datum:  new Date().toISOString(),
-      equity: parseFloat(equity)
-    });
+  if (!equityVerlauf[strategieName]) equityVerlauf[strategieName] = [];
+  equityVerlauf[strategieName].push({ datum: new Date().toISOString(), equity: parseFloat(equity) });
   speichereEquityDaten(equityVerlauf);
-  console.log(`📈 Equity Punkt gespeichert [${strategieName}]: ${equity}€`);
+}
+
+// ── Trade Historie ────────────────────────────────────
+const TRADES_FILE = '/data/trades.json';
+
+function ladeTradeDaten() {
+  try {
+    if (fs.existsSync(TRADES_FILE)) return JSON.parse(fs.readFileSync(TRADES_FILE, 'utf8'));
+  } catch (err) { console.error('❌ Trades laden:', err.message); }
+  return { mittel: [], aggressiv: [], goldglobe: [], test: [] };
+}
+
+function speichereTradeDaten(daten) {
+  try { fs.writeFileSync(TRADES_FILE, JSON.stringify(daten, null, 2)); }
+  catch (err) { console.error('❌ Trades speichern:', err.message); }
+}
+
+let tradeVerlauf = ladeTradeDaten();
+
+function tradeHinzufuegen(strategieName, trade) {
+  if (!tradeVerlauf[strategieName]) tradeVerlauf[strategieName] = [];
+  tradeVerlauf[strategieName].push(trade);
+  speichereTradeDaten(tradeVerlauf);
+  console.log(`📝 Trade gespeichert [${strategieName}]: PnL ${trade.pnl > 0 ? '+' : ''}${trade.pnl}€`);
 }
 
 // ── Login ─────────────────────────────────────────────
@@ -258,7 +278,17 @@ async function handleWebhook(req, res, strategieName) {
     }
 
     const pnl = equity - letzteEquity[strategieName];
-    if (pnl !== 0) updatePerformance(strategieName, pnl);
+    if (pnl !== 0) {
+      updatePerformance(strategieName, pnl);
+      tradeHinzufuegen(strategieName, {
+        datum:  new Date().toISOString(),
+        pnl:    parseFloat(pnl.toFixed(2)),
+        equity: parseFloat(equity.toFixed(2)),
+        seite:  side,
+        sl:     parseFloat(sl),
+        tp:     parseFloat(tp)
+      });
+    }
     letzteEquity[strategieName] = equity;
     equityPunktHinzufuegen(strategieName, equity);
 
@@ -414,91 +444,21 @@ app.get('/api/equity', (req, res) => {
   res.json(equityVerlauf);
 });
 
-// ── Trades API (direkt von Capital.com) ───────────────
-app.get('/api/trades/:strategie', async (req, res) => {
+// ── Trades API ────────────────────────────────────────
+app.get('/api/trades/:strategie', (req, res) => {
   const strategieName = req.params.strategie;
-  const strategie     = STRATEGIEN[strategieName];
-  if (!strategie) return res.status(400).json({ error: 'Unbekannte Strategie' });
+  if (!STRATEGIEN[strategieName]) return res.status(400).json({ error: 'Unbekannte Strategie' });
 
   const { datum } = req.query; // Optional: ?datum=2026-04-28
-  const konto = strategie.konto;
-  try {
-    if (!konto.cst) await login(konto);
+  let trades = tradeVerlauf[strategieName] || [];
 
-    let von, bis;
-    if (datum) {
-      von = datum + 'T00:00:00';
-      bis = datum + 'T23:59:59';
-    }
-    const trades = await getClosedTrades(konto, von, bis);
-    res.json({ strategie: strategieName, trades, count: trades.length });
-  } catch (err) {
-    if (err.response?.status === 401) {
-      konto.cst = null;
-      await login(konto);
-      return res.redirect(req.originalUrl);
-    }
-    res.status(500).json({ error: err.message, capitalResponse: err.response?.data });
+  if (datum) {
+    trades = trades.filter(t => t.datum.startsWith(datum));
   }
-});
 
-// ── Debug: Rohe Capital.com History ───────────────────
-app.get('/api/debug/activity/:strategie', async (req, res) => {
-  const strategie = STRATEGIEN[req.params.strategie];
-  if (!strategie) return res.status(400).json({ error: 'Unbekannte Strategie' });
-  const konto = strategie.konto;
-  try {
-    if (!konto.cst) await login(konto);
-    const headers = { 'X-CAP-API-KEY': konto.apiKey, 'CST': konto.cst, 'X-SECURITY-TOKEN': konto.token };
-
-    const fromMs  = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    const fromIso = new Date(fromMs).toISOString().slice(0, 19);
-    const toIso   = new Date().toISOString().slice(0, 19);
-
-    const ergebnisse = {};
-
-    // Versuch 1: ISO-Format
-    try {
-      const r = await axios.get(`${konto.baseUrl}/history/activity`, {
-        headers, params: { from: fromIso, to: toIso, lastNumberOfItems: 5, detailed: true }
-      });
-      ergebnisse.iso = { keys: Object.keys(r.data), count: (r.data.activityHistory || []).length, sample: (r.data.activityHistory || [])[0] || null };
-    } catch (e) { ergebnisse.iso = { error: e.message, status: e.response?.status }; }
-
-    // Versuch 2: Millisekunden
-    try {
-      const r = await axios.get(`${konto.baseUrl}/history/activity`, {
-        headers, params: { from: fromMs, to: Date.now(), lastNumberOfItems: 5, detailed: true }
-      });
-      ergebnisse.ms = { keys: Object.keys(r.data), count: (r.data.activityHistory || []).length, sample: (r.data.activityHistory || [])[0] || null };
-    } catch (e) { ergebnisse.ms = { error: e.message, status: e.response?.status }; }
-
-    // Versuch 3: Transactions ohne Datum
-    try {
-      const r = await axios.get(`${konto.baseUrl}/history/transactions`, {
-        headers, params: { type: 'ALL', pageSize: 10 }
-      });
-      ergebnisse.tx_kein_datum = { keys: Object.keys(r.data), count: (r.data.transactions||[]).length, sample: (r.data.transactions||[])[0] || null };
-    } catch (e) { ergebnisse.tx_kein_datum = { error: e.message, status: e.response?.status }; }
-
-    // Versuch 4: Transactions mit Millisekunden
-    try {
-      const r = await axios.get(`${konto.baseUrl}/history/transactions`, {
-        headers, params: { from: fromMs, to: Date.now(), type: 'ALL', pageSize: 10 }
-      });
-      ergebnisse.tx_ms = { count: (r.data.transactions||[]).length, sample: (r.data.transactions||[])[0] || null };
-    } catch (e) { ergebnisse.tx_ms = { error: e.message, status: e.response?.status }; }
-
-    // Versuch 5: Positions direkt
-    try {
-      const r = await axios.get(`${konto.baseUrl}/positions`, { headers });
-      ergebnisse.positions_offen = { count: (r.data.positions||[]).length, sample: (r.data.positions||[])[0] || null };
-    } catch (e) { ergebnisse.positions_offen = { error: e.message, status: e.response?.status }; }
-
-    res.json(ergebnisse);
-  } catch (err) {
-    res.status(500).json({ error: err.message, status: err.response?.status, data: err.response?.data });
-  }
+  const gesamtPnL = trades.reduce((s, t) => s + t.pnl, 0);
+  const gewinn    = trades.filter(t => t.pnl > 0).length;
+  res.json({ strategie: strategieName, datum: datum || 'alle', trades, count: trades.length, gesamtPnL: parseFloat(gesamtPnL.toFixed(2)), gewinn, verlust: trades.length - gewinn });
 });
 
 // ── Reset ─────────────────────────────────────────────
@@ -590,35 +550,57 @@ app.get('/test/trade', async (req, res) => {
 });
 
 // ── Dashboard ─────────────────────────────────────────
-app.get('/dashboard', (req, res) => {
-  res.send(`<!DOCTYPE html>
+app.get('/dashboard', (req, res) => { res.send(`<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trading Bot Dashboard</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, sans-serif; background: #0f0f0f; color: #fff; padding: 24px; }
-  h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
-  .subtitle { color: #666; font-size: 14px; margin-bottom: 32px; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-  .card { background: #1a1a1a; border-radius: 12px; padding: 24px; border: 1px solid #222; }
-  .card h2 { font-size: 14px; color: #888; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
-  .equity { font-size: 36px; font-weight: 700; }
-  .stat { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; }
-  .stat:last-child { border-bottom: none; }
-  .stat-label { color: #888; font-size: 14px; }
-  .stat-value { font-size: 15px; font-weight: 600; }
-  .pos { color: #22c55e; }
-  .neg { color: #ef4444; }
-  .tag { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-  .tag-mittel { background: #1e3a5f; color: #60a5fa; }
-  .tag-aggressiv { background: #3b1f00; color: #fb923c; }
-  .tag-test { background: #1a3a1a; color: #4ade80; }
-  .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; margin-right: 8px; }
-  .btn-refresh { background: #222; color: #fff; }
-  .btn-reset { background: #2a0000; color: #ef4444; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,sans-serif; background:#0f0f0f; color:#fff; padding:24px; }
+h1 { font-size:24px; font-weight:600; margin-bottom:6px; }
+.subtitle { color:#666; font-size:14px; margin-bottom:28px; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.card { background:#1a1a1a; border-radius:12px; padding:22px; border:1px solid #222; cursor:pointer; transition:border-color .15s, box-shadow .15s; }
+.card:hover { border-color:#444; box-shadow:0 0 0 1px #333; }
+.card h2 { font-size:12px; color:#666; margin-bottom:14px; text-transform:uppercase; letter-spacing:1px; display:flex; justify-content:space-between; align-items:center; }
+.card h2 span.hint { font-size:10px; color:#333; text-transform:none; letter-spacing:0; }
+.equity { font-size:32px; font-weight:700; margin-bottom:14px; }
+.stat { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #1e1e1e; }
+.stat:last-of-type { border-bottom:none; }
+.stat-label { color:#666; font-size:13px; }
+.stat-value { font-size:13px; font-weight:600; }
+.pos { color:#22c55e; } .neg { color:#ef4444; }
+.tag { display:inline-block; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; }
+.tag-mittel { background:#1e3a5f; color:#60a5fa; }
+.tag-aggressiv { background:#3b1f00; color:#fb923c; }
+.tag-test { background:#1a3a1a; color:#4ade80; }
+.btn { padding:9px 18px; border-radius:8px; border:none; cursor:pointer; font-size:13px; font-weight:600; margin-right:8px; }
+/* Modal */
+.overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:200; align-items:center; justify-content:center; padding:16px; }
+.overlay.on { display:flex; }
+.modal { background:#161616; border:1px solid #2a2a2a; border-radius:16px; width:100%; max-width:680px; max-height:88vh; overflow-y:auto; padding:26px; }
+.modal-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+.modal-top h2 { font-size:17px; font-weight:600; }
+.modal-close { background:#222; border:none; color:#777; font-size:18px; padding:3px 10px; border-radius:7px; cursor:pointer; }
+.modal-close:hover { color:#fff; }
+.date-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:18px; }
+.date-bar input { background:#222; border:1px solid #333; color:#fff; padding:7px 11px; border-radius:8px; font-size:13px; }
+.date-bar button { background:#262626; border:1px solid #333; color:#aaa; padding:7px 13px; border-radius:8px; font-size:12px; cursor:pointer; }
+.date-bar button:hover { color:#fff; border-color:#555; }
+.summary { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:18px; }
+.sbox { background:#1e1e1e; border-radius:10px; padding:14px; text-align:center; }
+.sbox .v { font-size:20px; font-weight:700; }
+.sbox .l { font-size:11px; color:#555; margin-top:3px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { color:#444; font-weight:500; padding:7px 8px; text-align:left; border-bottom:1px solid #222; }
+td { padding:9px 8px; border-bottom:1px solid #1a1a1a; vertical-align:middle; }
+tr:last-child td { border:none; }
+.badge { display:inline-block; padding:2px 7px; border-radius:20px; font-size:11px; font-weight:700; }
+.buy-b { background:#1a3a1a; color:#4ade80; }
+.sell-b { background:#3a1a1a; color:#ef4444; }
+.empty { text-align:center; padding:36px; color:#333; font-size:14px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
@@ -626,204 +608,198 @@ app.get('/dashboard', (req, res) => {
 <h1>Trading Bot Dashboard</h1>
 <p class="subtitle" id="updatezeit">Wird geladen...</p>
 
-<div class="card" style="margin-bottom:16px">
-  <h2>Equity Kurve</h2>
-  <canvas id="equityChart" height="80"></canvas>
+<div class="card" style="margin-bottom:16px;cursor:default">
+  <h2>Equity Kurve — Test 1M</h2>
+  <canvas id="equityChart" height="75"></canvas>
 </div>
 
-<div class="grid">
-  <div class="card">
-    <h2><span class="tag tag-mittel">Mittel</span></h2>
-    <div class="equity pos" id="m-equity">...</div>
-    <br>
-    <div class="stat"><span class="stat-label">Trades gesamt</span><span class="stat-value" id="m-trades">-</span></div>
-    <div class="stat"><span class="stat-label">Gewinn-Trades</span><span class="stat-value pos" id="m-gewinn">-</span></div>
-    <div class="stat"><span class="stat-label">Verlust-Trades</span><span class="stat-value neg" id="m-verlust">-</span></div>
+<div class="grid2">
+  <div class="card" onclick="openModal('mittel')">
+    <h2><span class="tag tag-mittel">Mittel</span><span class="hint">Trades anzeigen →</span></h2>
+    <div class="equity pos" id="m-equity">—</div>
+    <div class="stat"><span class="stat-label">Trades</span><span class="stat-value" id="m-trades">-</span></div>
     <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="m-winrate">-</span></div>
-    <div class="stat"><span class="stat-label">Gesamt PnL</span><span class="stat-value" id="m-pnl">-</span></div>
-    <div class="stat"><span class="stat-label">Bester Trade</span><span class="stat-value pos" id="m-best">-</span></div>
-    <div class="stat"><span class="stat-label">Schlechtester Trade</span><span class="stat-value neg" id="m-worst">-</span></div>
+    <div class="stat"><span class="stat-label">Gesamt P&L</span><span class="stat-value" id="m-pnl">-</span></div>
     <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="m-dd">-</span></div>
   </div>
-  <div class="card">
-    <h2><span class="tag tag-aggressiv">Aggressiv</span></h2>
-    <div class="equity pos" id="a-equity">...</div>
-    <br>
-    <div class="stat"><span class="stat-label">Trades gesamt</span><span class="stat-value" id="a-trades">-</span></div>
-    <div class="stat"><span class="stat-label">Gewinn-Trades</span><span class="stat-value pos" id="a-gewinn">-</span></div>
-    <div class="stat"><span class="stat-label">Verlust-Trades</span><span class="stat-value neg" id="a-verlust">-</span></div>
+  <div class="card" onclick="openModal('aggressiv')">
+    <h2><span class="tag tag-aggressiv">Aggressiv</span><span class="hint">Trades anzeigen →</span></h2>
+    <div class="equity pos" id="a-equity">—</div>
+    <div class="stat"><span class="stat-label">Trades</span><span class="stat-value" id="a-trades">-</span></div>
     <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="a-winrate">-</span></div>
-    <div class="stat"><span class="stat-label">Gesamt PnL</span><span class="stat-value" id="a-pnl">-</span></div>
-    <div class="stat"><span class="stat-label">Bester Trade</span><span class="stat-value pos" id="a-best">-</span></div>
-    <div class="stat"><span class="stat-label">Schlechtester Trade</span><span class="stat-value neg" id="a-worst">-</span></div>
+    <div class="stat"><span class="stat-label">Gesamt P&L</span><span class="stat-value" id="a-pnl">-</span></div>
     <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="a-dd">-</span></div>
   </div>
 </div>
-
-<div class="grid" style="margin-bottom:16px">
-  <div class="card" style="border:1px solid #2d1f5e">
-    <h2><span class="tag" style="background:#2d1f5e;color:#a78bfa">GoldGlobe</span></h2>
-    <div class="equity pos" id="g-equity">...</div>
-    <br>
-    <div class="stat"><span class="stat-label">Trades gesamt</span><span class="stat-value" id="g-trades">-</span></div>
-    <div class="stat"><span class="stat-label">Gewinn-Trades</span><span class="stat-value pos" id="g-gewinn">-</span></div>
-    <div class="stat"><span class="stat-label">Verlust-Trades</span><span class="stat-value neg" id="g-verlust">-</span></div>
+<div class="grid2">
+  <div class="card" style="border-color:#2d1f5e" onclick="openModal('goldglobe')">
+    <h2><span class="tag" style="background:#2d1f5e;color:#a78bfa">GoldGlobe</span><span class="hint">Trades anzeigen →</span></h2>
+    <div class="equity pos" id="g-equity">—</div>
+    <div class="stat"><span class="stat-label">Trades</span><span class="stat-value" id="g-trades">-</span></div>
     <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="g-winrate">-</span></div>
-    <div class="stat"><span class="stat-label">Gesamt PnL</span><span class="stat-value" id="g-pnl">-</span></div>
-    <div class="stat"><span class="stat-label">Bester Trade</span><span class="stat-value pos" id="g-best">-</span></div>
-    <div class="stat"><span class="stat-label">Schlechtester Trade</span><span class="stat-value neg" id="g-worst">-</span></div>
+    <div class="stat"><span class="stat-label">Gesamt P&L</span><span class="stat-value" id="g-pnl">-</span></div>
     <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="g-dd">-</span></div>
+  </div>
+  <div class="card" style="border-color:#1a3a1a" onclick="openModal('test')">
+    <h2><span class="tag tag-test">Test 1M</span><span class="hint">Trades anzeigen →</span></h2>
+    <div class="equity pos" id="t-equity">—</div>
+    <div class="stat"><span class="stat-label">Trades</span><span class="stat-value" id="t-trades">-</span></div>
+    <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="t-winrate">-</span></div>
+    <div class="stat"><span class="stat-label">Gesamt P&L</span><span class="stat-value" id="t-pnl">-</span></div>
+    <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="t-dd">-</span></div>
   </div>
 </div>
 
-<div class="card" style="margin-bottom:16px;border:1px solid #1a3a1a">
-  <h2><span class="tag tag-test">Test 1M</span></h2>
-  <div class="equity pos" id="t-equity">...</div>
-  <br>
-  <div class="stat"><span class="stat-label">Trades gesamt</span><span class="stat-value" id="t-trades">-</span></div>
-  <div class="stat"><span class="stat-label">Gewinn-Trades</span><span class="stat-value pos" id="t-gewinn">-</span></div>
-  <div class="stat"><span class="stat-label">Verlust-Trades</span><span class="stat-value neg" id="t-verlust">-</span></div>
-  <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="t-winrate">-</span></div>
-  <div class="stat"><span class="stat-label">Gesamt PnL</span><span class="stat-value" id="t-pnl">-</span></div>
-  <div class="stat"><span class="stat-label">Bester Trade</span><span class="stat-value pos" id="t-best">-</span></div>
-  <div class="stat"><span class="stat-label">Schlechtester Trade</span><span class="stat-value neg" id="t-worst">-</span></div>
-  <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="t-dd">-</span></div>
-  <div style="margin-top:12px;color:#555;font-size:12px">Webhook: /webhook/test &nbsp;|&nbsp; Risiko: 1% &nbsp;|&nbsp; 1M Timeframe</div>
-</div>
-
-<div class="card" style="margin-bottom:16px">
-  <h2>Ein- / Auszahlung</h2>
-  <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
-    <div>
-      <div style="color:#888;font-size:12px;margin-bottom:6px">Betrag (€)</div>
-      <input type="number" id="betrag" placeholder="z.B. 500" style="background:#222;border:1px solid #333;color:#fff;padding:10px;border-radius:8px;width:140px;font-size:14px">
-    </div>
-    <div>
-      <div style="color:#888;font-size:12px;margin-bottom:6px">Strategie</div>
-      <select id="strategie" style="background:#222;border:1px solid #333;color:#fff;padding:10px;border-radius:8px;font-size:14px">
-        <option value="mittel">Mittel</option>
-        <option value="aggressiv">Aggressiv</option>
-        <option value="beide">Beide</option>
-      </select>
-    </div>
+<div class="card" style="margin-top:16px;margin-bottom:16px;cursor:default">
+  <h2 style="margin-bottom:14px">EIN- / AUSZAHLUNG</h2>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+    <div><div style="color:#555;font-size:11px;margin-bottom:5px">BETRAG (€)</div>
+      <input type="number" id="betrag" placeholder="500" style="background:#222;border:1px solid #333;color:#fff;padding:9px 11px;border-radius:8px;width:120px;font-size:14px"></div>
+    <div><div style="color:#555;font-size:11px;margin-bottom:5px">STRATEGIE</div>
+      <select id="strategie" style="background:#222;border:1px solid #333;color:#fff;padding:9px 11px;border-radius:8px;font-size:13px">
+        <option value="mittel">Mittel</option><option value="aggressiv">Aggressiv</option><option value="beide">Beide</option>
+      </select></div>
     <button class="btn" style="background:#1a3a1a;color:#22c55e" onclick="einzahlung()">Einzahlen</button>
     <button class="btn" style="background:#3a1a1a;color:#ef4444" onclick="auszahlung()">Auszahlen</button>
   </div>
-  <div id="zahlung-status" style="margin-top:12px;font-size:13px;color:#888"></div>
+  <div id="zahlung-status" style="margin-top:10px;font-size:12px;color:#555"></div>
+</div>
+<button class="btn" style="background:#222;color:#fff" onclick="laden()">Aktualisieren</button>
+<button class="btn" style="background:#1a0000;color:#ef4444" onclick="reset()">Reset</button>
+
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="modal-top">
+      <h2 id="modal-titel">Trades</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="date-bar">
+      <input type="date" id="modal-datum">
+      <button onclick="ladeModalTrades()">Laden</button>
+      <button onclick="setTag(0)">Heute</button>
+      <button onclick="setTag(-1)">Gestern</button>
+      <button onclick="setTag(-2)">Vorgestern</button>
+    </div>
+    <div class="summary">
+      <div class="sbox"><div class="v" id="s-anz">—</div><div class="l">Trades</div></div>
+      <div class="sbox"><div class="v" id="s-pnl">—</div><div class="l">Gesamt P&L</div></div>
+      <div class="sbox"><div class="v" id="s-wl">—</div><div class="l">Win / Loss</div></div>
+    </div>
+    <div id="modal-body"></div>
+  </div>
 </div>
 
-<button class="btn btn-refresh" onclick="laden()">Aktualisieren</button>
-<button class="btn btn-reset" onclick="reset()">Statistik zurücksetzen</button>
-
 <script>
-function pnlFarbe(val) { return val > 0 ? 'pos' : val < 0 ? 'neg' : ''; }
+let aktStrat = 'test';
+const namen = { mittel:'Mittel', aggressiv:'Aggressiv', goldglobe:'GoldGlobe', test:'Test 1M' };
 
-function fillKarte(prefix, d) {
+function pf(v) { return v > 0 ? 'pos' : v < 0 ? 'neg' : ''; }
+
+function fillKarte(p, d) {
   const eq = d.aktuellesEquity;
-  document.getElementById(prefix + '-equity').textContent  = eq != null ? parseFloat(eq).toFixed(2) + ' €' : '—';
-  document.getElementById(prefix + '-trades').textContent  = d.trades;
-  document.getElementById(prefix + '-gewinn').textContent  = d.gewinn;
-  document.getElementById(prefix + '-verlust').textContent = d.verlust;
-  document.getElementById(prefix + '-winrate').textContent = d.winRate + '%';
-  const pnlEl = document.getElementById(prefix + '-pnl');
-  pnlEl.textContent = (d.gesamtPnL >= 0 ? '+' : '') + parseFloat(d.gesamtPnL).toFixed(2) + ' €';
-  pnlEl.className   = 'stat-value ' + pnlFarbe(parseFloat(d.gesamtPnL));
-  document.getElementById(prefix + '-best').textContent    = '+' + parseFloat(d.bestesTrade).toFixed(2) + ' €';
-  document.getElementById(prefix + '-worst').textContent   = parseFloat(d.schlechtestesTrade).toFixed(2) + ' €';
-  document.getElementById(prefix + '-dd').textContent      = d.drawdown + '%';
+  document.getElementById(p+'-equity').textContent = eq != null ? parseFloat(eq).toFixed(2)+' €' : '—';
+  document.getElementById(p+'-trades').textContent  = d.trades;
+  document.getElementById(p+'-winrate').textContent = d.winRate+'%';
+  const pel = document.getElementById(p+'-pnl');
+  pel.textContent = (d.gesamtPnL>=0?'+':'')+parseFloat(d.gesamtPnL).toFixed(2)+' €';
+  pel.className = 'stat-value '+pf(parseFloat(d.gesamtPnL));
+  document.getElementById(p+'-dd').textContent = d.drawdown+'%';
 }
 
 async function laden() {
   try {
-    const res = await fetch('/api/performance');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    document.getElementById('updatezeit').textContent = 'Letzte Aktualisierung: ' + new Date(data.letzteAktualisierung).toLocaleString('de-DE');
-    fillKarte('m', data.mittel);
-    fillKarte('a', data.aggressiv);
-    fillKarte('g', data.goldglobe);
-    fillKarte('t', data.test);
-  } catch (err) {
-    document.getElementById('updatezeit').textContent = '❌ Ladefehler: ' + err.message;
-  }
+    const r = await fetch('/api/performance');
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const d = await r.json();
+    document.getElementById('updatezeit').textContent = 'Letzte Aktualisierung: '+new Date(d.letzteAktualisierung).toLocaleString('de-DE');
+    fillKarte('m',d.mittel); fillKarte('a',d.aggressiv); fillKarte('g',d.goldglobe); fillKarte('t',d.test);
+  } catch(e) { document.getElementById('updatezeit').textContent = '❌ '+e.message; }
 }
 
-async function reset() {
-  if (!confirm('Statistik wirklich zurücksetzen?')) return;
-  await fetch('/api/reset', { method: 'POST' });
-  laden();
+function tagStr(offset) {
+  const d = new Date(); d.setDate(d.getDate()+offset);
+  return d.toISOString().slice(0,10);
 }
+function setTag(offset) { document.getElementById('modal-datum').value = tagStr(offset); }
 
-async function einzahlung() {
-  const betrag    = document.getElementById('betrag').value;
-  const strategie = document.getElementById('strategie').value;
-  if (!betrag) return alert('Bitte Betrag eingeben!');
-  await fetch('/api/einzahlung?betrag=' + betrag + '&strategie=' + strategie);
-  document.getElementById('zahlung-status').textContent = '✅ Einzahlung: ' + betrag + '€ für ' + strategie;
-  laden();
+function openModal(strat) {
+  aktStrat = strat;
+  document.getElementById('modal-titel').textContent = namen[strat]+' — Trades des Tages';
+  setTag(0);
+  document.getElementById('overlay').classList.add('on');
+  ladeModalTrades();
 }
+function closeModal() { document.getElementById('overlay').classList.remove('on'); }
+function bgClose(e) { if (e.target===document.getElementById('overlay')) closeModal(); }
 
-async function auszahlung() {
-  const betrag    = document.getElementById('betrag').value;
-  const strategie = document.getElementById('strategie').value;
-  if (!betrag) return alert('Bitte Betrag eingeben!');
-  await fetch('/api/auszahlung?betrag=' + betrag + '&strategie=' + strategie);
-  document.getElementById('zahlung-status').textContent = '💸 Auszahlung: ' + betrag + '€ für ' + strategie;
-  laden();
-}
-
-// Baut Equity-Kurve aus geschlossenen Trades (startEquity + kumuliertes P&L)
-function buildEquityCurve(trades, startEquity) {
-  let equity = startEquity;
-  return trades
-    .filter(t => t.date)
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .map(t => {
-      const pnl = parseFloat(t.details?.profitAndLoss || t.details?.profit || 0);
-      equity += pnl;
-      return { datum: t.date, equity: parseFloat(equity.toFixed(2)) };
-    });
+async function ladeModalTrades() {
+  const datum = document.getElementById('modal-datum').value;
+  if (!datum) return;
+  try {
+    const r = await fetch('/api/trades/'+aktStrat+'?datum='+datum);
+    const d = await r.json();
+    document.getElementById('s-anz').textContent = d.count;
+    const pe = document.getElementById('s-pnl');
+    pe.textContent = (d.gesamtPnL>=0?'+':'')+d.gesamtPnL.toFixed(2)+'€';
+    pe.className = 'v '+pf(d.gesamtPnL);
+    document.getElementById('s-wl').textContent = d.gewinn+' / '+d.verlust;
+    const body = document.getElementById('modal-body');
+    if (!d.trades.length) { body.innerHTML='<div class="empty">Keine Trades für diesen Tag</div>'; return; }
+    let h = '<table><thead><tr><th>Zeit</th><th>Richtung</th><th>P&L</th><th>Equity</th><th>SL</th><th>TP</th></tr></thead><tbody>';
+    for (const t of d.trades) {
+      const z = new Date(t.datum).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      const cl = t.pnl>0?'pos':'neg';
+      h += \`<tr><td>\${z}</td><td><span class="badge \${t.seite==='BUY'?'buy-b':'sell-b'}">\${t.seite}</span></td><td class="\${cl}">\${t.pnl>=0?'+':''}\${t.pnl.toFixed(2)}€</td><td>\${t.equity.toFixed(2)}€</td><td>\${t.sl}</td><td>\${t.tp}</td></tr>\`;
+    }
+    body.innerHTML = h+'</tbody></table>';
+  } catch(e) { document.getElementById('modal-body').innerHTML='<div class="empty">Fehler: '+e.message+'</div>'; }
 }
 
 async function ladeChart() {
   try {
-    const res  = await fetch('/api/trades/test');
-    const data = await res.json();
-
-    const kurve = buildEquityCurve(data.trades || [], 1000);
-    // Startpunkt hinzufügen
-    kurve.unshift({ datum: kurve[0]?.datum || new Date().toISOString(), equity: 1000 });
-
-    const labels = kurve.map(p => {
-      const dt = new Date(p.datum);
-      return dt.toLocaleDateString('de-DE') + ' ' + dt.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-    });
-
-    const ctx = document.getElementById('equityChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [
-          { label: 'Test 1M', data: kurve.map(p => p.equity), borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', tension: 0.3, fill: true, pointRadius: 3 }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { labels: { color: '#fff' } } },
-        scales: {
-          x: { ticks: { color: '#888', maxTicksLimit: 15 }, grid: { color: '#222' } },
-          y: { ticks: { color: '#888', callback: v => v.toFixed(0) + '€' }, grid: { color: '#222' } }
-        }
+    const r = await fetch('/api/trades/test');
+    const d = await r.json();
+    let labels=[], vals=[];
+    if (d.trades && d.trades.length > 0) {
+      let eq=1000; labels.push('Start'); vals.push(1000);
+      for (const t of d.trades) {
+        eq = parseFloat((eq+t.pnl).toFixed(2));
+        const dt = new Date(t.datum);
+        labels.push(dt.toLocaleDateString('de-DE')+' '+dt.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}));
+        vals.push(eq);
       }
+    } else {
+      const r2 = await fetch('/api/equity');
+      const eq2 = await r2.json();
+      const pts = (eq2.test||[]).filter(p=>p.equity>800);
+      labels = pts.map(p=>{ const dt=new Date(p.datum); return dt.toLocaleDateString('de-DE')+' '+dt.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}); });
+      vals   = pts.map(p=>p.equity);
+    }
+    if (!labels.length) return;
+    new Chart(document.getElementById('equityChart').getContext('2d'), {
+      type:'line',
+      data:{ labels, datasets:[{ label:'Test 1M', data:vals, borderColor:'#4ade80', backgroundColor:'rgba(74,222,128,0.08)', tension:0.3, fill:true, pointRadius:2, pointHoverRadius:4 }] },
+      options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#666', font:{size:11} } } }, scales:{ x:{ ticks:{ color:'#555', maxTicksLimit:10, font:{size:10} }, grid:{ color:'#1a1a1a' } }, y:{ ticks:{ color:'#555', callback:v=>v.toFixed(0)+'€', font:{size:10} }, grid:{ color:'#1a1a1a' } } } }
     });
-  } catch (err) {
-    console.error('Chart Fehler:', err.message);
-  }
+  } catch(e) { console.error('Chart:',e.message); }
 }
 
-laden();
-ladeChart();
+async function reset() { if(!confirm('Wirklich zurücksetzen?')) return; await fetch('/api/reset',{method:'POST'}); laden(); }
+async function einzahlung() {
+  const b=document.getElementById('betrag').value, s=document.getElementById('strategie').value;
+  if(!b) return alert('Betrag eingeben');
+  await fetch('/api/einzahlung?betrag='+b+'&strategie='+s);
+  document.getElementById('zahlung-status').textContent='✅ Einzahlung '+b+'€ für '+s; laden();
+}
+async function auszahlung() {
+  const b=document.getElementById('betrag').value, s=document.getElementById('strategie').value;
+  if(!b) return alert('Betrag eingeben');
+  await fetch('/api/auszahlung?betrag='+b+'&strategie='+s);
+  document.getElementById('zahlung-status').textContent='💸 Auszahlung '+b+'€ für '+s; laden();
+}
+
+laden(); ladeChart();
 </script>
 </body>
 </html>`);
