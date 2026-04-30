@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Trading Bot — Komplette Historie</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,sans-serif;background:#0f0f0f;color:#fff;padding:24px}
+h1{font-size:22px;font-weight:600;margin-bottom:6px}
+.sub{color:#666;font-size:13px;margin-bottom:20px}
+.config{display:flex;gap:8px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
+.config input{background:#1a1a1a;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px;width:320px}
+.config button{background:#222;border:1px solid #444;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer}
+.config button:hover{background:#2a2a2a}
+.tabs{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap}
+.tab{background:#1a1a1a;border:1px solid #222;color:#555;padding:7px 16px;border-radius:20px;font-size:13px;cursor:pointer;transition:all .15s}
+.tab.active,.tab:hover{background:#222;border-color:#444;color:#fff}
+.panel{display:none}.panel.on{display:block}
+.chart-section{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid #222}
+.chart-section h2{font-size:12px;color:#555;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.scard{background:#1a1a1a;border-radius:10px;padding:14px;border:1px solid #222}
+.scard .v{font-size:22px;font-weight:700}.scard .l{font-size:11px;color:#555;margin-top:4px}
+.pos{color:#22c55e}.neg{color:#ef4444}
+.search-bar{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.search-bar input{flex:1;background:#1a1a1a;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px}
+.search-bar select{background:#1a1a1a;border:1px solid #333;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{color:#444;font-weight:500;padding:8px;text-align:left;border-bottom:1px solid #222;position:sticky;top:0;background:#0f0f0f}
+td{padding:9px 8px;border-bottom:1px solid #1a1a1a}
+tr:hover td{background:#141414}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:700}
+.buy-b{background:#1a3a1a;color:#4ade80}.sell-b{background:#3a1a1a;color:#ef4444}
+.tbl-wrap{max-height:60vh;overflow-y:auto;border:1px solid #1a1a1a;border-radius:8px}
+.status{color:#555;font-size:13px;padding:12px 0}
+.cache-note{background:#1a2a1a;border:1px solid #1e3a1e;border-radius:8px;padding:10px 14px;font-size:12px;color:#4ade80;margin-bottom:16px}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+<h1>Trading Bot — Komplette Historie</h1>
+<p class="sub">Lokale PC-App — alle Daten werden vom Server geladen und lokal gecacht</p>
+
+<div class="config">
+  <input type="text" id="serverUrl" placeholder="Server URL z.B. https://trading-bot-production-86d8.up.railway.app" value="">
+  <button onclick="verbinden()">Verbinden & Laden</button>
+  <button onclick="cacheLeeren()">Cache leeren</button>
+  <span class="status" id="status">Nicht verbunden</span>
+</div>
+
+<div id="cached-note" style="display:none" class="cache-note">📦 Daten aus lokalem Cache geladen. Klicke "Verbinden & Laden" für aktuelle Daten.</div>
+
+<div class="tabs" id="tabs"></div>
+<div id="panels"></div>
+
+<script>
+const CACHE_KEY  = 'trading_bot_cache';
+const URL_KEY    = 'trading_bot_url';
+const STRATEGIEN = ['mittel','aggressiv','goldglobe','test','konservativ','optimiert'];
+const FARBEN     = { mittel:'#60a5fa', aggressiv:'#fb923c', goldglobe:'#a78bfa', test:'#4ade80', konservativ:'#34d399', optimiert:'#f472b6' };
+let daten = {};
+let charts = {};
+
+// Init: URL und Cache laden
+window.onload = () => {
+  const url = localStorage.getItem(URL_KEY) || '';
+  document.getElementById('serverUrl').value = url;
+  const cached = localStorage.getItem(CACHE_KEY);
+  if (cached) {
+    try {
+      daten = JSON.parse(cached);
+      document.getElementById('cached-note').style.display = 'block';
+      baueUI();
+      document.getElementById('status').textContent = '📦 Aus Cache';
+    } catch(e) {}
+  }
+};
+
+async function verbinden() {
+  const url = document.getElementById('serverUrl').value.trim().replace(/\/$/,'');
+  if (!url) return alert('Server URL eingeben');
+  localStorage.setItem(URL_KEY, url);
+  document.getElementById('status').textContent = '⏳ Lade...';
+
+  try {
+    // Alle Strategien laden
+    for (const name of STRATEGIEN) {
+      const r = await fetch(url+'/api/trades/'+name);
+      if (!r.ok) continue;
+      const d = await r.json();
+      daten[name] = d.trades || [];
+    }
+    // Equity-Verlauf
+    const er = await fetch(url+'/api/equity');
+    if (er.ok) { const ed = await er.json(); daten._equity = ed; }
+
+    localStorage.setItem(CACHE_KEY, JSON.stringify(daten));
+    document.getElementById('cached-note').style.display = 'none';
+    document.getElementById('status').textContent = '✅ Verbunden — '+new Date().toLocaleTimeString('de-DE');
+    baueUI();
+  } catch(e) {
+    document.getElementById('status').textContent = '❌ '+e.message;
+  }
+}
+
+function cacheLeeren() {
+  localStorage.removeItem(CACHE_KEY);
+  document.getElementById('cached-note').style.display = 'none';
+  document.getElementById('status').textContent = 'Cache geleert';
+}
+
+function baueUI() {
+  const tabsEl   = document.getElementById('tabs');
+  const panelsEl = document.getElementById('panels');
+  tabsEl.innerHTML   = '';
+  panelsEl.innerHTML = '';
+
+  // Übersichts-Tab
+  tabsEl.innerHTML += '<button class="tab active" onclick="showTab(\'uebersicht\',this)">📊 Übersicht</button>';
+  panelsEl.innerHTML += `<div class="panel on" id="panel-uebersicht">${baueUebersicht()}</div>`;
+
+  for (const name of STRATEGIEN) {
+    if (!daten[name] || !daten[name].length) continue;
+    tabsEl.innerHTML += `<button class="tab" onclick="showTab('${name}',this)">${name}</button>`;
+    panelsEl.innerHTML += `<div class="panel" id="panel-${name}">${bauePanel(name)}</div>`;
+  }
+
+  // Charts zeichnen nach DOM-Update
+  setTimeout(() => {
+    zeichneUebersichtsChart();
+    for (const name of STRATEGIEN) {
+      if (daten[name] && daten[name].length) zeichneStratChart(name);
+    }
+  }, 100);
+}
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  btn.classList.add('active');
+  document.getElementById('panel-'+name).classList.add('on');
+}
+
+function baueUebersicht() {
+  let total = 0, wins = 0, count = 0;
+  for (const name of STRATEGIEN) {
+    const ts = daten[name] || [];
+    count += ts.length;
+    total += ts.reduce((s,t) => s+t.pnl, 0);
+    wins  += ts.filter(t => t.pnl>0).length;
+  }
+  const wr = count>0 ? ((wins/count)*100).toFixed(1) : '0';
+  return `
+    <div class="stats-grid">
+      <div class="scard"><div class="v">${count}</div><div class="l">Trades gesamt</div></div>
+      <div class="scard"><div class="v ${total>=0?'pos':'neg'}">${total>=0?'+':''}${total.toFixed(2)}€</div><div class="l">Gesamt P&L</div></div>
+      <div class="scard"><div class="v">${wr}%</div><div class="l">Win Rate</div></div>
+      <div class="scard"><div class="v">${wins} / ${count-wins}</div><div class="l">Win / Loss</div></div>
+    </div>
+    <div class="chart-section"><h2>Equity-Verlauf alle Strategien</h2><canvas id="chart-uebersicht" height="120"></canvas></div>
+  `;
+}
+
+function bauePanel(name) {
+  const trades = daten[name] || [];
+  const pnl    = trades.reduce((s,t)=>s+t.pnl,0);
+  const wins   = trades.filter(t=>t.pnl>0).length;
+  const wr     = trades.length>0?((wins/trades.length)*100).toFixed(1):'0';
+  const bester = trades.length>0?Math.max(...trades.map(t=>t.pnl)):0;
+  const worst  = trades.length>0?Math.min(...trades.map(t=>t.pnl)):0;
+
+  let rows = trades.slice().reverse().map(t => {
+    const d  = new Date(t.datum);
+    const cl = t.pnl>0?'pos':'neg';
+    return `<tr><td>${d.toLocaleDateString('de-DE')}</td><td>${d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}</td><td><span class="badge ${t.seite==='BUY'?'buy-b':'sell-b'}">${t.seite}</span></td><td class="${cl}">${t.pnl>=0?'+':''}${t.pnl.toFixed(2)}€</td><td>${t.equity.toFixed(2)}€</td><td>${t.sl}</td><td>${t.tp}</td></tr>`;
+  }).join('');
+
+  return `
+    <div class="stats-grid">
+      <div class="scard"><div class="v">${trades.length}</div><div class="l">Trades</div></div>
+      <div class="scard"><div class="v ${pnl>=0?'pos':'neg'}">${pnl>=0?'+':''}${pnl.toFixed(2)}€</div><div class="l">Gesamt P&L</div></div>
+      <div class="scard"><div class="v">${wr}%</div><div class="l">Win Rate</div></div>
+      <div class="scard"><div class="v pos">+${bester.toFixed(2)}€</div><div class="l">Bester Trade</div></div>
+      <div class="scard"><div class="v neg">${worst.toFixed(2)}€</div><div class="l">Schlechtester</div></div>
+    </div>
+    <div class="chart-section"><h2>Equity-Verlauf ${name}</h2><canvas id="chart-${name}" height="100"></canvas></div>
+    <div class="search-bar">
+      <input type="text" id="search-${name}" placeholder="Suchen (Datum, Seite, PnL...)" oninput="filterTabelle('${name}')">
+      <select id="filter-${name}" onchange="filterTabelle('${name}')">
+        <option value="">Alle Richtungen</option>
+        <option value="BUY">BUY</option>
+        <option value="SELL">SELL</option>
+      </select>
+    </div>
+    <div class="tbl-wrap">
+      <table id="tbl-${name}">
+        <thead><tr><th>Datum</th><th>Zeit</th><th>Richtung</th><th>P&L</th><th>Equity</th><th>SL</th><th>TP</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function filterTabelle(name) {
+  const q    = (document.getElementById('search-'+name)?.value || '').toLowerCase();
+  const dir  = document.getElementById('filter-'+name)?.value || '';
+  const tbl  = document.getElementById('tbl-'+name);
+  if (!tbl) return;
+  const rows = tbl.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    const txt = row.textContent.toLowerCase();
+    const matchQ   = !q || txt.includes(q);
+    const matchDir = !dir || row.cells[2]?.textContent.trim() === dir;
+    row.style.display = (matchQ && matchDir) ? '' : 'none';
+  });
+}
+
+function zeichneUebersichtsChart() {
+  const ctx = document.getElementById('chart-uebersicht');
+  if (!ctx) return;
+  const datasets = [];
+  for (const name of STRATEGIEN) {
+    const trades = daten[name];
+    if (!trades || !trades.length) continue;
+    let eq = 1000; const pts = [1000];
+    for (const t of trades) { eq = parseFloat((eq+t.pnl).toFixed(2)); pts.push(eq); }
+    datasets.push({ label: name, data: pts, borderColor: FARBEN[name], backgroundColor: 'transparent', tension: 0.3, pointRadius: 0 });
+  }
+  if (!datasets.length) return;
+  if (charts['uebersicht']) charts['uebersicht'].destroy();
+  charts['uebersicht'] = new Chart(ctx.getContext('2d'), {
+    type: 'line', data: { labels: datasets[0].data.map((_,i)=>i), datasets },
+    options: { responsive:true, plugins:{ legend:{ labels:{ color:'#666', font:{ size:11 } } } }, scales:{ x:{ display:false }, y:{ ticks:{ color:'#555', callback:v=>v.toFixed(0)+'€', font:{size:10} }, grid:{ color:'#1a1a1a' } } } }
+  });
+}
+
+function zeichneStratChart(name) {
+  const ctx = document.getElementById('chart-'+name);
+  if (!ctx) return;
+  const trades = daten[name] || [];
+  let eq = 1000; const pts = [1000]; const labels = ['Start'];
+  for (const t of trades) {
+    eq = parseFloat((eq+t.pnl).toFixed(2)); pts.push(eq);
+    labels.push(new Date(t.datum).toLocaleDateString('de-DE'));
+  }
+  if (charts[name]) charts[name].destroy();
+  charts[name] = new Chart(ctx.getContext('2d'), {
+    type: 'line',
+    data: { labels, datasets: [{ label: name, data: pts, borderColor: FARBEN[name], backgroundColor: FARBEN[name]+'18', tension: 0.3, fill: true, pointRadius: pts.length > 100 ? 0 : 2 }] },
+    options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ color:'#444', maxTicksLimit:12, font:{size:10} }, grid:{ color:'#1a1a1a' } }, y:{ ticks:{ color:'#555', callback:v=>v+'€', font:{size:10} }, grid:{ color:'#1a1a1a' } } } }
+  });
+}
+</script>
+</body>
+</html>
