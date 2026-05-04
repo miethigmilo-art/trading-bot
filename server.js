@@ -190,6 +190,21 @@ async function closeOpenPosition(konto, epic) {
   }
 }
 
+// ── Alle Positionen schließen (US Marktschluss) ───────
+async function schliesseAllePositionen() {
+  console.log('🇺🇸 [Marktschluss] US Markt schließt – alle Positionen werden geschlossen...');
+  for (const [name, strat] of Object.entries(STRATEGIEN)) {
+    try {
+      if (!strat.konto.cst) await login(strat.konto);
+      await closeOpenPosition(strat.konto, strat.epic);
+      console.log(`✅ [Marktschluss] ${name} geschlossen`);
+    } catch (e) {
+      console.error(`❌ [Marktschluss] Fehler bei ${name}:`, e.message);
+    }
+  }
+  await sendTelegram('🇺🇸 <b>US Marktschluss</b>\nAlle offenen Positionen wurden automatisch geschlossen (15:55 NY Zeit).');
+}
+
 // ── calcSize (original, mit Leverage) ────────────────
 function calcSize(equity, sl, tp, strategie) {
   const riskCapital = equity * (strategie.riskPct / 100) * strategie.leverage;
@@ -382,10 +397,6 @@ async function handleWebhookOptimiert(req, res) {
     const minRRR   = strategie.minRRR || 2.0;
     const slFloat  = parseFloat(sl);
     let   tpFloat  = parseFloat(tp);
-    // Schätze Entry-Preis als Midpoint (SL und TP liegen zu beiden Seiten der Entry)
-    // Für BUY: entry > SL, TP > entry → riskDist = entry - SL, rewardDist = TP - entry
-    // Für SELL: entry < SL, TP < entry → riskDist = SL - entry, rewardDist = entry - TP
-    // Ohne exakten Entry: validiere über Marktpreis von Capital.com
     try {
       const mkt = await axios.get(`${konto.baseUrl}/markets/${strategie.epic}`, {
         headers: { 'X-CAP-API-KEY': konto.apiKey, 'CST': konto.cst, 'X-SECURITY-TOKEN': konto.token }
@@ -1250,7 +1261,7 @@ ${einstellungen}
 
     // Email senden
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.EMAIL_TO) {
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         host:   process.env.SMTP_HOST || 'smtp.gmail.com',
         port:   parseInt(process.env.SMTP_PORT || '587'),
         secure: false,
@@ -1284,6 +1295,33 @@ function schedule23Uhr() {
   setTimeout(() => { sendeBackup(); schedule23Uhr(); }, next - now);
 }
 schedule23Uhr();
+
+// ── Wochenendschluss – Freitag 23:00 UTC alle Positionen schließen ─
+function scheduleWochenendSchluss() {
+  const now  = new Date();
+  const next = new Date(now);
+
+  // Nächsten Freitag 23:00 UTC berechnen
+  const tag = next.getUTCDay(); // 0=So, 1=Mo, ..., 5=Fr, 6=Sa
+  const daysUntilFriday = (5 - tag + 7) % 7 || 7; // Tage bis nächsten Freitag
+  next.setUTCDate(next.getUTCDate() + daysUntilFriday);
+  next.setUTCHours(23, 0, 0, 0);
+
+  // Falls heute Freitag und noch vor 23:00 UTC
+  if (tag === 5 && now.getUTCHours() < 23) {
+    next.setUTCDate(now.getUTCDate());
+    next.setUTCHours(23, 0, 0, 0);
+  }
+
+  const msLeft = next - now;
+  console.log(`📅 [Wochenendschluss] Nächste Ausführung: ${next.toUTCString()}`);
+
+  setTimeout(async () => {
+    await schliesseAllePositionen();
+    scheduleWochenendSchluss();
+  }, msLeft);
+}
+scheduleWochenendSchluss();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server läuft auf http://localhost:${PORT}`));
