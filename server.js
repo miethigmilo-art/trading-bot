@@ -22,7 +22,7 @@ const KONTO_STEADY      = { apiKey: process.env.API_KEY_STEADY,     email: proce
 const STRATEGIEN = {
   mittel:      { konto: KONTO_MITTEL,      epic: 'GOLD', riskPct: 1.5, leverage: 5, maxDrawdownPct: 20, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.0 },
   aggressiv:   { konto: KONTO_AGGRESSIV,   epic: 'GOLD', riskPct: 2.0, leverage: 5, maxDrawdownPct: 30, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.0 },
-  goldglobe:   { konto: KONTO_GOLDGLOBE,   epic: 'GOLD', riskPct: 1.0, leverage: 5, maxDrawdownPct: 20, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.0 },
+  smart:       { konto: KONTO_GOLDGLOBE,   epic: 'GOLD', riskPct: 1.2, leverage: 5, maxDrawdownPct: 20, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.5, regimeFilter: true },
   test:        { konto: KONTO_TEST,        epic: 'GOLD', riskPct: 1.0, leverage: 5, maxDrawdownPct: 50, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.0 },
   konservativ: { konto: KONTO_KONSERVATIV, epic: 'GOLD', riskPct: 1.0, leverage: 5, maxDrawdownPct: 50, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.0 },
   optimiert:   { konto: KONTO_OPTIMIERT,   epic: 'GOLD', riskPct: 1.0, leverage: 5, maxDrawdownPct: 50, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.0 },
@@ -199,6 +199,49 @@ function datumBerlin(isoString) {
   return `${p.year}-${p.month}-${p.day}`;
 }
 
+// ── Smart Regime Detection ─────────────────────────────
+const SMART_STATE = { modus: 'AKTIV', pauseBis: null, geaendertAm: null, rollendeWinRate: null, konsekVerluste: 0 };
+const WR_PAUSE      = 0.35;
+const WR_VORSICHTIG = 0.42;
+const KONSE_MAX     = 4;
+const PAUSE_MS      = 2 * 60 * 60 * 1000;
+
+function berechneRegime(name) {
+  const trades = tradeVerlauf[name] || [];
+  let konsek = 0;
+  for (let i = trades.length - 1; i >= 0; i--) { if (trades[i].pnl < 0) konsek++; else break; }
+  SMART_STATE.konsekVerluste = konsek;
+  const fenster = trades.slice(-15);
+  if (fenster.length < 5) { SMART_STATE.rollendeWinRate = null; return 'AKTIV'; }
+  const wr = fenster.filter(t => t.pnl > 0).length / fenster.length;
+  SMART_STATE.rollendeWinRate = parseFloat((wr * 100).toFixed(1));
+  if (konsek >= KONSE_MAX || wr < WR_PAUSE) return 'PAUSE';
+  if (wr < WR_VORSICHTIG)                  return 'VORSICHTIG';
+  return 'AKTIV';
+}
+
+async function pruefeRegime(name) {
+  if (SMART_STATE.modus === 'PAUSE' && SMART_STATE.pauseBis && Date.now() < SMART_STATE.pauseBis) {
+    return { geblockt: true, grund: `PAUSE – noch ${Math.round((SMART_STATE.pauseBis - Date.now()) / 60000)} Min.` };
+  }
+  const neu = berechneRegime(name);
+  if (neu !== SMART_STATE.modus) {
+    const alt = SMART_STATE.modus;
+    SMART_STATE.modus      = neu;
+    SMART_STATE.geaendertAm = new Date().toISOString();
+    SMART_STATE.pauseBis    = neu === 'PAUSE' ? Date.now() + PAUSE_MS : null;
+    const emoji = neu === 'AKTIV' ? '🟢' : neu === 'VORSICHTIG' ? '🟡' : '🔴';
+    await sendTelegram(
+      `${emoji} <b>[Smart] Regime: ${alt} → ${neu}</b>\n` +
+      `Rolling WR: <b>${SMART_STATE.rollendeWinRate ?? '?'}%</b> | Konsek. Verluste: <b>${SMART_STATE.konsekVerluste}</b>` +
+      (neu === 'PAUSE' ? `\n⏸ Pause bis: <b>${new Date(SMART_STATE.pauseBis).toLocaleTimeString('de-DE')}</b>` : '')
+    );
+    console.log(`🔄 [smart] ${alt} → ${neu} (WR: ${SMART_STATE.rollendeWinRate}%, Verl: ${SMART_STATE.konsekVerluste})`);
+  }
+  if (SMART_STATE.modus === 'PAUSE') return { geblockt: true, grund: 'PAUSE aktiv (2h)' };
+  return { geblockt: false, modus: SMART_STATE.modus };
+}
+
 // ── Universeller Webhook Handler — alle Fixes ─────────
 async function handleWebhook(req, res, name) {
   const strategie = STRATEGIEN[name];
@@ -252,6 +295,21 @@ async function handleWebhook(req, res, name) {
       return res.json({ status: 'gestoppt', grund: 'Max. Drawdown erreicht' });
     }
 
+    // Regime-Filter (nur Smart Bot)
+    let regimeModus = 'AKTIV';
+    if (strategie.regimeFilter) {
+      const regime = await pruefeRegime(name);
+      if (regime.geblockt) {
+        console.log(`⏸ [${name}] übersprungen: ${regime.grund}`);
+        return res.json({ status: 'übersprungen', grund: regime.grund, modus: SMART_STATE.modus });
+      }
+      regimeModus = regime.modus;
+      if (regimeModus === 'VORSICHTIG' && side === 'SELL') {
+        console.log(`🟡 [${name}] VORSICHTIG: SELL ignoriert`);
+        return res.json({ status: 'übersprungen', grund: 'VORSICHTIG – nur LONG erlaubt', modus: 'VORSICHTIG' });
+      }
+    }
+
     // Trade-PnL aufzeichnen (Equity-Differenz zum letzten Signal)
     const pnl = equity - letzteEquity[name];
     if (pnl !== 0) {
@@ -268,10 +326,10 @@ async function handleWebhook(req, res, name) {
     letzteEquity[name] = equity;
     equityPunktHinzufuegen(name, equity);
 
-    // RRR erzwingen
+    // RRR erzwingen (im VORSICHTIG-Modus strenger)
     let slFloat = parseFloat(sl);
     let tpFloat = parseFloat(tp);
-    const minRRR = strategie.minRRR || 2.0;
+    const minRRR = (strategie.regimeFilter && regimeModus === 'VORSICHTIG') ? 3.5 : (strategie.minRRR || 2.0);
     try {
       const mkt = await axios.get(`${konto.baseUrl}/markets/${strategie.epic}`, {
         headers: { 'X-CAP-API-KEY': konto.apiKey, 'CST': konto.cst, 'X-SECURITY-TOKEN': konto.token }
@@ -313,12 +371,25 @@ async function handleWebhook(req, res, name) {
 // ── Webhook Routen ────────────────────────────────────
 app.post('/webhook/mittel',      (req, res) => handleWebhook(req, res, 'mittel'));
 app.post('/webhook/aggressiv',   (req, res) => handleWebhook(req, res, 'aggressiv'));
-app.post('/webhook/goldglobe',   (req, res) => handleWebhook(req, res, 'goldglobe'));
+app.post('/webhook/smart',       (req, res) => handleWebhook(req, res, 'smart'));
+app.post('/webhook/goldglobe',   (req, res) => handleWebhook(req, res, 'smart')); // Alias – TradingView Alert bleibt unverändert
 app.post('/webhook/test',        (req, res) => handleWebhook(req, res, 'test'));
 app.post('/webhook/konservativ', (req, res) => handleWebhook(req, res, 'konservativ'));
 app.post('/webhook/optimiert',   (req, res) => handleWebhook(req, res, 'optimiert'));
 app.post('/webhook/adaptive',    (req, res) => handleWebhook(req, res, 'adaptive'));
 app.post('/webhook/steady',      (req, res) => handleWebhook(req, res, 'steady'));
+
+// ── Smart Status API ───────────────────────────────────
+app.get('/api/smart-status', (req, res) => {
+  res.json({
+    modus:           SMART_STATE.modus,
+    rollendeWinRate: SMART_STATE.rollendeWinRate,
+    konsekVerluste:  SMART_STATE.konsekVerluste,
+    pauseMinLeft:    SMART_STATE.pauseBis && Date.now() < SMART_STATE.pauseBis ? Math.round((SMART_STATE.pauseBis - Date.now()) / 60000) : 0,
+    geaendertAm:     SMART_STATE.geaendertAm,
+    schwellen:       { pause: WR_PAUSE * 100, vorsichtig: WR_VORSICHTIG * 100, konsekMax: KONSE_MAX }
+  });
+});
 
 // ── SL Update ─────────────────────────────────────────
 app.post('/webhook/update_sl/:strategie', async (req, res) => {
@@ -691,8 +762,8 @@ tr:last-child td{border:none}
   </div>
 </div>
 <div class="grid2">
-  <div class="card" style="border-color:#2d1f5e" onclick="openModal('goldglobe')">
-    <h2><span class="tag" style="background:#2d1f5e;color:#a78bfa">GoldGlobe</span><span class="hint">Trades →</span></h2>
+  <div class="card" style="border-color:#0f2a28" onclick="openModal('smart')">
+    <h2><span class="tag" style="background:#0f2a28;color:#2dd4bf">Smart ✦</span><span class="hint">Trades →</span></h2>
     <div class="equity pos" id="g-equity">—</div>
     <div class="stat"><span class="stat-label">Trades</span><span class="stat-value" id="g-trades">-</span></div>
     <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="g-winrate">-</span></div>
@@ -765,7 +836,7 @@ tr:last-child td{border:none}
     <div><div style="color:#555;font-size:11px;margin-bottom:5px">STRATEGIE</div>
       <select id="strategie" style="background:#222;border:1px solid #333;color:#fff;padding:9px 11px;border-radius:8px;font-size:13px">
         <option value="mittel">Mittel</option><option value="aggressiv">Aggressiv</option>
-        <option value="goldglobe">GoldGlobe</option><option value="test">Test</option>
+        <option value="smart">Smart</option><option value="test">Test</option>
         <option value="konservativ">Konservativ</option><option value="optimiert">Optimiert</option>
         <option value="adaptive">Adaptive</option>
         <option value="steady">Steady</option><option value="alle">Alle</option>
@@ -809,9 +880,9 @@ let allChartData = {};
 let chartExpanded = false;
 let zoomPct      = 100;
 
-const namen  = { mittel:'Mittel', aggressiv:'Aggressiv', goldglobe:'GoldGlobe', test:'Test 1M', konservativ:'Konservativ', optimiert:'Optimiert', adaptive:'Adaptive', steady:'Steady' };
-const prefix = { mittel:'m', aggressiv:'a', goldglobe:'g', test:'t', konservativ:'k', optimiert:'o', adaptive:'ad', steady:'st' };
-const farben  = { mittel:'#60a5fa', aggressiv:'#fb923c', goldglobe:'#a78bfa', test:'#4ade80', konservativ:'#34d399', optimiert:'#f472b6', adaptive:'#2dd4bf', steady:'#e879f9' };
+const namen  = { mittel:'Mittel', aggressiv:'Aggressiv', smart:'Smart', test:'Test 1M', konservativ:'Konservativ', optimiert:'Optimiert', adaptive:'Adaptive', steady:'Steady' };
+const prefix = { mittel:'m', aggressiv:'a', smart:'g', test:'t', konservativ:'k', optimiert:'o', adaptive:'ad', steady:'st' };
+const farben  = { mittel:'#60a5fa', aggressiv:'#fb923c', smart:'#2dd4bf', test:'#4ade80', konservativ:'#34d399', optimiert:'#f472b6', adaptive:'#38bdf8', steady:'#e879f9' };
 
 function pf(v) { return v > 0 ? 'pos' : v < 0 ? 'neg' : ''; }
 
