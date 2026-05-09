@@ -1,0 +1,187 @@
+//@version=5
+// Test2 1M Strategy
+// Änderungen gegenüber Final2 Adaptiv (Item 5):
+//   swingLength: 5 → 18
+//   slATRmult:   1.5 → 2.0
+//   rsiFilter:   50 → 55
+//   maxMult:     1.5 → 1.2
+//   lookbackN:   20 → 30
+//   beATRmult:   3.7 → 1.5  (Item 13)
+//   trailATRmult:3.3 → 1.2  (Item 13)
+//   TP: RRR-basiert statt ATR-mult  (Item 9)
+strategy("Test2 1M — RRR+Adaptiv", overlay=true, initial_capital=10000, pyramiding=0, default_qty_type=strategy.fixed)
+
+// ───────── INPUTS ─────────
+emaLength    = input.int(200,   "EMA Laenge")
+swingLength  = input.int(18,    "Swing Laenge")           // war 5
+atrLength    = input.int(14,    "ATR Laenge")
+
+slATRmult    = input.float(2.0, "SL ATR Multiplikator")  // war 1.5
+minRRR       = input.float(2.0, "Min RRR (TP = SL-Dist * RRR)") // neu Item 9
+
+rsiLength    = input.int(14,    "RSI Laenge")
+rsiFilter    = input.int(55,    "RSI Trendfilter")        // war 50
+
+leverage     = input.int(5,     "Hebel", minval=1)
+riskPct      = input.float(1.0, "Risiko pro Trade (%)", step=0.1)
+reservePct   = input.float(20.0,"Nutzbare Equity (%)", minval=10, maxval=100)
+
+allowShorts  = input.bool(true,  "SELL / Short Trades erlauben")
+spread       = input.float(0.25, "Spread USD", step=0.01)
+
+beATRmult    = input.float(1.5, "Break Even ATR Multiplikator (0=aus)", step=0.1, minval=0)  // war 3.7
+trailATRmult = input.float(1.2, "Trailing Stop ATR Abstand (0=aus)",    step=0.1, minval=0)  // war 3.3
+
+// ───────── ADAPTIVES RISIKO ─────────
+adaptiveAn   = input.bool(true,  "Adaptives Risiko aktiv",               group="Adaptives Risiko")
+minTrades    = input.int(10,     "Mindest-Trades bis Anpassung startet",  group="Adaptives Risiko", minval=3)
+lookbackN    = input.int(30,     "Lookback Anzahl Trades",                group="Adaptives Risiko", minval=5, maxval=100)  // war 20
+maxMult      = input.float(1.2,  "Max Multiplikator",                    group="Adaptives Risiko", step=0.1, minval=1.0, maxval=3.0)  // war 1.5
+minMult      = input.float(0.5,  "Min Multiplikator",                    group="Adaptives Risiko", step=0.1, minval=0.1, maxval=1.0)
+streakSchutz = input.bool(true,  "Verlust-Streak Schutz (3x verloren)",  group="Adaptives Risiko")
+
+// ───────── INDICATORS ─────────
+ema200    = ta.ema(close, emaLength)
+atr       = ta.atr(atrLength)
+rsi       = ta.rsi(close, rsiLength)
+swingHigh = ta.highest(high, swingLength)
+swingLow  = ta.lowest(low,  swingLength)
+
+// ───────── ENTRY BASIS ─────────
+longBase  = ta.crossover(close,  swingHigh[1]) and close > ema200 and rsi > rsiFilter
+shortBase = ta.crossunder(close, swingLow[1])  and close < ema200 and rsi < rsiFilter
+longEntry  = longBase
+shortEntry = allowShorts and shortBase
+
+// ───────── SL / TP (Item 9: RRR-basiert) ─────────
+var float longSL       = na
+var float longTP       = na
+var float shortSL      = na
+var float shortTP      = na
+var float longEntryPx  = na
+var float shortEntryPx = na
+var bool  longBEDone   = false
+var bool  shortBEDone  = false
+var float prevLongSL   = na
+var float prevShortSL  = na
+
+spreadHalf = spread / 2
+
+if longEntry and strategy.position_size == 0
+    longSL      := math.min(close - atr * slATRmult - spreadHalf, swingLow[1] - spreadHalf)
+    slDist       = math.abs(close - longSL)
+    longTP      := close + slDist * minRRR                    // RRR-basiert
+    longEntryPx := close
+    longBEDone  := false
+    prevLongSL  := longSL
+
+if shortEntry and strategy.position_size == 0
+    shortSL      := math.max(close + atr * slATRmult + spreadHalf, swingHigh[1] + spreadHalf)
+    slDist        = math.abs(close - shortSL)
+    shortTP      := close - slDist * minRRR                   // RRR-basiert
+    shortEntryPx := close
+    shortBEDone  := false
+    prevShortSL  := shortSL
+
+// ───────── BREAK EVEN (1.5x ATR) ─────────
+if beATRmult > 0
+    if strategy.position_size > 0
+        if high >= longEntryPx + atr * beATRmult
+            longSL     := math.max(longSL, longEntryPx)
+            longBEDone := true
+    if strategy.position_size < 0
+        if low <= shortEntryPx - atr * beATRmult
+            shortSL     := math.min(shortSL, shortEntryPx)
+            shortBEDone := true
+
+// ───────── TRAILING STOP (1.2x ATR) ─────────
+if trailATRmult > 0
+    if strategy.position_size > 0 and longBEDone
+        trailSL = high - atr * trailATRmult
+        if trailSL > longSL
+            longSL := trailSL
+    if strategy.position_size < 0 and shortBEDone
+        trailSL = low + atr * trailATRmult
+        if trailSL < shortSL
+            shortSL := trailSL
+
+// ───────── ADAPTIVE RISK ─────────
+var float adaptiveMult = 1.0
+if adaptiveAn
+    if strategy.closedtrades < minTrades
+        adaptiveMult := 1.0
+    else
+        streakAktiv = false
+        if streakSchutz and strategy.closedtrades >= 3
+            p1 = strategy.closedtrades.profit(strategy.closedtrades - 1)
+            p2 = strategy.closedtrades.profit(strategy.closedtrades - 2)
+            p3 = strategy.closedtrades.profit(strategy.closedtrades - 3)
+            if p1 <= 0 and p2 <= 0 and p3 <= 0
+                streakAktiv := true
+        if streakAktiv
+            adaptiveMult := minMult
+        else
+            n               = math.min(lookbackN, strategy.closedtrades)
+            recentWins      = 0.0
+            recentGrossWin  = 0.0
+            recentGrossLoss = 0.0
+            for i = 0 to n - 1
+                pnl = strategy.closedtrades.profit(strategy.closedtrades - 1 - i)
+                if pnl > 0
+                    recentWins      += 1
+                    recentGrossWin  += pnl
+                else
+                    recentGrossLoss += math.abs(pnl)
+            winRate      = recentWins / n
+            lossCount    = n - recentWins
+            avgWin       = recentWins > 0  ? recentGrossWin  / recentWins  : 0.0
+            avgLoss      = lossCount  > 0  ? recentGrossLoss / lossCount   : 0.0
+            ratio        = avgLoss    > 0  ? avgWin / avgLoss              : 1.0
+            kelly        = winRate - (1.0 - winRate) / ratio
+            adaptiveMult := math.max(minMult, math.min(maxMult, 0.5 + kelly * 2.0))
+else
+    adaptiveMult := 1.0
+
+aktuellesRisiko = riskPct * adaptiveMult
+
+// ───────── POSITIONSGRÖSSE ─────────
+usableEquity     = strategy.equity * (reservePct / 100)
+riskCapital      = usableEquity * (aktuellesRisiko / 100)
+basePosSize      = riskCapital / (atr * slATRmult)
+maxPositionValue = usableEquity * leverage
+posSize          = basePosSize
+if basePosSize * close > maxPositionValue
+    posSize := maxPositionValue / close
+
+// ───────── ENTRIES ─────────
+if longEntry  and strategy.position_size == 0
+    strategy.entry("Long",  strategy.long,  qty=posSize)
+if shortEntry and strategy.position_size == 0
+    strategy.entry("Short", strategy.short, qty=posSize)
+
+// ───────── EXITS ─────────
+strategy.exit("Long Exit",  "Long",  stop=longSL,  limit=longTP)
+strategy.exit("Short Exit", "Short", stop=shortSL, limit=shortTP)
+
+// ───────── VISUALS ─────────
+plot(ema200, color=color.orange, title="EMA 200")
+plot(strategy.position_size > 0 ? longSL  : na, title="Long SL",  color=color.red,   linewidth=2)
+plot(strategy.position_size > 0 ? longTP  : na, title="Long TP",  color=color.green, linewidth=2)
+plot(strategy.position_size < 0 ? shortSL : na, title="Short SL", color=color.red,   linewidth=2)
+plot(strategy.position_size < 0 ? shortTP : na, title="Short TP", color=color.green, linewidth=2)
+
+// ───────── ALERTS ─────────
+if longEntry and strategy.position_size == 0
+    alert('{"symbol":"' + syminfo.ticker + '","side":"BUY","sl":' + str.tostring(longSL) + ',"tp":' + str.tostring(longTP) + '}', alert.freq_once_per_bar_close)
+if shortEntry and strategy.position_size == 0
+    alert('{"symbol":"' + syminfo.ticker + '","side":"SELL","sl":' + str.tostring(shortSL) + ',"tp":' + str.tostring(shortTP) + '}', alert.freq_once_per_bar_close)
+
+longSLChanged = strategy.position_size > 0 and longSL != prevLongSL
+if longSLChanged
+    alert('{"action":"UPDATE_SL","sl":' + str.tostring(longSL) + '}', alert.freq_once_per_bar_close)
+    prevLongSL := longSL
+
+shortSLChanged = strategy.position_size < 0 and shortSL != prevShortSL
+if shortSLChanged
+    alert('{"action":"UPDATE_SL","sl":' + str.tostring(shortSL) + '}', alert.freq_once_per_bar_close)
+    prevShortSL := shortSL

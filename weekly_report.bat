@@ -16,7 +16,7 @@ set DATUM=%JAHR%-%MON%-%TAG%
 
 echo Lade Wochenberichte...
 
-for %%s in (mittel aggressiv goldglobe test konservativ optimiert) do (
+for %%s in (mittel aggressiv goldglobe test konservativ optimiert sideways test2 steady) do (
   echo Strategie: %%s
   curl -s "%BOT_URL%/api/report/weekly/%%s" -o "%REPORT_DIR%\trading_report_%%s_%DATUM%.html"
   if errorlevel 1 (
