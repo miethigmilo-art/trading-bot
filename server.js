@@ -360,8 +360,9 @@ async function handleWebhook(req, res, name) {
 
   } catch (err) {
     if (err.response?.status === 401) { konto.cst = null; await login(konto); return res.status(500).json({ error: 'Session erneuert' }); }
-    console.error('❌ Fehler:', err.response?.data || err.message);
-    res.status(500).json({ error: err.message });
+    const capErr = err.response?.data;
+    console.error(`❌ [${name}] Fehler:`, capErr || err.message);
+    res.status(500).json({ error: err.message, details: capErr || null });
   } finally {
     aktiveTrades[name] = false;
     letzterTrade[name] = Date.now();
