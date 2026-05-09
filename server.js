@@ -1143,7 +1143,7 @@ ${einstellungen}
     fs.writeFileSync(`${berichte}/${datum}.md`, mdContent);
 
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS && process.env.EMAIL_TO) {
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         host:   process.env.SMTP_HOST || 'smtp.gmail.com',
         port:   parseInt(process.env.SMTP_PORT || '587'),
         secure: false,
@@ -1173,6 +1173,33 @@ function schedule23Uhr() {
   setTimeout(() => { sendeBackup(); schedule23Uhr(); }, next - now);
 }
 schedule23Uhr();
+
+// ── Wochenendschluss – Freitag 23:00 UTC alle Positionen schließen ─
+function scheduleWochenendSchluss() {
+  const now  = new Date();
+  const next = new Date(now);
+
+  // Nächsten Freitag 23:00 UTC berechnen
+  const tag = next.getUTCDay(); // 0=So, 1=Mo, ..., 5=Fr, 6=Sa
+  const daysUntilFriday = (5 - tag + 7) % 7 || 7; // Tage bis nächsten Freitag
+  next.setUTCDate(next.getUTCDate() + daysUntilFriday);
+  next.setUTCHours(23, 0, 0, 0);
+
+  // Falls heute Freitag und noch vor 23:00 UTC
+  if (tag === 5 && now.getUTCHours() < 23) {
+    next.setUTCDate(now.getUTCDate());
+    next.setUTCHours(23, 0, 0, 0);
+  }
+
+  const msLeft = next - now;
+  console.log(`📅 [Wochenendschluss] Nächste Ausführung: ${next.toUTCString()}`);
+
+  setTimeout(async () => {
+    await schliesseAllePositionen();
+    scheduleWochenendSchluss();
+  }, msLeft);
+}
+scheduleWochenendSchluss();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server läuft auf http://localhost:${PORT}`));
