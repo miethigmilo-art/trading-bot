@@ -628,6 +628,28 @@ app.get('/test', async (req, res) => {
   } catch (err) { res.json({ status: '❌ Fehler', fehler: err.message }); }
 });
 
+app.get('/test/konten', async (req, res) => {
+  const ergebnisse = {};
+  for (const [name, strat] of Object.entries(STRATEGIEN)) {
+    const k = strat.konto;
+    const hatKey   = !!k.apiKey;
+    const hatEmail = !!k.email;
+    const hatPass  = !!k.password;
+    if (!hatKey || !hatEmail || !hatPass) {
+      ergebnisse[name] = { status: '❌ ENV fehlt', apiKey: hatKey, email: hatEmail, password: hatPass };
+      continue;
+    }
+    try {
+      if (!k.cst) await login(k);
+      const equity = await getEquity(k);
+      ergebnisse[name] = { status: '✅ OK', equity: equity + '€' };
+    } catch (err) {
+      ergebnisse[name] = { status: '❌ Login fehlgeschlagen', fehler: err.response?.data?.errorCode || err.message };
+    }
+  }
+  res.json(ergebnisse);
+});
+
 app.get('/test/trade', async (req, res) => {
   try {
     if (!KONTO_TEST.cst) await login(KONTO_TEST);
