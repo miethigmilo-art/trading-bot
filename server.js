@@ -13,8 +13,7 @@ const KONTO_GOLDGLOBE   = { apiKey: process.env.API_KEY_GOLDGLOBE,  email: proce
 const KONTO_TEST        = { apiKey: process.env.API_KEY_TEST,       email: process.env.EMAIL_TEST,       password: process.env.PASSWORD_TEST,       baseUrl: process.env.BASE_URL, cst: null, token: null };
 const KONTO_KONSERVATIV = { apiKey: process.env.API_KEY_KONSERVATIV,email: process.env.EMAIL_KONSERVATIV,password: process.env.PASSWORD_KONSERVATIV, baseUrl: process.env.BASE_URL, cst: null, token: null };
 const KONTO_OPTIMIERT   = { apiKey: process.env.API_KEY_OPTIMIERT,  email: process.env.EMAIL_OPTIMIERT,  password: process.env.PASSWORD_OPTIMIERT,  baseUrl: process.env.BASE_URL, cst: null, token: null };
-const KONTO_SIDEWAYS    = { apiKey: process.env.API_KEY_SIDEWAYS,   email: process.env.EMAIL_SIDEWAYS,   password: process.env.PASSWORD_SIDEWAYS,   baseUrl: process.env.BASE_URL, cst: null, token: null };
-const KONTO_TEST2       = { apiKey: process.env.API_KEY_TEST2,      email: process.env.EMAIL_TEST2,      password: process.env.PASSWORD_TEST2,      baseUrl: process.env.BASE_URL, cst: null, token: null };
+const KONTO_ADAPTIVE    = { apiKey: process.env.API_KEY_TEST2,      email: process.env.EMAIL_TEST2,      password: process.env.PASSWORD_TEST2,      baseUrl: process.env.BASE_URL, cst: null, token: null };
 const KONTO_STEADY      = { apiKey: process.env.API_KEY_STEADY,     email: process.env.EMAIL_STEADY,     password: process.env.PASSWORD_STEADY,     baseUrl: process.env.BASE_URL, cst: null, token: null };
 
 // ── Strategien ────────────────────────────────────────
@@ -27,8 +26,7 @@ const STRATEGIEN = {
   test:        { konto: KONTO_TEST,        epic: 'GOLD', riskPct: 1.0, leverage: 5, maxDrawdownPct: 50, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.0 },
   konservativ: { konto: KONTO_KONSERVATIV, epic: 'GOLD', riskPct: 1.0, leverage: 5, maxDrawdownPct: 50, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.0 },
   optimiert:   { konto: KONTO_OPTIMIERT,   epic: 'GOLD', riskPct: 1.0, leverage: 5, maxDrawdownPct: 50, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.0 },
-  sideways:    { konto: KONTO_SIDEWAYS,    epic: 'GOLD', riskPct: 1.0, leverage: 5, maxDrawdownPct: 20, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 1.0 },
-  test2:       { konto: KONTO_TEST2,       epic: 'GOLD', riskPct: 1.0, leverage: 5, maxDrawdownPct: 50, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.0 },
+  adaptive:    { konto: KONTO_ADAPTIVE,    epic: 'GOLD', riskPct: 1.0, leverage: 5, maxDrawdownPct: 30, startEquity: 1000, tagsStopPct: 5.0,  minRRR: 2.0 },
   steady:      { konto: KONTO_STEADY,      epic: 'GOLD', riskPct: 0.2, leverage: 2, maxDrawdownPct: 3,  startEquity: 1000, tagsStopPct: 0.05, tagsVerlustPct: 0.1, minRRR: 2.0 },
 };
 
@@ -319,8 +317,7 @@ app.post('/webhook/goldglobe',   (req, res) => handleWebhook(req, res, 'goldglob
 app.post('/webhook/test',        (req, res) => handleWebhook(req, res, 'test'));
 app.post('/webhook/konservativ', (req, res) => handleWebhook(req, res, 'konservativ'));
 app.post('/webhook/optimiert',   (req, res) => handleWebhook(req, res, 'optimiert'));
-app.post('/webhook/sideways',    (req, res) => handleWebhook(req, res, 'sideways'));
-app.post('/webhook/test2',       (req, res) => handleWebhook(req, res, 'test2'));
+app.post('/webhook/adaptive',    (req, res) => handleWebhook(req, res, 'adaptive'));
 app.post('/webhook/steady',      (req, res) => handleWebhook(req, res, 'steady'));
 
 // ── SL Update ─────────────────────────────────────────
@@ -737,26 +734,16 @@ tr:last-child td{border:none}
     <div id="o-openpos"></div>
   </div>
 </div>
-<div class="grid3">
-  <div class="card" style="border-color:#2d2a00" onclick="openModal('sideways')">
-    <h2><span class="tag" style="background:#2d2a00;color:#fbbf24">Sideways ↔</span><span class="hint">Trades →</span></h2>
-    <div class="equity pos" id="sw-equity">—</div>
-    <div class="stat"><span class="stat-label">Trades</span><span class="stat-value" id="sw-trades">-</span></div>
-    <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="sw-winrate">-</span></div>
-    <div class="stat"><span class="stat-label">Gesamt P&L</span><span class="stat-value" id="sw-pnl">-</span></div>
-    <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="sw-dd">-</span></div>
-    <div class="dir-bars" id="sw-dirs"></div>
-    <div id="sw-openpos"></div>
-  </div>
-  <div class="card" style="border-color:#003a3a" onclick="openModal('test2')">
-    <h2><span class="tag" style="background:#003a3a;color:#38bdf8">Test2 1M</span><span class="hint">Trades →</span></h2>
-    <div class="equity pos" id="t2-equity">—</div>
-    <div class="stat"><span class="stat-label">Trades</span><span class="stat-value" id="t2-trades">-</span></div>
-    <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="t2-winrate">-</span></div>
-    <div class="stat"><span class="stat-label">Gesamt P&L</span><span class="stat-value" id="t2-pnl">-</span></div>
-    <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="t2-dd">-</span></div>
-    <div class="dir-bars" id="t2-dirs"></div>
-    <div id="t2-openpos"></div>
+<div class="grid2">
+  <div class="card" style="border-color:#003a2a" onclick="openModal('adaptive')">
+    <h2><span class="tag" style="background:#003a2a;color:#2dd4bf">Adaptive ⚡ Trend+Range</span><span class="hint">Trades →</span></h2>
+    <div class="equity pos" id="ad-equity">—</div>
+    <div class="stat"><span class="stat-label">Trades</span><span class="stat-value" id="ad-trades">-</span></div>
+    <div class="stat"><span class="stat-label">Win Rate</span><span class="stat-value" id="ad-winrate">-</span></div>
+    <div class="stat"><span class="stat-label">Gesamt P&L</span><span class="stat-value" id="ad-pnl">-</span></div>
+    <div class="stat"><span class="stat-label">Drawdown</span><span class="stat-value" id="ad-dd">-</span></div>
+    <div class="dir-bars" id="ad-dirs"></div>
+    <div id="ad-openpos"></div>
   </div>
   <div class="card" style="border-color:#3a0030" onclick="openModal('steady')">
     <h2><span class="tag" style="background:#3a0030;color:#e879f9">Steady 0.05%</span><span class="hint">Trades →</span></h2>
@@ -780,7 +767,7 @@ tr:last-child td{border:none}
         <option value="mittel">Mittel</option><option value="aggressiv">Aggressiv</option>
         <option value="goldglobe">GoldGlobe</option><option value="test">Test</option>
         <option value="konservativ">Konservativ</option><option value="optimiert">Optimiert</option>
-        <option value="sideways">Sideways</option><option value="test2">Test2</option>
+        <option value="adaptive">Adaptive</option>
         <option value="steady">Steady</option><option value="alle">Alle</option>
       </select></div>
     <button class="btn" style="background:#1a3a1a;color:#22c55e" onclick="einzahlung()">Einzahlen</button>
@@ -822,9 +809,9 @@ let allChartData = {};
 let chartExpanded = false;
 let zoomPct      = 100;
 
-const namen  = { mittel:'Mittel', aggressiv:'Aggressiv', goldglobe:'GoldGlobe', test:'Test 1M', konservativ:'Konservativ', optimiert:'Optimiert', sideways:'Sideways', test2:'Test2 1M', steady:'Steady' };
-const prefix = { mittel:'m', aggressiv:'a', goldglobe:'g', test:'t', konservativ:'k', optimiert:'o', sideways:'sw', test2:'t2', steady:'st' };
-const farben  = { mittel:'#60a5fa', aggressiv:'#fb923c', goldglobe:'#a78bfa', test:'#4ade80', konservativ:'#34d399', optimiert:'#f472b6', sideways:'#fbbf24', test2:'#38bdf8', steady:'#e879f9' };
+const namen  = { mittel:'Mittel', aggressiv:'Aggressiv', goldglobe:'GoldGlobe', test:'Test 1M', konservativ:'Konservativ', optimiert:'Optimiert', adaptive:'Adaptive', steady:'Steady' };
+const prefix = { mittel:'m', aggressiv:'a', goldglobe:'g', test:'t', konservativ:'k', optimiert:'o', adaptive:'ad', steady:'st' };
+const farben  = { mittel:'#60a5fa', aggressiv:'#fb923c', goldglobe:'#a78bfa', test:'#4ade80', konservativ:'#34d399', optimiert:'#f472b6', adaptive:'#2dd4bf', steady:'#e879f9' };
 
 function pf(v) { return v > 0 ? 'pos' : v < 0 ? 'neg' : ''; }
 

@@ -1,0 +1,230 @@
+//@version=5
+// Adaptive Strategy — Trend + Sideways
+// ADX > 25 → Trend-Modus (Test2 Logik: Swing-Breakout, EMA200, RRR)
+// ADX ≤ 25 → Sideways-Modus (RSI-Extreme + Range-Grenzen, ATR SL/TP)
+strategy("Adaptive — Trend + Sideways", overlay=true, initial_capital=10000, pyramiding=0, default_qty_type=strategy.fixed)
+
+// ───────── REGIME ─────────
+adxLength    = input.int(14,   "ADX Länge",               group="Regime")
+adxSchwelle  = input.float(25, "ADX Schwelle (> = Trend)", group="Regime", step=1)
+
+// ───────── TREND-MODUS (ADX > Schwelle) ─────────
+emaLength    = input.int(200,  "EMA Länge",          group="Trend-Modus")
+swingLength  = input.int(18,   "Swing Länge",         group="Trend-Modus")
+slATRmult    = input.float(2.0,"SL ATR Multiplikator",group="Trend-Modus", step=0.1)
+minRRR       = input.float(2.0,"Min RRR",             group="Trend-Modus", step=0.1)
+rsiTrend     = input.int(55,   "RSI Filter",          group="Trend-Modus")
+beATRmult    = input.float(1.5,"Break Even ATR (0=aus)",group="Trend-Modus", step=0.1, minval=0)
+trailATRmult = input.float(1.2,"Trailing ATR (0=aus)",  group="Trend-Modus", step=0.1, minval=0)
+
+// ───────── SIDEWAYS-MODUS (ADX ≤ Schwelle) ─────────
+rsiBuyLevel   = input.int(30,  "RSI Long-Level",   group="Sideways-Modus")
+rsiSellLevel  = input.int(70,  "RSI Short-Level",  group="Sideways-Modus")
+rangeLookback = input.int(20,  "Range Lookback",   group="Sideways-Modus")
+slSideATR     = input.float(1.0,"SL ATR Mult",     group="Sideways-Modus", step=0.1)
+tpSideATR     = input.float(0.8,"TP ATR Mult",     group="Sideways-Modus", step=0.1)
+
+// ───────── ALLGEMEIN ─────────
+atrLength    = input.int(14,    "ATR Länge")
+rsiLength    = input.int(14,    "RSI Länge")
+spread       = input.float(0.25,"Spread USD", step=0.01)
+allowShorts  = input.bool(true, "Short Trades erlauben")
+
+// ───────── ADAPTIVES RISIKO ─────────
+adaptiveAn   = input.bool(true,  "Adaptives Risiko aktiv",              group="Adaptives Risiko")
+minTrades    = input.int(10,     "Mindest-Trades",                       group="Adaptives Risiko", minval=3)
+lookbackN    = input.int(30,     "Lookback Trades",                      group="Adaptives Risiko", minval=5, maxval=100)
+maxMult      = input.float(1.2,  "Max Multiplikator",                   group="Adaptives Risiko", step=0.1, minval=1.0, maxval=3.0)
+minMult      = input.float(0.5,  "Min Multiplikator",                   group="Adaptives Risiko", step=0.1, minval=0.1, maxval=1.0)
+streakSchutz = input.bool(true,  "Verlust-Streak Schutz (3x verloren)", group="Adaptives Risiko")
+
+leverage     = input.int(5,     "Hebel",                minval=1)
+riskPct      = input.float(1.0, "Risiko pro Trade (%)", step=0.1)
+reservePct   = input.float(20.0,"Nutzbare Equity (%)",  minval=10, maxval=100)
+
+// ───────── INDIKATOREN ─────────
+[diPlus, diMinus, adxVal] = ta.dmi(adxLength, adxLength)
+ema200     = ta.ema(close, emaLength)
+atr        = ta.atr(atrLength)
+rsi        = ta.rsi(close, rsiLength)
+swingHigh  = ta.highest(high, swingLength)
+swingLow   = ta.lowest(low,  swingLength)
+rangeHigh  = ta.highest(high, rangeLookback)
+rangeLow   = ta.lowest(low,  rangeLookback)
+
+isTrend    = adxVal > adxSchwelle
+isSideways = not isTrend
+spreadHalf = spread / 2
+
+// ───────── ENTRY SIGNALE ─────────
+// Trend-Modus
+trendLong  = isTrend and ta.crossover(close,  swingHigh[1]) and close > ema200 and rsi > rsiTrend and strategy.position_size == 0
+trendShort = isTrend and allowShorts and ta.crossunder(close, swingLow[1])  and close < ema200 and rsi < (100 - rsiTrend) and strategy.position_size == 0
+
+// Sideways-Modus
+sideLong   = isSideways and rsi < rsiBuyLevel  and close <= rangeLow[1]  * 1.002 and strategy.position_size == 0
+sideShort  = isSideways and allowShorts and rsi > rsiSellLevel and close >= rangeHigh[1] * 0.998 and strategy.position_size == 0
+
+longEntry  = trendLong  or sideLong
+shortEntry = trendShort or sideShort
+
+// ───────── SL / TP ─────────
+var float longSL       = na
+var float longTP       = na
+var float shortSL      = na
+var float shortTP      = na
+var float longEntryPx  = na
+var float shortEntryPx = na
+var bool  longBEDone   = false
+var bool  shortBEDone  = false
+var float prevLongSL   = na
+var float prevShortSL  = na
+var bool  longIsTrend  = false
+var bool  shortIsTrend = false
+
+if longEntry
+    longEntryPx := close
+    longBEDone  := false
+    if trendLong
+        longSL      := math.min(close - atr * slATRmult - spreadHalf, swingLow[1] - spreadHalf)
+        slDist       = math.abs(close - longSL)
+        longTP      := close + slDist * minRRR
+        longIsTrend := true
+    else
+        longSL      := close - atr * slSideATR - spreadHalf
+        longTP      := close + atr * tpSideATR
+        longIsTrend := false
+    prevLongSL  := longSL
+
+if shortEntry
+    shortEntryPx := close
+    shortBEDone  := false
+    if trendShort
+        shortSL      := math.max(close + atr * slATRmult + spreadHalf, swingHigh[1] + spreadHalf)
+        slDist        = math.abs(close - shortSL)
+        shortTP      := close - slDist * minRRR
+        shortIsTrend := true
+    else
+        shortSL      := close + atr * slSideATR + spreadHalf
+        shortTP      := close - atr * tpSideATR
+        shortIsTrend := false
+    prevShortSL  := shortSL
+
+// ───────── BREAK EVEN (nur Trend) ─────────
+if beATRmult > 0
+    if strategy.position_size > 0 and longIsTrend
+        if high >= longEntryPx + atr * beATRmult
+            longSL     := math.max(longSL, longEntryPx)
+            longBEDone := true
+    if strategy.position_size < 0 and shortIsTrend
+        if low <= shortEntryPx - atr * beATRmult
+            shortSL     := math.min(shortSL, shortEntryPx)
+            shortBEDone := true
+
+// ───────── TRAILING STOP (nur Trend nach BE) ─────────
+if trailATRmult > 0
+    if strategy.position_size > 0 and longIsTrend and longBEDone
+        trailSL = high - atr * trailATRmult
+        if trailSL > longSL
+            longSL := trailSL
+    if strategy.position_size < 0 and shortIsTrend and shortBEDone
+        trailSL = low + atr * trailATRmult
+        if trailSL < shortSL
+            shortSL := trailSL
+
+// ───────── ADAPTIVES RISIKO ─────────
+var float adaptiveMult = 1.0
+if adaptiveAn
+    if strategy.closedtrades < minTrades
+        adaptiveMult := 1.0
+    else
+        streakAktiv = false
+        if streakSchutz and strategy.closedtrades >= 3
+            p1 = strategy.closedtrades.profit(strategy.closedtrades - 1)
+            p2 = strategy.closedtrades.profit(strategy.closedtrades - 2)
+            p3 = strategy.closedtrades.profit(strategy.closedtrades - 3)
+            if p1 <= 0 and p2 <= 0 and p3 <= 0
+                streakAktiv := true
+        if streakAktiv
+            adaptiveMult := minMult
+        else
+            n               = math.min(lookbackN, strategy.closedtrades)
+            recentWins      = 0.0
+            recentGrossWin  = 0.0
+            recentGrossLoss = 0.0
+            for i = 0 to n - 1
+                pnl = strategy.closedtrades.profit(strategy.closedtrades - 1 - i)
+                if pnl > 0
+                    recentWins      += 1
+                    recentGrossWin  += pnl
+                else
+                    recentGrossLoss += math.abs(pnl)
+            winRate      = recentWins / n
+            lossCount    = n - recentWins
+            avgWin       = recentWins > 0  ? recentGrossWin  / recentWins  : 0.0
+            avgLoss      = lossCount  > 0  ? recentGrossLoss / lossCount   : 0.0
+            ratio        = avgLoss    > 0  ? avgWin / avgLoss              : 1.0
+            kelly        = winRate - (1.0 - winRate) / ratio
+            adaptiveMult := math.max(minMult, math.min(maxMult, 0.5 + kelly * 2.0))
+else
+    adaptiveMult := 1.0
+
+aktuellesRisiko = riskPct * adaptiveMult
+
+// ───────── POSITIONSGRÖSSE ─────────
+usableEquity     = strategy.equity * (reservePct / 100)
+riskCapital      = usableEquity * (aktuellesRisiko / 100)
+basePosSize      = riskCapital / (atr * slATRmult)
+maxPositionValue = usableEquity * leverage
+posSize          = basePosSize
+if basePosSize * close > maxPositionValue
+    posSize := maxPositionValue / close
+
+// ───────── ENTRIES / EXITS ─────────
+if longEntry
+    strategy.entry("Long",  strategy.long,  qty=posSize)
+if shortEntry
+    strategy.entry("Short", strategy.short, qty=posSize)
+
+strategy.exit("Long Exit",  "Long",  stop=longSL,  limit=longTP)
+strategy.exit("Short Exit", "Short", stop=shortSL, limit=shortTP)
+
+// ───────── VISUALS ─────────
+bgcolor(isTrend ? color.new(color.orange, 92) : color.new(color.blue, 92), title="Regime")
+plot(ema200, color=color.new(color.orange, 30), title="EMA 200", linewidth=1)
+plot(strategy.position_size > 0 ? longSL  : na, "Long SL",  color.red,   linewidth=2)
+plot(strategy.position_size > 0 ? longTP  : na, "Long TP",  color.green, linewidth=2)
+plot(strategy.position_size < 0 ? shortSL : na, "Short SL", color.red,   linewidth=2)
+plot(strategy.position_size < 0 ? shortTP : na, "Short TP", color.green, linewidth=2)
+
+// Regime-Label oben rechts
+var label regimeLabel = na
+label.delete(regimeLabel)
+regimeLabel := label.new(bar_index, high, isTrend ? "TREND" : "RANGE",
+  style=label.style_label_down,
+  color=isTrend ? color.new(color.orange, 70) : color.new(color.teal, 70),
+  textcolor=color.white, size=size.small)
+
+plotchar(longEntry  and trendLong,  "Trend Long",     "T▲", location.belowbar, color.new(color.green, 0), size=size.small)
+plotchar(longEntry  and sideLong,   "Sideways Long",  "S▲", location.belowbar, color.new(color.teal,  0), size=size.small)
+plotchar(shortEntry and trendShort, "Trend Short",    "T▼", location.abovebar, color.new(color.red,   0), size=size.small)
+plotchar(shortEntry and sideShort,  "Sideways Short", "S▼", location.abovebar, color.new(color.orange,0), size=size.small)
+
+// ───────── ALERTS → /webhook/adaptive ─────────
+if longEntry
+    mode = trendLong ? "TREND" : "SIDEWAYS"
+    alert('{"symbol":"' + syminfo.ticker + '","side":"BUY","sl":' + str.tostring(longSL) + ',"tp":' + str.tostring(longTP) + ',"mode":"' + mode + '"}', alert.freq_once_per_bar_close)
+
+if shortEntry
+    mode = trendShort ? "TREND" : "SIDEWAYS"
+    alert('{"symbol":"' + syminfo.ticker + '","side":"SELL","sl":' + str.tostring(shortSL) + ',"tp":' + str.tostring(shortTP) + ',"mode":"' + mode + '"}', alert.freq_once_per_bar_close)
+
+longSLChanged = strategy.position_size > 0 and not na(longSL) and longSL != prevLongSL and not na(prevLongSL)
+if longSLChanged
+    alert('{"action":"UPDATE_SL","sl":' + str.tostring(longSL) + '}', alert.freq_once_per_bar_close)
+    prevLongSL := longSL
+
+shortSLChanged = strategy.position_size < 0 and not na(shortSL) and shortSL != prevShortSL and not na(prevShortSL)
+if shortSLChanged
+    alert('{"action":"UPDATE_SL","sl":' + str.tostring(shortSL) + '}', alert.freq_once_per_bar_close)
+    prevShortSL := shortSL
