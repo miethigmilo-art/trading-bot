@@ -114,12 +114,36 @@ function tradeHinzufuegen(name, trade) {
 
 // ── Login ─────────────────────────────────────────────
 async function login(konto) {
+  if (!konto.apiKey || !konto.email || !konto.password) {
+    throw new Error(`❌ Fehlende Credentials für ${konto.email || 'unbekanntes Konto'} — prüfe .env (API_KEY, EMAIL, PASSWORD)`);
+  }
   const res = await axios.post(`${konto.baseUrl}/session`,
     { identifier: konto.email, password: konto.password },
     { headers: { 'X-CAP-API-KEY': konto.apiKey } });
   konto.cst   = res.headers['cst'];
   konto.token = res.headers['x-security-token'];
   console.log(`✅ Login: ${konto.email}`);
+}
+
+// ── Order mit Auto-Retry bei 401 ─────────────────────
+async function placeOrderWithRetry(konto, order) {
+  try {
+    const res = await axios.post(`${konto.baseUrl}/positions`, order, {
+      headers: { 'X-CAP-API-KEY': konto.apiKey, 'CST': konto.cst, 'X-SECURITY-TOKEN': konto.token }
+    });
+    return res;
+  } catch (err) {
+    if (err.response?.status === 401) {
+      console.log('🔄 Session abgelaufen – erneuere und wiederhole Order...');
+      konto.cst = null;
+      await login(konto);
+      // Einmaliger Retry nach Session-Erneuerung
+      return await axios.post(`${konto.baseUrl}/positions`, order, {
+        headers: { 'X-CAP-API-KEY': konto.apiKey, 'CST': konto.cst, 'X-SECURITY-TOKEN': konto.token }
+      });
+    }
+    throw err;
+  }
 }
 
 // ── Equity ────────────────────────────────────────────
@@ -347,19 +371,16 @@ async function handleWebhook(req, res, name) {
     // Offene Position schließen vor neuer Order
     await closeOpenPosition(konto, strategie.epic);
 
-    // Order platzieren
+    // Order platzieren (mit Auto-Retry bei abgelaufener Session)
     const size  = calcSizeFixed(equity, slFloat, tpFloat, strategie);
     const order = { epic: strategie.epic, direction: side, size, guaranteedStop: false, stopLevel: slFloat, profitLevel: tpFloat };
     console.log(`📤 [${name}] Order:`, order);
-    await axios.post(`${konto.baseUrl}/positions`, order, {
-      headers: { 'X-CAP-API-KEY': konto.apiKey, 'CST': konto.cst, 'X-SECURITY-TOKEN': konto.token }
-    });
+    await placeOrderWithRetry(konto, order);
 
     await sendTelegram(`${side === 'BUY' ? '🟢' : '🔴'} <b>${side === 'BUY' ? 'LONG' : 'SHORT'} eröffnet</b>\nStrategie: <b>${name}</b>\nGröße: <b>${size} Units</b>\nSL: <b>${slFloat}$</b>\nTP: <b>${tpFloat}$</b>`);
     res.json({ status: 'ok', strategie: name, size, sl: slFloat, tp: tpFloat });
 
   } catch (err) {
-    if (err.response?.status === 401) { konto.cst = null; await login(konto); return res.status(500).json({ error: 'Session erneuert' }); }
     const capErr = err.response?.data;
     console.error(`❌ [${name}] Fehler:`, capErr || err.message);
     res.status(500).json({ error: err.message, details: capErr || null });
@@ -392,6 +413,19 @@ app.get('/api/smart-status', (req, res) => {
   });
 });
 
+// ── Smart Regime Reset ───────────────────────────────
+app.post('/api/smart/reset', async (req, res) => {
+  const alt = SMART_STATE.modus;
+  SMART_STATE.modus        = 'AKTIV';
+  SMART_STATE.pauseBis     = null;
+  SMART_STATE.geaendertAm  = new Date().toISOString();
+  SMART_STATE.konsekVerluste = 0;
+  console.log(`🔄 [smart] Regime manuell zurückgesetzt: ${alt} → AKTIV`);
+  await sendTelegram(`🔄 <b>[Smart] Regime manuell zurückgesetzt</b>
+${alt} → AKTIV`);
+  res.json({ status: 'ok', alt, neu: 'AKTIV' });
+});
+
 // ── SL Update ─────────────────────────────────────────
 app.post('/webhook/update_sl/:strategie', async (req, res) => {
   const name = req.params.strategie;
@@ -410,7 +444,20 @@ app.post('/webhook/update_sl/:strategie', async (req, res) => {
     await sendTelegram(`🔄 <b>SL aktualisiert</b>\nStrategie: <b>${name}</b>\nNeuer SL: <b>${sl}$</b>`);
     res.json({ status: 'ok', neuerSL: sl });
   } catch (err) {
-    if (err.response?.status === 401) { konto.cst = null; await login(konto); return res.status(500).json({ error: 'Session erneuert' }); }
+    if (err.response?.status === 401) {
+      konto.cst = null;
+      await login(konto);
+      // Retry SL Update
+      try {
+        const pos2 = await getOpenPosition(konto, strategie.epic);
+        if (pos2) {
+          await axios.put(`${konto.baseUrl}/positions/${pos2.position.dealId}`, { stopLevel: parseFloat(sl) }, {
+            headers: { 'X-CAP-API-KEY': konto.apiKey, 'CST': konto.cst, 'X-SECURITY-TOKEN': konto.token }
+          });
+          return res.json({ status: 'ok (nach Session-Erneuerung)', neuerSL: sl });
+        }
+      } catch (e2) { return res.status(500).json({ error: e2.message }); }
+    }
     res.status(500).json({ error: err.message });
   }
 });
