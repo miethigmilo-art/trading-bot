@@ -1,102 +1,5025 @@
 [
-  { "n": 1, "company": "Volkswagen", "ticker": "VOW3", "yahooSymbol": "VOW.DE", "years": [2008], "type": "Klassischer Short Squeeze", "note": "Bereits als manueller Fall 'VOW3-2008' mit recherchierten Werten erfasst (siehe events.json). WICHTIG: 'VOW3.DE' liefert bei Yahoo eine ANDERE Aktiengattung mit fallenden statt steigenden Kursen im Okt 2008 — verifiziert per Testabruf. 'VOW.DE' (Stammaktie) zeigt die tatsächliche Squeeze-Bewegung (~210 auf 500+) und ist der korrekte Ticker für diesen historischen Fall." },
-  { "n": 2, "company": "GameStop", "ticker": "GME", "years": [2021], "type": "Short + Gamma Squeeze" },
-  { "n": 3, "company": "AMC Entertainment", "ticker": "AMC", "years": [2021], "type": "Retail Short Squeeze" },
-  { "n": 4, "company": "Koss", "ticker": "KOSS", "years": [2021], "type": "Gamma Squeeze" },
-  { "n": 5, "company": "BlackBerry", "ticker": "BB", "years": [2021], "type": "Meme Short Squeeze" },
-  { "n": 6, "company": "Nokia", "ticker": "NOK", "years": [2021], "type": "Meme Short Squeeze" },
-  { "n": 7, "company": "Bed Bath & Beyond", "ticker": "BBBY", "years": [2021, 2022], "type": "Short Squeeze", "skip": true, "skipReason": "Ticker-Kollision: BBBY gehört seit 2023 zu Overstock/Beyond Inc. — bereits manuell als 'BBBY-2022' mit korrekten Werten erfasst (siehe events.json)." },
-  { "n": 8, "company": "Support.com", "ticker": "SPRT", "years": [2021], "type": "Low Float Squeeze", "note": "Bereits manuell als 'SPRT' erfasst (siehe events.json) — Ticker bei Yahoo nicht mehr abrufbar (Merger zu GREE), Verifikation daher nicht möglich." },
-  { "n": 9, "company": "IronNet", "ticker": "IRNT", "years": [2021], "type": "SPAC Low Float Squeeze" },
-  { "n": 10, "company": "Vinco Ventures / Vinco", "ticker": "BBIG", "years": [2021], "type": "Short Squeeze" },
-  { "n": 11, "company": "Aterian", "ticker": "ATER", "years": [2021], "type": "Short Squeeze" },
-  { "n": 12, "company": "Camber Energy", "ticker": "CEI", "years": [2021], "type": "Momentum Short Squeeze" },
-  { "n": 13, "company": "Phunware", "ticker": "PHUN", "years": [2021], "type": "News + Short Squeeze" },
-  { "n": 14, "company": "Clover Health", "ticker": "CLOV", "years": [2021], "type": "Gamma/Short" },
-  { "n": 15, "company": "Workhorse", "ticker": "WKHS", "years": [2021], "type": "Short Interest Squeeze" },
-  { "n": 16, "company": "MicroVision", "ticker": "MVIS", "years": [2021], "type": "Short Squeeze" },
-  { "n": 17, "company": "Senseonics", "ticker": "SENS", "years": [2021], "type": "Short Squeeze" },
-  { "n": 18, "company": "Ocugen", "ticker": "OCGN", "years": [2021], "type": "News Short Squeeze" },
-  { "n": 19, "company": "Newegg", "ticker": "NEGG", "years": [2021], "type": "Low Float Squeeze" },
-  { "n": 20, "company": "Rocket Companies", "ticker": "RKT", "years": [2021], "type": "Short Covering" },
-  { "n": 21, "company": "Dillard's", "ticker": "DDS", "years": [2021], "type": "Low Float Short Squeeze" },
-  { "n": 22, "company": "Avis Budget", "ticker": "CAR", "years": [2021], "type": "Short Covering" },
-  { "n": 23, "company": "Geo Group", "ticker": "GEO", "years": [2021], "type": "Short Squeeze" },
-  { "n": 24, "company": "Cinemark", "ticker": "CNK", "years": [2021], "type": "Recovery Short Squeeze" },
-  { "n": 25, "company": "Cleveland-Cliffs", "ticker": "CLF", "years": [2021], "type": "Commodity Short Squeeze" },
-  { "n": 26, "company": "Express", "ticker": "EXPR", "years": [2021], "type": "Meme Squeeze", "note": "Express war 2024 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 27, "company": "Sundial Growers", "ticker": "SNDL", "years": [2021], "type": "Retail Squeeze" },
-  { "n": 28, "company": "Tilray", "ticker": "TLRY", "years": [2018], "type": "Cannabis Short Squeeze" },
-  { "n": 29, "company": "Canopy Growth", "ticker": "CGC", "years": [2018], "type": "Cannabis Squeeze" },
-  { "n": 30, "company": "Aphria", "ticker": "APHA", "years": [2018, 2021], "type": "Cannabis Squeeze", "note": "Aphria fusionierte 2021 mit Tilray zu TLRY — Ticker APHA bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 31, "company": "DryShips", "ticker": "DRYS", "years": [2016], "type": "Extreme Short Squeeze", "note": "DryShips wurde 2019 von der Börse genommen — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 32, "company": "Overstock.com", "ticker": "OSTK", "years": [2005], "type": "Short Squeeze", "note": "Overstock benannte sich 2023 in Beyond Inc. um und wechselte den Ticker zu BBBY — OSTK evtl. bei Yahoo nicht mehr live, und 2005 liegt am Rand der von Yahoo verfügbaren Tagesdaten-Historie." },
-  { "n": 33, "company": "Tesla", "ticker": "TSLA", "years": [2020], "type": "Massive Short Covering" },
-  { "n": 34, "company": "Herbalife", "ticker": "HLF", "years": [2012], "type": "Short Battle", "note": "Mehrjährige Ackman-vs-Icahn-Auseinandersetzung, kein klassischer kurzer Squeeze-Spike — Detektor findet ggf. kein Muster im Standard-Zeitfenster." },
-  { "n": 35, "company": "Beyond Meat", "ticker": "BYND", "years": [2019], "type": "Low Float Squeeze" },
-  { "n": 36, "company": "Carvana", "ticker": "CVNA", "years": [2023], "type": "Short Squeeze" },
-  { "n": 37, "company": "Upstart", "ticker": "UPST", "years": [2023], "type": "Short Covering" },
-  { "n": 38, "company": "FuboTV", "ticker": "FUBO", "years": [2021, 2020], "type": "Short Squeeze" },
-  { "n": 39, "company": "Plug Power", "ticker": "PLUG", "years": [2020], "type": "Short Covering" },
-  { "n": 40, "company": "FuelCell Energy", "ticker": "FCEL", "years": [2020], "type": "Short Covering" },
-  { "n": 41, "company": "Blink Charging", "ticker": "BLNK", "years": [2020], "type": "Short Squeeze" },
-  { "n": 42, "company": "Lordstown Motors", "ticker": "RIDE", "years": [2021], "type": "Meme Squeeze", "note": "Lordstown Motors war 2023 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 43, "company": "Canoo", "ticker": "GOEV", "years": [2021], "type": "Meme Squeeze", "note": "Canoo war 2025 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 44, "company": "Nikola", "ticker": "NKLA", "years": [2020], "type": "Short Volatility" },
-  { "n": 45, "company": "Lucid Group", "ticker": "LCID", "years": [2021], "type": "SPAC Short Squeeze" },
-  { "n": 46, "company": "Rivian", "ticker": "RIVN", "years": [2021], "type": "Low Float Momentum" },
-  { "n": 47, "company": "Fisker", "ticker": "FSR", "years": [2021], "type": "Short Interest Rally", "note": "Fisker war 2024 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 48, "company": "3D Systems", "ticker": "DDD", "years": [2021], "type": "Short Squeeze" },
-  { "n": 49, "company": "Tattooed Chef", "ticker": "TTCF", "years": [2021], "type": "Meme Squeeze" },
-  { "n": 50, "company": "SmileDirectClub", "ticker": "SDC", "years": [2021], "type": "Short Squeeze", "note": "SmileDirectClub war 2023 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 51, "company": "PetMed Express", "ticker": "PETS", "years": [2021], "type": "Short Interest" },
-  { "n": 52, "company": "Children's Place", "ticker": "PLCE", "years": [2021], "type": "Low Float" },
-  { "n": 53, "company": "SunPower", "ticker": "SPWR", "years": [2021], "type": "Short Squeeze", "note": "SunPower war 2024 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 54, "company": "Aeva Technologies", "ticker": "AEVA", "years": [2021], "type": "SPAC Squeeze" },
-  { "n": 55, "company": "Virgin Galactic", "ticker": "SPCE", "years": [2021], "type": "Short Covering" },
-  { "n": 56, "company": "Clean Energy Fuels", "ticker": "CLNE", "years": [2021], "type": "Gamma Squeeze" },
-  { "n": 57, "company": "BigCommerce", "ticker": "BIGC", "years": [2021], "type": "Short Interest" },
-  { "n": 58, "company": "Ligand Pharmaceuticals", "ticker": "LGND", "years": [2021], "type": "Short Covering" },
-  { "n": 59, "company": "Accelerate Diagnostics", "ticker": "AXDX", "years": [2021], "type": "Low Float" },
-  { "n": 60, "company": "Acutus Medical", "ticker": "AFIB", "years": [2021], "type": "Low Float", "note": "Acutus Medical stellte 2024 den operativen Betrieb ein — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 61, "company": "FuboTV", "ticker": "FUBO", "years": [2020], "type": "Momentum Squeeze", "duplicateOf": 38 },
-  { "n": 62, "company": "Kodak", "ticker": "KODK", "years": [2020], "type": "News Short Squeeze" },
-  { "n": 63, "company": "Moderna", "ticker": "MRNA", "years": [2020], "type": "Short Covering" },
-  { "n": 64, "company": "Novavax", "ticker": "NVAX", "years": [2020], "type": "Biotech Squeeze" },
-  { "n": 65, "company": "GameStop", "ticker": "GME", "years": [2024], "type": "Second Squeeze Event" },
-  { "n": 66, "company": "AMC Entertainment", "ticker": "AMC", "years": [2024], "type": "Meme Squeeze Event" },
-  { "n": 67, "company": "Tupperware", "ticker": "TUP", "years": [2023], "type": "Short Squeeze", "note": "Tupperware war 2024 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 68, "company": "Yellow Corporation", "ticker": "YELL", "years": [2023], "type": "Short Squeeze", "note": "Yellow war 2023 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 69, "company": "Mullen Automotive", "ticker": "MULN", "years": [2022], "type": "Retail Squeeze" },
-  { "n": 70, "company": "Bed Bath & Beyond", "ticker": "BBBY", "years": [2022], "type": "Gamma/Short", "skip": true, "skipReason": "Dieselbe reale Bewegung wie Nr. 7 (Aug 2022) — bereits als 'BBBY-2022' erfasst.", "duplicateOf": 7 },
-  { "n": 71, "company": "Revlon", "ticker": "REV", "years": [2022], "type": "Low Float Squeeze", "note": "Revlon war 2022 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 72, "company": "HKD (AMTD Digital)", "ticker": "HKD", "years": [2022], "type": "Low Float Momentum" },
-  { "n": 73, "company": "Magic Empire Global", "ticker": "MEGL", "years": [2022], "type": "IPO Float Squeeze" },
-  { "n": 74, "company": "AMTD IDEA", "ticker": "AMTD", "years": [2022], "type": "Low Float" },
-  { "n": 75, "company": "Alto Ingredients", "ticker": "ALTO", "years": [2021], "type": "Short Squeeze" },
-  { "n": 76, "company": "Transocean", "ticker": "RIG", "years": [2021], "type": "Short Covering" },
-  { "n": 77, "company": "Riot Blockchain / Riot Platforms", "ticker": "RIOT", "years": [2021], "type": "Crypto Short Covering" },
-  { "n": 78, "company": "MARA Holdings", "ticker": "MARA", "years": [2021], "type": "Crypto Squeeze" },
-  { "n": 79, "company": "Coinbase", "ticker": "COIN", "years": [2021], "type": "Short Covering" },
-  { "n": 80, "company": "DraftKings", "ticker": "DKNG", "years": [2021], "type": "Short Interest Rally" },
-  { "n": 81, "company": "Peloton", "ticker": "PTON", "years": [2021], "type": "Short Squeeze" },
-  { "n": 82, "company": "Chewy", "ticker": "CHWY", "years": [2021], "type": "Short Covering" },
-  { "n": 83, "company": "Wayfair", "ticker": "W", "years": [2020], "type": "Short Squeeze" },
-  { "n": 84, "company": "Pinterest", "ticker": "PINS", "years": [2020], "type": "Short Covering" },
-  { "n": 85, "company": "Snap", "ticker": "SNAP", "years": [2018], "type": "Short Covering" },
-  { "n": 86, "company": "Spotify", "ticker": "SPOT", "years": [2019], "type": "Short Covering" },
-  { "n": 87, "company": "Shopify", "ticker": "SHOP", "years": [2020], "type": "Short Covering" },
-  { "n": 88, "company": "Virgin Orbit", "ticker": "VORB", "years": [2023], "type": "Low Float", "note": "Virgin Orbit war 2023 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 89, "company": "Party City", "ticker": "PRTY", "years": [2023], "type": "Short Squeeze", "note": "Party City war 2023 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar." },
-  { "n": 90, "company": "Krispy Kreme", "ticker": "DNUT", "years": [2025], "type": "Meme/Short Interest" },
-  { "n": 91, "company": "GoPro", "ticker": "GPRO", "years": [2025], "type": "Meme/Short Interest" },
-  { "n": 92, "company": "iRobot", "ticker": "IRBT", "years": [2025], "type": "Short Interest Rally" },
-  { "n": 93, "company": "Opendoor", "ticker": "OPEN", "years": [2025], "type": "Retail Short Interest" },
-  { "n": 94, "company": "Kohl's", "ticker": "KSS", "years": [2025], "type": "Short Interest Rally" },
-  { "n": 95, "company": "Polestar", "ticker": "PSNY", "years": [2024], "type": "Short Interest" },
-  { "n": 96, "company": "Rumble", "ticker": "RUM", "years": [2024], "type": "Short Interest" },
-  { "n": 97, "company": "QuantumScape", "ticker": "QS", "years": [2020], "type": "Short Covering" },
-  { "n": 98, "company": "Nikola", "ticker": "NKLA", "years": [2020], "type": "Short Interest", "duplicateOf": 44, "skip": true, "skipReason": "Gleiches Symbol und Jahr wie Nr. 44." },
-  { "n": 99, "company": "Plug Power", "ticker": "PLUG", "years": [2021], "type": "Short Covering" },
-  { "n": 100, "company": "Bloom Energy", "ticker": "BE", "years": [2020], "type": "Short Covering" }
+  {
+    "n": 1,
+    "company": "Volkswagen",
+    "ticker": "VOW3",
+    "yahooSymbol": "VOW.DE",
+    "years": [
+      2008
+    ],
+    "type": "Klassischer Short Squeeze",
+    "note": "Bereits als manueller Fall 'VOW3-2008' mit recherchierten Werten erfasst (siehe events.json). WICHTIG: 'VOW3.DE' liefert bei Yahoo eine ANDERE Aktiengattung mit fallenden statt steigenden Kursen im Okt 2008 — verifiziert per Testabruf. 'VOW.DE' (Stammaktie) zeigt die tatsächliche Squeeze-Bewegung (~210 auf 500+) und ist der korrekte Ticker für diesen historischen Fall."
+  },
+  {
+    "n": 2,
+    "company": "GameStop",
+    "ticker": "GME",
+    "years": [
+      2021
+    ],
+    "type": "Short + Gamma Squeeze"
+  },
+  {
+    "n": 3,
+    "company": "AMC Entertainment",
+    "ticker": "AMC",
+    "years": [
+      2021
+    ],
+    "type": "Retail Short Squeeze"
+  },
+  {
+    "n": 4,
+    "company": "Koss",
+    "ticker": "KOSS",
+    "years": [
+      2021
+    ],
+    "type": "Gamma Squeeze"
+  },
+  {
+    "n": 5,
+    "company": "BlackBerry",
+    "ticker": "BB",
+    "years": [
+      2021
+    ],
+    "type": "Meme Short Squeeze"
+  },
+  {
+    "n": 6,
+    "company": "Nokia",
+    "ticker": "NOK",
+    "years": [
+      2021
+    ],
+    "type": "Meme Short Squeeze"
+  },
+  {
+    "n": 7,
+    "company": "Bed Bath & Beyond",
+    "ticker": "BBBY",
+    "years": [
+      2021,
+      2022
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Ticker-Kollision: BBBY gehört seit 2023 zu Overstock/Beyond Inc. — bereits manuell als 'BBBY-2022' mit korrekten Werten erfasst (siehe events.json)."
+  },
+  {
+    "n": 8,
+    "company": "Support.com",
+    "ticker": "SPRT",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze",
+    "note": "Bereits manuell als 'SPRT' erfasst (siehe events.json) — Ticker bei Yahoo nicht mehr abrufbar (Merger zu GREE), Verifikation daher nicht möglich."
+  },
+  {
+    "n": 9,
+    "company": "IronNet",
+    "ticker": "IRNT",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Low Float Squeeze"
+  },
+  {
+    "n": 10,
+    "company": "Vinco Ventures / Vinco",
+    "ticker": "BBIG",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 11,
+    "company": "Aterian",
+    "ticker": "ATER",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 12,
+    "company": "Camber Energy",
+    "ticker": "CEI",
+    "years": [
+      2021
+    ],
+    "type": "Momentum Short Squeeze"
+  },
+  {
+    "n": 13,
+    "company": "Phunware",
+    "ticker": "PHUN",
+    "years": [
+      2021
+    ],
+    "type": "News + Short Squeeze"
+  },
+  {
+    "n": 14,
+    "company": "Clover Health",
+    "ticker": "CLOV",
+    "years": [
+      2021
+    ],
+    "type": "Gamma/Short"
+  },
+  {
+    "n": 15,
+    "company": "Workhorse",
+    "ticker": "WKHS",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest Squeeze"
+  },
+  {
+    "n": 16,
+    "company": "MicroVision",
+    "ticker": "MVIS",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 17,
+    "company": "Senseonics",
+    "ticker": "SENS",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 18,
+    "company": "Ocugen",
+    "ticker": "OCGN",
+    "years": [
+      2021
+    ],
+    "type": "News Short Squeeze"
+  },
+  {
+    "n": 19,
+    "company": "Newegg",
+    "ticker": "NEGG",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 20,
+    "company": "Rocket Companies",
+    "ticker": "RKT",
+    "years": [
+      2021
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 21,
+    "company": "Dillard's",
+    "ticker": "DDS",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Short Squeeze"
+  },
+  {
+    "n": 22,
+    "company": "Avis Budget",
+    "ticker": "CAR",
+    "years": [
+      2021
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 23,
+    "company": "Geo Group",
+    "ticker": "GEO",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 24,
+    "company": "Cinemark",
+    "ticker": "CNK",
+    "years": [
+      2021
+    ],
+    "type": "Recovery Short Squeeze"
+  },
+  {
+    "n": 25,
+    "company": "Cleveland-Cliffs",
+    "ticker": "CLF",
+    "years": [
+      2021
+    ],
+    "type": "Commodity Short Squeeze"
+  },
+  {
+    "n": 26,
+    "company": "Express",
+    "ticker": "EXPR",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze",
+    "note": "Express war 2024 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 27,
+    "company": "Sundial Growers",
+    "ticker": "SNDL",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze"
+  },
+  {
+    "n": 28,
+    "company": "Tilray",
+    "ticker": "TLRY",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Short Squeeze"
+  },
+  {
+    "n": 29,
+    "company": "Canopy Growth",
+    "ticker": "CGC",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Squeeze"
+  },
+  {
+    "n": 30,
+    "company": "Aphria",
+    "ticker": "APHA",
+    "years": [
+      2018,
+      2021
+    ],
+    "type": "Cannabis Squeeze",
+    "note": "Aphria fusionierte 2021 mit Tilray zu TLRY — Ticker APHA bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 31,
+    "company": "DryShips",
+    "ticker": "DRYS",
+    "years": [
+      2016
+    ],
+    "type": "Extreme Short Squeeze",
+    "note": "DryShips wurde 2019 von der Börse genommen — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 32,
+    "company": "Overstock.com",
+    "ticker": "OSTK",
+    "years": [
+      2005
+    ],
+    "type": "Short Squeeze",
+    "note": "Overstock benannte sich 2023 in Beyond Inc. um und wechselte den Ticker zu BBBY — OSTK evtl. bei Yahoo nicht mehr live, und 2005 liegt am Rand der von Yahoo verfügbaren Tagesdaten-Historie."
+  },
+  {
+    "n": 33,
+    "company": "Tesla",
+    "ticker": "TSLA",
+    "years": [
+      2020
+    ],
+    "type": "Massive Short Covering"
+  },
+  {
+    "n": 34,
+    "company": "Herbalife",
+    "ticker": "HLF",
+    "years": [
+      2012
+    ],
+    "type": "Short Battle",
+    "note": "Mehrjährige Ackman-vs-Icahn-Auseinandersetzung, kein klassischer kurzer Squeeze-Spike — Detektor findet ggf. kein Muster im Standard-Zeitfenster."
+  },
+  {
+    "n": 35,
+    "company": "Beyond Meat",
+    "ticker": "BYND",
+    "years": [
+      2019
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 36,
+    "company": "Carvana",
+    "ticker": "CVNA",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 37,
+    "company": "Upstart",
+    "ticker": "UPST",
+    "years": [
+      2023
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 38,
+    "company": "FuboTV",
+    "ticker": "FUBO",
+    "years": [
+      2021,
+      2020
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 39,
+    "company": "Plug Power",
+    "ticker": "PLUG",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 40,
+    "company": "FuelCell Energy",
+    "ticker": "FCEL",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 41,
+    "company": "Blink Charging",
+    "ticker": "BLNK",
+    "years": [
+      2020
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 42,
+    "company": "Lordstown Motors",
+    "ticker": "RIDE",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze",
+    "note": "Lordstown Motors war 2023 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 43,
+    "company": "Canoo",
+    "ticker": "GOEV",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze",
+    "note": "Canoo war 2025 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 44,
+    "company": "Nikola",
+    "ticker": "NKLA",
+    "years": [
+      2020
+    ],
+    "type": "Short Volatility"
+  },
+  {
+    "n": 45,
+    "company": "Lucid Group",
+    "ticker": "LCID",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Short Squeeze"
+  },
+  {
+    "n": 46,
+    "company": "Rivian",
+    "ticker": "RIVN",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Momentum"
+  },
+  {
+    "n": 47,
+    "company": "Fisker",
+    "ticker": "FSR",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest Rally",
+    "note": "Fisker war 2024 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 48,
+    "company": "3D Systems",
+    "ticker": "DDD",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 49,
+    "company": "Tattooed Chef",
+    "ticker": "TTCF",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze"
+  },
+  {
+    "n": 50,
+    "company": "SmileDirectClub",
+    "ticker": "SDC",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "note": "SmileDirectClub war 2023 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 51,
+    "company": "PetMed Express",
+    "ticker": "PETS",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 52,
+    "company": "Children's Place",
+    "ticker": "PLCE",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 53,
+    "company": "SunPower",
+    "ticker": "SPWR",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "note": "SunPower war 2024 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 54,
+    "company": "Aeva Technologies",
+    "ticker": "AEVA",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Squeeze"
+  },
+  {
+    "n": 55,
+    "company": "Virgin Galactic",
+    "ticker": "SPCE",
+    "years": [
+      2021
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 56,
+    "company": "Clean Energy Fuels",
+    "ticker": "CLNE",
+    "years": [
+      2021
+    ],
+    "type": "Gamma Squeeze"
+  },
+  {
+    "n": 57,
+    "company": "BigCommerce",
+    "ticker": "BIGC",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 58,
+    "company": "Ligand Pharmaceuticals",
+    "ticker": "LGND",
+    "years": [
+      2021
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 59,
+    "company": "Accelerate Diagnostics",
+    "ticker": "AXDX",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 60,
+    "company": "Acutus Medical",
+    "ticker": "AFIB",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "note": "Acutus Medical stellte 2024 den operativen Betrieb ein — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 61,
+    "company": "FuboTV",
+    "ticker": "FUBO",
+    "years": [
+      2020
+    ],
+    "type": "Momentum Squeeze",
+    "duplicateOf": 38
+  },
+  {
+    "n": 62,
+    "company": "Kodak",
+    "ticker": "KODK",
+    "years": [
+      2020
+    ],
+    "type": "News Short Squeeze"
+  },
+  {
+    "n": 63,
+    "company": "Moderna",
+    "ticker": "MRNA",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 64,
+    "company": "Novavax",
+    "ticker": "NVAX",
+    "years": [
+      2020
+    ],
+    "type": "Biotech Squeeze"
+  },
+  {
+    "n": 65,
+    "company": "GameStop",
+    "ticker": "GME",
+    "years": [
+      2024
+    ],
+    "type": "Second Squeeze Event"
+  },
+  {
+    "n": 66,
+    "company": "AMC Entertainment",
+    "ticker": "AMC",
+    "years": [
+      2024
+    ],
+    "type": "Meme Squeeze Event"
+  },
+  {
+    "n": 67,
+    "company": "Tupperware",
+    "ticker": "TUP",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze",
+    "note": "Tupperware war 2024 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 68,
+    "company": "Yellow Corporation",
+    "ticker": "YELL",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze",
+    "note": "Yellow war 2023 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 69,
+    "company": "Mullen Automotive",
+    "ticker": "MULN",
+    "years": [
+      2022
+    ],
+    "type": "Retail Squeeze"
+  },
+  {
+    "n": 70,
+    "company": "Bed Bath & Beyond",
+    "ticker": "BBBY",
+    "years": [
+      2022
+    ],
+    "type": "Gamma/Short",
+    "skip": true,
+    "skipReason": "Dieselbe reale Bewegung wie Nr. 7 (Aug 2022) — bereits als 'BBBY-2022' erfasst.",
+    "duplicateOf": 7
+  },
+  {
+    "n": 71,
+    "company": "Revlon",
+    "ticker": "REV",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze",
+    "note": "Revlon war 2022 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 72,
+    "company": "HKD (AMTD Digital)",
+    "ticker": "HKD",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Momentum"
+  },
+  {
+    "n": 73,
+    "company": "Magic Empire Global",
+    "ticker": "MEGL",
+    "years": [
+      2022
+    ],
+    "type": "IPO Float Squeeze"
+  },
+  {
+    "n": 74,
+    "company": "AMTD IDEA",
+    "ticker": "AMTD",
+    "years": [
+      2022
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 75,
+    "company": "Alto Ingredients",
+    "ticker": "ALTO",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 76,
+    "company": "Transocean",
+    "ticker": "RIG",
+    "years": [
+      2021
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 77,
+    "company": "Riot Blockchain / Riot Platforms",
+    "ticker": "RIOT",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short Covering"
+  },
+  {
+    "n": 78,
+    "company": "MARA Holdings",
+    "ticker": "MARA",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Squeeze"
+  },
+  {
+    "n": 79,
+    "company": "Coinbase",
+    "ticker": "COIN",
+    "years": [
+      2021
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 80,
+    "company": "DraftKings",
+    "ticker": "DKNG",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest Rally"
+  },
+  {
+    "n": 81,
+    "company": "Peloton",
+    "ticker": "PTON",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 82,
+    "company": "Chewy",
+    "ticker": "CHWY",
+    "years": [
+      2021
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 83,
+    "company": "Wayfair",
+    "ticker": "W",
+    "years": [
+      2020
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 84,
+    "company": "Pinterest",
+    "ticker": "PINS",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 85,
+    "company": "Snap",
+    "ticker": "SNAP",
+    "years": [
+      2018
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 86,
+    "company": "Spotify",
+    "ticker": "SPOT",
+    "years": [
+      2019
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 87,
+    "company": "Shopify",
+    "ticker": "SHOP",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 88,
+    "company": "Virgin Orbit",
+    "ticker": "VORB",
+    "years": [
+      2023
+    ],
+    "type": "Low Float",
+    "note": "Virgin Orbit war 2023 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 89,
+    "company": "Party City",
+    "ticker": "PRTY",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze",
+    "note": "Party City war 2023 insolvent — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 90,
+    "company": "Krispy Kreme",
+    "ticker": "DNUT",
+    "years": [
+      2025
+    ],
+    "type": "Meme/Short Interest"
+  },
+  {
+    "n": 91,
+    "company": "GoPro",
+    "ticker": "GPRO",
+    "years": [
+      2025
+    ],
+    "type": "Meme/Short Interest"
+  },
+  {
+    "n": 92,
+    "company": "iRobot",
+    "ticker": "IRBT",
+    "years": [
+      2025
+    ],
+    "type": "Short Interest Rally"
+  },
+  {
+    "n": 93,
+    "company": "Opendoor",
+    "ticker": "OPEN",
+    "years": [
+      2025
+    ],
+    "type": "Retail Short Interest"
+  },
+  {
+    "n": 94,
+    "company": "Kohl's",
+    "ticker": "KSS",
+    "years": [
+      2025
+    ],
+    "type": "Short Interest Rally"
+  },
+  {
+    "n": 95,
+    "company": "Polestar",
+    "ticker": "PSNY",
+    "years": [
+      2024
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 96,
+    "company": "Rumble",
+    "ticker": "RUM",
+    "years": [
+      2024
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 97,
+    "company": "QuantumScape",
+    "ticker": "QS",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 98,
+    "company": "Nikola",
+    "ticker": "NKLA",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest",
+    "duplicateOf": 44,
+    "skip": true,
+    "skipReason": "Gleiches Symbol und Jahr wie Nr. 44."
+  },
+  {
+    "n": 99,
+    "company": "Plug Power",
+    "ticker": "PLUG",
+    "years": [
+      2021
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 100,
+    "company": "Bloom Energy",
+    "ticker": "BE",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 101,
+    "company": "Progenity",
+    "ticker": "PROG",
+    "years": [
+      2021
+    ],
+    "type": "Short + Retail Squeeze"
+  },
+  {
+    "n": 102,
+    "company": "AGC (Grab SPAC)",
+    "ticker": "AGC",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Short Squeeze"
+  },
+  {
+    "n": 103,
+    "company": "Skillz",
+    "ticker": "SKLZ",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest Rally"
+  },
+  {
+    "n": 104,
+    "company": "TMC The Metals Company",
+    "ticker": "TMC",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 105,
+    "company": "Aterian",
+    "ticker": "ATER",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 11."
+  },
+  {
+    "n": 106,
+    "company": "Ortex-Top Short List Kandidat",
+    "ticker": "TY",
+    "years": [
+      2021
+    ],
+    "type": "High DTC Setup",
+    "skip": true,
+    "skipReason": "Kein identifizierbarer Einzelticker (TY ist kein Aktien-Ticker, sondern z.B. ein Futures-Kürzel) — kein konkreter Fall."
+  },
+  {
+    "n": 107,
+    "company": "Star Holdings",
+    "ticker": "STAR",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest Rally"
+  },
+  {
+    "n": 108,
+    "company": "World Acceptance",
+    "ticker": "WRLD",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 109,
+    "company": "Veru",
+    "ticker": "VERU",
+    "years": [
+      2022
+    ],
+    "type": "Biotech Short Squeeze"
+  },
+  {
+    "n": 110,
+    "company": "Acasti Pharma",
+    "ticker": "ACST",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 111,
+    "company": "Ebang International",
+    "ticker": "EBON",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short Squeeze"
+  },
+  {
+    "n": 112,
+    "company": "SOS Limited",
+    "ticker": "SOS",
+    "years": [
+      2021
+    ],
+    "type": "Retail Momentum"
+  },
+  {
+    "n": 113,
+    "company": "Bit Digital",
+    "ticker": "BTBT",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short Covering"
+  },
+  {
+    "n": 114,
+    "company": "Marathon Digital",
+    "ticker": "MARA",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short Covering"
+  },
+  {
+    "n": 115,
+    "company": "Riot Platforms",
+    "ticker": "RIOT",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short Covering",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 77."
+  },
+  {
+    "n": 116,
+    "company": "Hut 8 Mining",
+    "ticker": "HUT",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 117,
+    "company": "Cleanspark",
+    "ticker": "CLSK",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short Interest"
+  },
+  {
+    "n": 118,
+    "company": "MemeTech/Small Caps Basket",
+    "ticker": null,
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Kein Einzelticker, sondern ein Sammel-Basket."
+  },
+  {
+    "n": 119,
+    "company": "Zomedica",
+    "ticker": "ZOM",
+    "years": [
+      2021
+    ],
+    "type": "Retail Short Squeeze"
+  },
+  {
+    "n": 120,
+    "company": "Bionano Genomics",
+    "ticker": "BNGO",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Momentum"
+  },
+  {
+    "n": 121,
+    "company": "Naked Brand",
+    "ticker": "NAKD",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze"
+  },
+  {
+    "n": 122,
+    "company": "IDEX",
+    "ticker": "IDEX",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze"
+  },
+  {
+    "n": 123,
+    "company": "HOFV",
+    "ticker": "HOFV",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 124,
+    "company": "Meten Holding",
+    "ticker": "METX",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 125,
+    "company": "Castor Maritime",
+    "ticker": "CTRM",
+    "years": [
+      2021
+    ],
+    "type": "Retail Momentum"
+  },
+  {
+    "n": 126,
+    "company": "SOS Limited",
+    "ticker": "SOS",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 112."
+  },
+  {
+    "n": 127,
+    "company": "Oramed Pharmaceuticals",
+    "ticker": "ORMP",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Squeeze"
+  },
+  {
+    "n": 128,
+    "company": "Fathom Digital",
+    "ticker": "FATH",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 129,
+    "company": "Priveterra Acquisition",
+    "ticker": "PMGM",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Float"
+  },
+  {
+    "n": 130,
+    "company": "Blue Apron",
+    "ticker": "APRN",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 131,
+    "company": "Revlon",
+    "ticker": "REV",
+    "years": [
+      2022
+    ],
+    "type": "Classic Low Float"
+  },
+  {
+    "n": 132,
+    "company": "Tupperware",
+    "ticker": "TUP",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 133,
+    "company": "Yellow Corp",
+    "ticker": "YELL",
+    "years": [
+      2023
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 134,
+    "company": "Meme Global Basket",
+    "ticker": null,
+    "years": [
+      2023
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Kein Einzelticker, sondern ein Sammel-Basket."
+  },
+  {
+    "n": 135,
+    "company": "Ault Alliance",
+    "ticker": "AULT",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 136,
+    "company": "Cosmos Holdings",
+    "ticker": "COSM",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 137,
+    "company": "AMTD Digital",
+    "ticker": "HKD",
+    "years": [
+      2022
+    ],
+    "type": "IPO Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 72."
+  },
+  {
+    "n": 138,
+    "company": "Magic Empire Global",
+    "ticker": "MEGL",
+    "years": [
+      2022
+    ],
+    "type": "IPO Float Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 73."
+  },
+  {
+    "n": 139,
+    "company": "Addentax Group",
+    "ticker": "ATXG",
+    "years": [
+      2022
+    ],
+    "type": "IPO Squeeze"
+  },
+  {
+    "n": 140,
+    "company": "Bed Bath & Beyond",
+    "ticker": "BBBY",
+    "years": [
+      2022
+    ],
+    "type": "Gamma Squeeze",
+    "skip": true,
+    "skipReason": "Ticker-Kollision (siehe Nr. 7/70) — bereits als 'BBBY-2022' erfasst."
+  },
+  {
+    "n": 141,
+    "company": "Revive Therapeutics",
+    "ticker": "RVV",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Momentum"
+  },
+  {
+    "n": 142,
+    "company": "Sorrento Therapeutics",
+    "ticker": "SRNE",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Short Interest"
+  },
+  {
+    "n": 143,
+    "company": "Cassava Sciences",
+    "ticker": "SAVA",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Squeeze"
+  },
+  {
+    "n": 144,
+    "company": "Vaxart",
+    "ticker": "VXRT",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Momentum"
+  },
+  {
+    "n": 145,
+    "company": "ImmunityBio",
+    "ticker": "IBRX",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Short Cover"
+  },
+  {
+    "n": 146,
+    "company": "Aeterna Zentaris",
+    "ticker": "AEZS",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 147,
+    "company": "InterCure",
+    "ticker": "INCR",
+    "years": [
+      2021
+    ],
+    "type": "Cannabis Short Interest"
+  },
+  {
+    "n": 148,
+    "company": "Tilray",
+    "ticker": "TLRY",
+    "years": [
+      2021
+    ],
+    "type": "Cannabis Squeeze"
+  },
+  {
+    "n": 149,
+    "company": "Aurora Cannabis",
+    "ticker": "ACB",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Short Squeeze"
+  },
+  {
+    "n": 150,
+    "company": "Cronos Group",
+    "ticker": "CRON",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Momentum"
+  },
+  {
+    "n": 151,
+    "company": "Aphria",
+    "ticker": "APHA",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 30."
+  },
+  {
+    "n": 152,
+    "company": "HEXO",
+    "ticker": "HEXO",
+    "years": [
+      2021
+    ],
+    "type": "Cannabis Short Interest"
+  },
+  {
+    "n": 153,
+    "company": "Village Farms",
+    "ticker": "VFF",
+    "years": [
+      2021
+    ],
+    "type": "Cannabis Momentum"
+  },
+  {
+    "n": 154,
+    "company": "Green Thumb Industries",
+    "ticker": "GTBIF",
+    "years": [
+      2021
+    ],
+    "type": "Cannabis Short Cover"
+  },
+  {
+    "n": 155,
+    "company": "Carvana",
+    "ticker": "CVNA",
+    "years": [
+      2023
+    ],
+    "type": "High Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 36."
+  },
+  {
+    "n": 156,
+    "company": "Wayfair",
+    "ticker": "W",
+    "years": [
+      2023
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 157,
+    "company": "Affirm",
+    "ticker": "AFRM",
+    "years": [
+      2023
+    ],
+    "type": "Short Interest Rally"
+  },
+  {
+    "n": 158,
+    "company": "Upstart",
+    "ticker": "UPST",
+    "years": [
+      2023
+    ],
+    "type": "Short Covering",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 37."
+  },
+  {
+    "n": 159,
+    "company": "C3.ai",
+    "ticker": "AI",
+    "years": [
+      2023
+    ],
+    "type": "AI Momentum + Short"
+  },
+  {
+    "n": 160,
+    "company": "BigBear.ai",
+    "ticker": "BBAI",
+    "years": [
+      2023
+    ],
+    "type": "AI Short Interest"
+  },
+  {
+    "n": 161,
+    "company": "SoundHound AI",
+    "ticker": "SOUN",
+    "years": [
+      2024
+    ],
+    "type": "AI Short Interest"
+  },
+  {
+    "n": 162,
+    "company": "Guardforce AI",
+    "ticker": "GFAI",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 163,
+    "company": "Veritone",
+    "ticker": "VERI",
+    "years": [
+      2023
+    ],
+    "type": "AI Momentum"
+  },
+  {
+    "n": 164,
+    "company": "FuboTV",
+    "ticker": "FUBO",
+    "years": [
+      2021
+    ],
+    "type": "Short Covering",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 38."
+  },
+  {
+    "n": 165,
+    "company": "Peloton",
+    "ticker": "PTON",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 81."
+  },
+  {
+    "n": 166,
+    "company": "Chewy",
+    "ticker": "CHWY",
+    "years": [
+      2021
+    ],
+    "type": "Short Covering",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 82."
+  },
+  {
+    "n": 167,
+    "company": "Wolverine World Wide",
+    "ticker": "WWW",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 168,
+    "company": "Kohl's",
+    "ticker": "KSS",
+    "years": [
+      2025
+    ],
+    "type": "Meme Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 94."
+  },
+  {
+    "n": 169,
+    "company": "Opendoor",
+    "ticker": "OPEN",
+    "years": [
+      2025
+    ],
+    "type": "Retail Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 93."
+  },
+  {
+    "n": 170,
+    "company": "GoPro",
+    "ticker": "GPRO",
+    "years": [
+      2025
+    ],
+    "type": "Retail Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 91."
+  },
+  {
+    "n": 171,
+    "company": "Krispy Kreme",
+    "ticker": "DNUT",
+    "years": [
+      2025
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 90."
+  },
+  {
+    "n": 172,
+    "company": "Beyond Meat",
+    "ticker": "BYND",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 173,
+    "company": "Nikola",
+    "ticker": "NKLA",
+    "years": [
+      2020
+    ],
+    "type": "Momentum Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 44."
+  },
+  {
+    "n": 174,
+    "company": "Lordstown Motors",
+    "ticker": "RIDE",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 175,
+    "company": "Workhorse",
+    "ticker": "WKHS",
+    "years": [
+      2020
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 176,
+    "company": "Fisker",
+    "ticker": "FSR",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 177,
+    "company": "QuantumScape",
+    "ticker": "QS",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 97."
+  },
+  {
+    "n": 178,
+    "company": "Hyliion",
+    "ticker": "HYLN",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Momentum"
+  },
+  {
+    "n": 179,
+    "company": "Arrival",
+    "ticker": "ARVL",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Short Interest"
+  },
+  {
+    "n": 180,
+    "company": "Canoo",
+    "ticker": "GOEV",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Squeeze"
+  },
+  {
+    "n": 181,
+    "company": "Desktop Metal",
+    "ticker": "DM",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Momentum"
+  },
+  {
+    "n": 182,
+    "company": "Velodyne Lidar",
+    "ticker": "VLDR",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Short"
+  },
+  {
+    "n": 183,
+    "company": "Luminar",
+    "ticker": "LAZR",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Momentum"
+  },
+  {
+    "n": 184,
+    "company": "Blink Charging",
+    "ticker": "BLNK",
+    "years": [
+      2020
+    ],
+    "type": "EV Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 41."
+  },
+  {
+    "n": 185,
+    "company": "ChargePoint",
+    "ticker": "CHPT",
+    "years": [
+      2021
+    ],
+    "type": "EV Short Interest"
+  },
+  {
+    "n": 186,
+    "company": "Nio",
+    "ticker": "NIO",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 187,
+    "company": "XPeng",
+    "ticker": "XPEV",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 188,
+    "company": "Li Auto",
+    "ticker": "LI",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 189,
+    "company": "Tesla",
+    "ticker": "TSLA",
+    "years": [
+      2019,
+      2020
+    ],
+    "type": "Massive Short Cover"
+  },
+  {
+    "n": 190,
+    "company": "SolarEdge",
+    "ticker": "SEDG",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 191,
+    "company": "SunPower",
+    "ticker": "SPWR",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 192,
+    "company": "Plug Power",
+    "ticker": "PLUG",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 39."
+  },
+  {
+    "n": 193,
+    "company": "Ballard Power",
+    "ticker": "BLDP",
+    "years": [
+      2020
+    ],
+    "type": "Hydrogen Momentum"
+  },
+  {
+    "n": 194,
+    "company": "FuelCell Energy",
+    "ticker": "FCEL",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 40."
+  },
+  {
+    "n": 195,
+    "company": "Bloom Energy",
+    "ticker": "BE",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 100."
+  },
+  {
+    "n": 196,
+    "company": "GameStop",
+    "ticker": "GME",
+    "years": [
+      2024
+    ],
+    "type": "Meme Revival",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 65."
+  },
+  {
+    "n": 197,
+    "company": "AMC",
+    "ticker": "AMC",
+    "years": [
+      2024
+    ],
+    "type": "Meme Revival",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 66."
+  },
+  {
+    "n": 198,
+    "company": "Koss",
+    "ticker": "KOSS",
+    "years": [
+      2024
+    ],
+    "type": "Meme Revival"
+  },
+  {
+    "n": 199,
+    "company": "BlackBerry",
+    "ticker": "BB",
+    "years": [
+      2024
+    ],
+    "type": "Meme Revival"
+  },
+  {
+    "n": 200,
+    "company": "Bed Bath & Beyond",
+    "ticker": "BBBY",
+    "years": [
+      2024
+    ],
+    "type": "Residual Short Interest",
+    "skip": true,
+    "skipReason": "Ticker-Kollision (siehe Nr. 7/70/140) — bereits als 'BBBY-2022' erfasst; 2024 wäre ohnehin schon Overstock/Beyond Inc."
+  },
+  {
+    "n": 201,
+    "company": "Volkswagen Preference",
+    "ticker": "VOW3",
+    "years": [
+      2008
+    ],
+    "type": "Klassischer Squeeze",
+    "yahooSymbol": "VOW.DE",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 1 (mit korrigiertem Ticker VOW.DE)."
+  },
+  {
+    "n": 202,
+    "company": "Porsche SE",
+    "ticker": "PAH3",
+    "years": [
+      2008
+    ],
+    "type": "Short Covering",
+    "yahooSymbol": "PAH3.DE"
+  },
+  {
+    "n": 203,
+    "company": "Porsche Holding",
+    "ticker": "POAHY",
+    "years": [
+      2008
+    ],
+    "type": "Short Pressure"
+  },
+  {
+    "n": 204,
+    "company": "Blue Apron",
+    "ticker": "APRN",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 130."
+  },
+  {
+    "n": 205,
+    "company": "Eloxx Pharmaceuticals",
+    "ticker": "ELOX",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 206,
+    "company": "Mangoceuticals",
+    "ticker": "MGRX",
+    "years": [
+      2023
+    ],
+    "type": "IPO Float Squeeze"
+  },
+  {
+    "n": 207,
+    "company": "AMTD IDEA Group",
+    "ticker": "AMTD",
+    "years": [
+      2022
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 74."
+  },
+  {
+    "n": 208,
+    "company": "Bannix Acquisition",
+    "ticker": "BNIX",
+    "years": [
+      2023
+    ],
+    "type": "SPAC Float"
+  },
+  {
+    "n": 209,
+    "company": "Tritium DCFC",
+    "ticker": "DCFC",
+    "years": [
+      2023
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 210,
+    "company": "Arrival SA",
+    "ticker": "ARVL",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 179."
+  },
+  {
+    "n": 211,
+    "company": "QuantumScape",
+    "ticker": "QS",
+    "years": [
+      2021
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 212,
+    "company": "Nikola",
+    "ticker": "NKLA",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 44."
+  },
+  {
+    "n": 213,
+    "company": "Lordstown Motors",
+    "ticker": "RIDE",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 174."
+  },
+  {
+    "n": 214,
+    "company": "Workhorse",
+    "ticker": "WKHS",
+    "years": [
+      2020
+    ],
+    "type": "EV Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 175."
+  },
+  {
+    "n": 215,
+    "company": "Hyliion",
+    "ticker": "HYLN",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 178."
+  },
+  {
+    "n": 216,
+    "company": "Canoo",
+    "ticker": "GOEV",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 180."
+  },
+  {
+    "n": 217,
+    "company": "Fisker",
+    "ticker": "FSR",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 218,
+    "company": "Lucid",
+    "ticker": "LCID",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 45."
+  },
+  {
+    "n": 219,
+    "company": "Rivian",
+    "ticker": "RIVN",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Rally",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 46."
+  },
+  {
+    "n": 220,
+    "company": "Nikola Europe SPAC",
+    "ticker": "NKLA",
+    "years": [
+      2020
+    ],
+    "type": "Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 44."
+  },
+  {
+    "n": 221,
+    "company": "DraftKings",
+    "ticker": "DKNG",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 222,
+    "company": "Penn Entertainment",
+    "ticker": "PENN",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 223,
+    "company": "MGM Resorts",
+    "ticker": "MGM",
+    "years": [
+      2021
+    ],
+    "type": "Recovery Short"
+  },
+  {
+    "n": 224,
+    "company": "CarParts.com",
+    "ticker": "PRTS",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 225,
+    "company": "The RealReal",
+    "ticker": "REAL",
+    "years": [
+      2021
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 226,
+    "company": "Peloton",
+    "ticker": "PTON",
+    "years": [
+      2020
+    ],
+    "type": "High Short Interest"
+  },
+  {
+    "n": 227,
+    "company": "Chewy",
+    "ticker": "CHWY",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 228,
+    "company": "Stitch Fix",
+    "ticker": "SFIX",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 229,
+    "company": "Wayfair",
+    "ticker": "W",
+    "years": [
+      2020
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 230,
+    "company": "Etsy",
+    "ticker": "ETSY",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 231,
+    "company": "Beyond Meat",
+    "ticker": "BYND",
+    "years": [
+      2019
+    ],
+    "type": "High Short Float"
+  },
+  {
+    "n": 232,
+    "company": "Fiverr",
+    "ticker": "FVRR",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 233,
+    "company": "Upwork",
+    "ticker": "UPWK",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 234,
+    "company": "Fastly",
+    "ticker": "FSLY",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 235,
+    "company": "Cloudflare",
+    "ticker": "NET",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 236,
+    "company": "Snowflake",
+    "ticker": "SNOW",
+    "years": [
+      2020
+    ],
+    "type": "IPO Short Pressure"
+  },
+  {
+    "n": 237,
+    "company": "Unity Software",
+    "ticker": "U",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 238,
+    "company": "Roku",
+    "ticker": "ROKU",
+    "years": [
+      2019
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 239,
+    "company": "Snap",
+    "ticker": "SNAP",
+    "years": [
+      2018
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 240,
+    "company": "Twitter",
+    "ticker": "TWTR",
+    "years": [
+      2022
+    ],
+    "type": "Short Cover Event",
+    "note": "Twitter wurde Ende 2022 von X Corp. übernommen und von der Börse genommen — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 241,
+    "company": "Carvana",
+    "ticker": "CVNA",
+    "years": [
+      2022
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 242,
+    "company": "Carvana",
+    "ticker": "CVNA",
+    "years": [
+      2023
+    ],
+    "type": "Major Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 36."
+  },
+  {
+    "n": 243,
+    "company": "Affirm",
+    "ticker": "AFRM",
+    "years": [
+      2023
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 157."
+  },
+  {
+    "n": 244,
+    "company": "Block",
+    "ticker": "SQ",
+    "years": [
+      2023
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 245,
+    "company": "Coinbase",
+    "ticker": "COIN",
+    "years": [
+      2023
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 246,
+    "company": "MicroStrategy",
+    "ticker": "MSTR",
+    "years": [
+      2020
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 247,
+    "company": "Marathon Digital",
+    "ticker": "MARA",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 114."
+  },
+  {
+    "n": 248,
+    "company": "Riot Platforms",
+    "ticker": "RIOT",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 77."
+  },
+  {
+    "n": 249,
+    "company": "CleanSpark",
+    "ticker": "CLSK",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 117."
+  },
+  {
+    "n": 250,
+    "company": "Bitfarms",
+    "ticker": "BITF",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short"
+  },
+  {
+    "n": 251,
+    "company": "Hut 8 Mining",
+    "ticker": "HUT",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 116."
+  },
+  {
+    "n": 252,
+    "company": "SOS Limited",
+    "ticker": "SOS",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Retail",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 112."
+  },
+  {
+    "n": 253,
+    "company": "Bit Digital",
+    "ticker": "BTBT",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Rally",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 113."
+  },
+  {
+    "n": 254,
+    "company": "Ebang",
+    "ticker": "EBON",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 111."
+  },
+  {
+    "n": 255,
+    "company": "Mullen Automotive",
+    "ticker": "MULN",
+    "years": [
+      2022
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 69."
+  },
+  {
+    "n": 256,
+    "company": "Tupperware",
+    "ticker": "TUP",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 132."
+  },
+  {
+    "n": 257,
+    "company": "Party City",
+    "ticker": "PRTY",
+    "years": [
+      2023
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 258,
+    "company": "Revlon",
+    "ticker": "REV",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 131."
+  },
+  {
+    "n": 259,
+    "company": "Yellow Corporation",
+    "ticker": "YELL",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 133."
+  },
+  {
+    "n": 260,
+    "company": "Hertz",
+    "ticker": "HTZZ",
+    "years": [
+      2021
+    ],
+    "type": "Recovery Short",
+    "yahooSymbol": "HTZ",
+    "note": "Ticker HTZZ war eine temporäre OTC-Kennung während der Chapter-11-Insolvenz 2020/21 — heutiger reale Ticker ist HTZ."
+  },
+  {
+    "n": 261,
+    "company": "Avis Budget",
+    "ticker": "CAR",
+    "years": [
+      2021
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 22."
+  },
+  {
+    "n": 262,
+    "company": "Bed Bath & Beyond",
+    "ticker": "BBBY",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze",
+    "skip": true,
+    "skipReason": "Ticker-Kollision (siehe Nr. 7/70/140/200) — bereits als 'BBBY-2022' erfasst."
+  },
+  {
+    "n": 263,
+    "company": "GameStop",
+    "ticker": "GME",
+    "years": [
+      2021
+    ],
+    "type": "Short Gamma",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 2."
+  },
+  {
+    "n": 264,
+    "company": "AMC",
+    "ticker": "AMC",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 3."
+  },
+  {
+    "n": 265,
+    "company": "Express",
+    "ticker": "EXPR",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 26."
+  },
+  {
+    "n": 266,
+    "company": "Koss",
+    "ticker": "KOSS",
+    "years": [
+      2021
+    ],
+    "type": "Gamma Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 4."
+  },
+  {
+    "n": 267,
+    "company": "Naked Brand",
+    "ticker": "NAKD",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 121."
+  },
+  {
+    "n": 268,
+    "company": "Zomedica",
+    "ticker": "ZOM",
+    "years": [
+      2021
+    ],
+    "type": "Retail Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 119."
+  },
+  {
+    "n": 269,
+    "company": "Bionano Genomics",
+    "ticker": "BNGO",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 120."
+  },
+  {
+    "n": 270,
+    "company": "Ocugen",
+    "ticker": "OCGN",
+    "years": [
+      2021
+    ],
+    "type": "News Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 18."
+  },
+  {
+    "n": 271,
+    "company": "Sorrento Therapeutics",
+    "ticker": "SRNE",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 142."
+  },
+  {
+    "n": 272,
+    "company": "Vaxart",
+    "ticker": "VXRT",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 144."
+  },
+  {
+    "n": 273,
+    "company": "Cassava Sciences",
+    "ticker": "SAVA",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 143."
+  },
+  {
+    "n": 274,
+    "company": "Veru",
+    "ticker": "VERU",
+    "years": [
+      2022
+    ],
+    "type": "Biotech Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 109."
+  },
+  {
+    "n": 275,
+    "company": "Novavax",
+    "ticker": "NVAX",
+    "years": [
+      2020
+    ],
+    "type": "Biotech Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 64."
+  },
+  {
+    "n": 276,
+    "company": "Moderna",
+    "ticker": "MRNA",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 63."
+  },
+  {
+    "n": 277,
+    "company": "BioNTech",
+    "ticker": "BNTX",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 278,
+    "company": "GameStop",
+    "ticker": "GME",
+    "years": [
+      2022
+    ],
+    "type": "Meme Revival"
+  },
+  {
+    "n": 279,
+    "company": "AMC",
+    "ticker": "AMC",
+    "years": [
+      2022
+    ],
+    "type": "Meme Revival"
+  },
+  {
+    "n": 280,
+    "company": "DWAC",
+    "ticker": "DWAC",
+    "years": [
+      2021
+    ],
+    "type": "News/Momentum",
+    "note": "War bei früherer Prüfung nicht über Yahoo abrufbar — hier erneuter Versuch."
+  },
+  {
+    "n": 281,
+    "company": "PHUN",
+    "ticker": "PHUN",
+    "years": [
+      2021
+    ],
+    "type": "News Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 13."
+  },
+  {
+    "n": 282,
+    "company": "IRNT",
+    "ticker": "IRNT",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 9."
+  },
+  {
+    "n": 283,
+    "company": "SPRT",
+    "ticker": "SPRT",
+    "years": [
+      2021
+    ],
+    "type": "Classic Squeeze",
+    "skip": true,
+    "skipReason": "Bereits manuell als 'SPRT' erfasst (siehe Nr. 8 / events.json)."
+  },
+  {
+    "n": 284,
+    "company": "NEGG",
+    "ticker": "NEGG",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 19."
+  },
+  {
+    "n": 285,
+    "company": "ATER",
+    "ticker": "ATER",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 11."
+  },
+  {
+    "n": 286,
+    "company": "BBIG",
+    "ticker": "BBIG",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 10."
+  },
+  {
+    "n": 287,
+    "company": "CLOV",
+    "ticker": "CLOV",
+    "years": [
+      2021
+    ],
+    "type": "Gamma Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 14."
+  },
+  {
+    "n": 288,
+    "company": "RKT",
+    "ticker": "RKT",
+    "years": [
+      2021
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 20."
+  },
+  {
+    "n": 289,
+    "company": "WISH",
+    "ticker": "WISH",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "note": "War bei früherer Prüfung (Universum) nicht über Yahoo abrufbar — hier erneuter Versuch."
+  },
+  {
+    "n": 290,
+    "company": "SNDL",
+    "ticker": "SNDL",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 27."
+  },
+  {
+    "n": 291,
+    "company": "TLRY",
+    "ticker": "TLRY",
+    "years": [
+      2021
+    ],
+    "type": "Cannabis Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 148."
+  },
+  {
+    "n": 292,
+    "company": "CGC",
+    "ticker": "CGC",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 29."
+  },
+  {
+    "n": 293,
+    "company": "ACB",
+    "ticker": "ACB",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 149."
+  },
+  {
+    "n": 294,
+    "company": "Cronos",
+    "ticker": "CRON",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 150."
+  },
+  {
+    "n": 295,
+    "company": "Aurora",
+    "ticker": "ACB",
+    "years": [
+      2019
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 296,
+    "company": "Overstock",
+    "ticker": "OSTK",
+    "years": [
+      2005
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 32."
+  },
+  {
+    "n": 297,
+    "company": "Herbalife",
+    "ticker": "HLF",
+    "years": [
+      2013
+    ],
+    "type": "Short Battle"
+  },
+  {
+    "n": 298,
+    "company": "Tesla",
+    "ticker": "TSLA",
+    "years": [
+      2020
+    ],
+    "type": "Historic Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 33."
+  },
+  {
+    "n": 299,
+    "company": "DryShips",
+    "ticker": "DRYS",
+    "years": [
+      2016
+    ],
+    "type": "Extreme Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 31."
+  },
+  {
+    "n": 300,
+    "company": "KB Home",
+    "ticker": "KBH",
+    "years": [
+      2007
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 301,
+    "company": "Volkswagen",
+    "ticker": "VOW3",
+    "years": [
+      2008
+    ],
+    "type": "Klassischer Short Squeeze",
+    "yahooSymbol": "VOW.DE",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 1."
+  },
+  {
+    "n": 302,
+    "company": "Porsche",
+    "ticker": "PAH3",
+    "years": [
+      2008
+    ],
+    "type": "Short Covering",
+    "yahooSymbol": "PAH3.DE",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 202."
+  },
+  {
+    "n": 303,
+    "company": "Overstock.com",
+    "ticker": "OSTK",
+    "years": [
+      2005
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 32."
+  },
+  {
+    "n": 304,
+    "company": "Herbalife",
+    "ticker": "HLF",
+    "years": [
+      2012
+    ],
+    "type": "Short Battle",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 34."
+  },
+  {
+    "n": 305,
+    "company": "Tesla",
+    "ticker": "TSLA",
+    "years": [
+      2013
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 306,
+    "company": "Tesla",
+    "ticker": "TSLA",
+    "years": [
+      2018
+    ],
+    "type": "Short Pressure"
+  },
+  {
+    "n": 307,
+    "company": "Tesla",
+    "ticker": "TSLA",
+    "years": [
+      2020
+    ],
+    "type": "Massive Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 33."
+  },
+  {
+    "n": 308,
+    "company": "Netflix",
+    "ticker": "NFLX",
+    "years": [
+      2009
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 309,
+    "company": "Amazon",
+    "ticker": "AMZN",
+    "years": [
+      2003
+    ],
+    "type": "Short Covering",
+    "note": "2003 liegt am Rand der von Yahoo verfügbaren Tagesdaten-Historie."
+  },
+  {
+    "n": 310,
+    "company": "Apple",
+    "ticker": "AAPL",
+    "years": [
+      2009
+    ],
+    "type": "Short Covering"
+  },
+  {
+    "n": 311,
+    "company": "Baidu",
+    "ticker": "BIDU",
+    "years": [
+      2010
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 312,
+    "company": "Sina Corp",
+    "ticker": "SINA",
+    "years": [
+      2012
+    ],
+    "type": "Short Cover",
+    "note": "Sina wurde 2021 von der Börse genommen (Going-Private) — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 313,
+    "company": "Green Mountain Coffee",
+    "ticker": "GMCR",
+    "years": [
+      2013
+    ],
+    "type": "Short Squeeze",
+    "note": "Green Mountain (heute Keurig Dr Pepper, KDP) — alter Ticker GMCR evtl. bei Yahoo nicht mehr abrufbar."
+  },
+  {
+    "n": 314,
+    "company": "Skechers",
+    "ticker": "SKX",
+    "years": [
+      2012
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 315,
+    "company": "Crocs",
+    "ticker": "CROX",
+    "years": [
+      2017
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 316,
+    "company": "Shake Shack",
+    "ticker": "SHAK",
+    "years": [
+      2015
+    ],
+    "type": "High Short Interest"
+  },
+  {
+    "n": 317,
+    "company": "GoPro",
+    "ticker": "GPRO",
+    "years": [
+      2015
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 318,
+    "company": "Fitbit",
+    "ticker": "FIT",
+    "years": [
+      2015
+    ],
+    "type": "Short Interest Rally",
+    "note": "Fitbit wurde 2021 von Google übernommen und von der Börse genommen — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 319,
+    "company": "Keurig Dr Pepper",
+    "ticker": "KDP",
+    "years": [
+      2014
+    ],
+    "type": "Short Cover",
+    "note": "KDP als Ticker existiert erst seit der Fusion 2018 — 2014 hieß das Unternehmen noch anders. Zeitfenster evtl. nicht korrekt abbildbar."
+  },
+  {
+    "n": 320,
+    "company": "Valeant Pharmaceuticals",
+    "ticker": "VRX",
+    "years": [
+      2015
+    ],
+    "type": "Short Battle",
+    "note": "Valeant wurde 2018 in Bausch Health (BHC) umbenannt — alter Ticker VRX evtl. bei Yahoo nicht mehr abrufbar."
+  },
+  {
+    "n": 321,
+    "company": "Enphase Energy",
+    "ticker": "ENPH",
+    "years": [
+      2019
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 322,
+    "company": "Plug Power",
+    "ticker": "PLUG",
+    "years": [
+      2014
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 323,
+    "company": "Ballard Power",
+    "ticker": "BLDP",
+    "years": [
+      2014
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 324,
+    "company": "FuelCell Energy",
+    "ticker": "FCEL",
+    "years": [
+      2014
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 325,
+    "company": "Bloom Energy",
+    "ticker": "BE",
+    "years": [
+      2019
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 326,
+    "company": "GameStop",
+    "ticker": "GME",
+    "years": [
+      2019
+    ],
+    "type": "High Short Interest Setup"
+  },
+  {
+    "n": 327,
+    "company": "AMC",
+    "ticker": "AMC",
+    "years": [
+      2019
+    ],
+    "type": "High Short Interest Setup"
+  },
+  {
+    "n": 328,
+    "company": "Kandi Technologies",
+    "ticker": "KNDI",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest Rally"
+  },
+  {
+    "n": 329,
+    "company": "Kodak",
+    "ticker": "KODK",
+    "years": [
+      2020
+    ],
+    "type": "News Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 62."
+  },
+  {
+    "n": 330,
+    "company": "Eastman Kodak",
+    "ticker": "KODK",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 331,
+    "company": "Nikola",
+    "ticker": "NKLA",
+    "years": [
+      2020
+    ],
+    "type": "Short Volatility",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 44."
+  },
+  {
+    "n": 332,
+    "company": "Workhorse",
+    "ticker": "WKHS",
+    "years": [
+      2020
+    ],
+    "type": "EV Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 175."
+  },
+  {
+    "n": 333,
+    "company": "Blink Charging",
+    "ticker": "BLNK",
+    "years": [
+      2020
+    ],
+    "type": "EV Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 41."
+  },
+  {
+    "n": 334,
+    "company": "Fisker",
+    "ticker": "FSR",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 217."
+  },
+  {
+    "n": 335,
+    "company": "QuantumScape",
+    "ticker": "QS",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 97."
+  },
+  {
+    "n": 336,
+    "company": "Lordstown Motors",
+    "ticker": "RIDE",
+    "years": [
+      2021
+    ],
+    "type": "Meme Short"
+  },
+  {
+    "n": 337,
+    "company": "Canoo",
+    "ticker": "GOEV",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Short"
+  },
+  {
+    "n": 338,
+    "company": "Hyliion",
+    "ticker": "HYLN",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 178."
+  },
+  {
+    "n": 339,
+    "company": "Luminar",
+    "ticker": "LAZR",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 183."
+  },
+  {
+    "n": 340,
+    "company": "Velodyne Lidar",
+    "ticker": "VLDR",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 182."
+  },
+  {
+    "n": 341,
+    "company": "Desktop Metal",
+    "ticker": "DM",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 181."
+  },
+  {
+    "n": 342,
+    "company": "Arrival",
+    "ticker": "ARVL",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 179."
+  },
+  {
+    "n": 343,
+    "company": "Virgin Galactic",
+    "ticker": "SPCE",
+    "years": [
+      2019
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 344,
+    "company": "Astra Space",
+    "ticker": "ASTR",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Short"
+  },
+  {
+    "n": 345,
+    "company": "Rocket Lab",
+    "ticker": "RKLB",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 346,
+    "company": "Reddit Inc.",
+    "ticker": "RDDT",
+    "years": [
+      2024
+    ],
+    "type": "Short Interest Rally"
+  },
+  {
+    "n": 347,
+    "company": "SoundHound AI",
+    "ticker": "SOUN",
+    "years": [
+      2024
+    ],
+    "type": "AI Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 161."
+  },
+  {
+    "n": 348,
+    "company": "C3.ai",
+    "ticker": "AI",
+    "years": [
+      2023
+    ],
+    "type": "AI Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 159."
+  },
+  {
+    "n": 349,
+    "company": "BigBear.ai",
+    "ticker": "BBAI",
+    "years": [
+      2023
+    ],
+    "type": "AI Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 160."
+  },
+  {
+    "n": 350,
+    "company": "Palantir",
+    "ticker": "PLTR",
+    "years": [
+      2021
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 351,
+    "company": "Upstart",
+    "ticker": "UPST",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 352,
+    "company": "Affirm",
+    "ticker": "AFRM",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 353,
+    "company": "Carvana",
+    "ticker": "CVNA",
+    "years": [
+      2023
+    ],
+    "type": "Major Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 36."
+  },
+  {
+    "n": 354,
+    "company": "Wayfair",
+    "ticker": "W",
+    "years": [
+      2023
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 156."
+  },
+  {
+    "n": 355,
+    "company": "Beyond Meat",
+    "ticker": "BYND",
+    "years": [
+      2019
+    ],
+    "type": "Short Float Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 35/231."
+  },
+  {
+    "n": 356,
+    "company": "FuboTV",
+    "ticker": "FUBO",
+    "years": [
+      2020
+    ],
+    "type": "Short Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 38 (FUBO 2020)."
+  },
+  {
+    "n": 357,
+    "company": "Skillz",
+    "ticker": "SKLZ",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 103."
+  },
+  {
+    "n": 358,
+    "company": "DraftKings",
+    "ticker": "DKNG",
+    "years": [
+      2021
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 80."
+  },
+  {
+    "n": 359,
+    "company": "Peloton",
+    "ticker": "PTON",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 226."
+  },
+  {
+    "n": 360,
+    "company": "Chewy",
+    "ticker": "CHWY",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 227."
+  },
+  {
+    "n": 361,
+    "company": "The Trade Desk",
+    "ticker": "TTD",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 362,
+    "company": "Pinterest",
+    "ticker": "PINS",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 84."
+  },
+  {
+    "n": 363,
+    "company": "Snap",
+    "ticker": "SNAP",
+    "years": [
+      2017
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 364,
+    "company": "Twitter",
+    "ticker": "TWTR",
+    "years": [
+      2018
+    ],
+    "type": "Short Interest",
+    "note": "Twitter wurde Ende 2022 von X Corp. übernommen und von der Börse genommen — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 365,
+    "company": "Spotify",
+    "ticker": "SPOT",
+    "years": [
+      2019
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 86."
+  },
+  {
+    "n": 366,
+    "company": "Shopify",
+    "ticker": "SHOP",
+    "years": [
+      2019
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 367,
+    "company": "Roku",
+    "ticker": "ROKU",
+    "years": [
+      2019
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 238."
+  },
+  {
+    "n": 368,
+    "company": "Fastly",
+    "ticker": "FSLY",
+    "years": [
+      2020
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 234."
+  },
+  {
+    "n": 369,
+    "company": "Cloudflare",
+    "ticker": "NET",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 235."
+  },
+  {
+    "n": 370,
+    "company": "Unity Software",
+    "ticker": "U",
+    "years": [
+      2020
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 237."
+  },
+  {
+    "n": 371,
+    "company": "Snowflake",
+    "ticker": "SNOW",
+    "years": [
+      2020
+    ],
+    "type": "IPO Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 236."
+  },
+  {
+    "n": 372,
+    "company": "Coinbase",
+    "ticker": "COIN",
+    "years": [
+      2021
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 79."
+  },
+  {
+    "n": 373,
+    "company": "MicroStrategy",
+    "ticker": "MSTR",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 246."
+  },
+  {
+    "n": 374,
+    "company": "Marathon Digital",
+    "ticker": "MARA",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 114."
+  },
+  {
+    "n": 375,
+    "company": "Riot Platforms",
+    "ticker": "RIOT",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 77."
+  },
+  {
+    "n": 376,
+    "company": "Hut 8",
+    "ticker": "HUT",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 116."
+  },
+  {
+    "n": 377,
+    "company": "CleanSpark",
+    "ticker": "CLSK",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 117."
+  },
+  {
+    "n": 378,
+    "company": "Bitfarms",
+    "ticker": "BITF",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 250."
+  },
+  {
+    "n": 379,
+    "company": "SOS Limited",
+    "ticker": "SOS",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Retail",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 112."
+  },
+  {
+    "n": 380,
+    "company": "Ebang",
+    "ticker": "EBON",
+    "years": [
+      2021
+    ],
+    "type": "Crypto Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 111."
+  },
+  {
+    "n": 381,
+    "company": "Sundial Growers",
+    "ticker": "SNDL",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 27."
+  },
+  {
+    "n": 382,
+    "company": "Tilray",
+    "ticker": "TLRY",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 28."
+  },
+  {
+    "n": 383,
+    "company": "Canopy Growth",
+    "ticker": "CGC",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 29."
+  },
+  {
+    "n": 384,
+    "company": "Aurora Cannabis",
+    "ticker": "ACB",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 149."
+  },
+  {
+    "n": 385,
+    "company": "Cronos Group",
+    "ticker": "CRON",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 150."
+  },
+  {
+    "n": 386,
+    "company": "Aphria",
+    "ticker": "APHA",
+    "years": [
+      2018
+    ],
+    "type": "Cannabis Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 30."
+  },
+  {
+    "n": 387,
+    "company": "Hexo",
+    "ticker": "HEXO",
+    "years": [
+      2021
+    ],
+    "type": "Cannabis Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 152."
+  },
+  {
+    "n": 388,
+    "company": "Zomedica",
+    "ticker": "ZOM",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 119."
+  },
+  {
+    "n": 389,
+    "company": "Bionano Genomics",
+    "ticker": "BNGO",
+    "years": [
+      2021
+    ],
+    "type": "Retail Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 120."
+  },
+  {
+    "n": 390,
+    "company": "Senseonics",
+    "ticker": "SENS",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 17."
+  },
+  {
+    "n": 391,
+    "company": "Ocugen",
+    "ticker": "OCGN",
+    "years": [
+      2021
+    ],
+    "type": "News Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 18."
+  },
+  {
+    "n": 392,
+    "company": "Cassava Sciences",
+    "ticker": "SAVA",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 143."
+  },
+  {
+    "n": 393,
+    "company": "Veru",
+    "ticker": "VERU",
+    "years": [
+      2022
+    ],
+    "type": "Biotech Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 109."
+  },
+  {
+    "n": 394,
+    "company": "Novavax",
+    "ticker": "NVAX",
+    "years": [
+      2020
+    ],
+    "type": "Biotech Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 64."
+  },
+  {
+    "n": 395,
+    "company": "Moderna",
+    "ticker": "MRNA",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 63."
+  },
+  {
+    "n": 396,
+    "company": "BioNTech",
+    "ticker": "BNTX",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 277."
+  },
+  {
+    "n": 397,
+    "company": "Revlon",
+    "ticker": "REV",
+    "years": [
+      2022
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 131."
+  },
+  {
+    "n": 398,
+    "company": "Tupperware",
+    "ticker": "TUP",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 132."
+  },
+  {
+    "n": 399,
+    "company": "Yellow Corp",
+    "ticker": "YELL",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 133."
+  },
+  {
+    "n": 400,
+    "company": "Party City",
+    "ticker": "PRTY",
+    "years": [
+      2023
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 257."
+  },
+  {
+    "n": 401,
+    "company": "AMC Entertainment",
+    "ticker": "AMC",
+    "years": [
+      2023
+    ],
+    "type": "Meme Revival"
+  },
+  {
+    "n": 402,
+    "company": "GameStop",
+    "ticker": "GME",
+    "years": [
+      2024
+    ],
+    "type": "Meme Revival",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 65."
+  },
+  {
+    "n": 403,
+    "company": "Koss",
+    "ticker": "KOSS",
+    "years": [
+      2024
+    ],
+    "type": "Low Float Gamma",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 198."
+  },
+  {
+    "n": 404,
+    "company": "BlackBerry",
+    "ticker": "BB",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 5."
+  },
+  {
+    "n": 405,
+    "company": "Nokia",
+    "ticker": "NOK",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 6."
+  },
+  {
+    "n": 406,
+    "company": "Express",
+    "ticker": "EXPR",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 26."
+  },
+  {
+    "n": 407,
+    "company": "Wish",
+    "ticker": "WISH",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 289."
+  },
+  {
+    "n": 408,
+    "company": "Clover Health",
+    "ticker": "CLOV",
+    "years": [
+      2021
+    ],
+    "type": "Gamma Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 14."
+  },
+  {
+    "n": 409,
+    "company": "Clean Energy Fuels",
+    "ticker": "CLNE",
+    "years": [
+      2021
+    ],
+    "type": "Gamma Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 56."
+  },
+  {
+    "n": 410,
+    "company": "Support.com",
+    "ticker": "SPRT",
+    "years": [
+      2021
+    ],
+    "type": "Classic Squeeze",
+    "skip": true,
+    "skipReason": "Bereits manuell erfasst (siehe Nr. 8 / events.json)."
+  },
+  {
+    "n": 411,
+    "company": "Newegg",
+    "ticker": "NEGG",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 19."
+  },
+  {
+    "n": 412,
+    "company": "Aterian",
+    "ticker": "ATER",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 11."
+  },
+  {
+    "n": 413,
+    "company": "Vinco Ventures",
+    "ticker": "BBIG",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 10."
+  },
+  {
+    "n": 414,
+    "company": "Phunware",
+    "ticker": "PHUN",
+    "years": [
+      2021
+    ],
+    "type": "News Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 13."
+  },
+  {
+    "n": 415,
+    "company": "IronNet",
+    "ticker": "IRNT",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Float Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 9."
+  },
+  {
+    "n": 416,
+    "company": "Rocket Companies",
+    "ticker": "RKT",
+    "years": [
+      2021
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 20."
+  },
+  {
+    "n": 417,
+    "company": "Dillard's",
+    "ticker": "DDS",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 21."
+  },
+  {
+    "n": 418,
+    "company": "Geo Group",
+    "ticker": "GEO",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 23."
+  },
+  {
+    "n": 419,
+    "company": "Cinemark",
+    "ticker": "CNK",
+    "years": [
+      2021
+    ],
+    "type": "Recovery Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 24."
+  },
+  {
+    "n": 420,
+    "company": "Cleveland-Cliffs",
+    "ticker": "CLF",
+    "years": [
+      2021
+    ],
+    "type": "Commodity Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 25."
+  },
+  {
+    "n": 421,
+    "company": "Avis Budget",
+    "ticker": "CAR",
+    "years": [
+      2021
+    ],
+    "type": "Extreme Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 22."
+  },
+  {
+    "n": 422,
+    "company": "Hertz",
+    "ticker": "HTZZ",
+    "years": [
+      2021
+    ],
+    "type": "Recovery Short",
+    "yahooSymbol": "HTZ",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 260."
+  },
+  {
+    "n": 423,
+    "company": "TravelCenters of America",
+    "ticker": "TA",
+    "years": [
+      2023
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 424,
+    "company": "Macy's",
+    "ticker": "M",
+    "years": [
+      2021
+    ],
+    "type": "Retail Short"
+  },
+  {
+    "n": 425,
+    "company": "Kohl's",
+    "ticker": "KSS",
+    "years": [
+      2022
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 426,
+    "company": "Bed Bath & Beyond",
+    "ticker": "BBBY",
+    "years": [
+      2022
+    ],
+    "type": "Gamma/Short",
+    "skip": true,
+    "skipReason": "Ticker-Kollision — bereits als 'BBBY-2022' erfasst."
+  },
+  {
+    "n": 427,
+    "company": "Blue Apron",
+    "ticker": "APRN",
+    "years": [
+      2022
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 130."
+  },
+  {
+    "n": 428,
+    "company": "Revlon",
+    "ticker": "REV",
+    "years": [
+      2022
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 131."
+  },
+  {
+    "n": 429,
+    "company": "Cosmos Holdings",
+    "ticker": "COSM",
+    "years": [
+      2022
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 136."
+  },
+  {
+    "n": 430,
+    "company": "AMTD Digital",
+    "ticker": "HKD",
+    "years": [
+      2022
+    ],
+    "type": "IPO Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 72."
+  },
+  {
+    "n": 431,
+    "company": "Magic Empire Global",
+    "ticker": "MEGL",
+    "years": [
+      2022
+    ],
+    "type": "IPO Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 73."
+  },
+  {
+    "n": 432,
+    "company": "Addentax Group",
+    "ticker": "ATXG",
+    "years": [
+      2022
+    ],
+    "type": "IPO Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 139."
+  },
+  {
+    "n": 433,
+    "company": "Mullen Automotive",
+    "ticker": "MULN",
+    "years": [
+      2022
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 69."
+  },
+  {
+    "n": 434,
+    "company": "VinFast",
+    "ticker": "VFS",
+    "years": [
+      2023
+    ],
+    "type": "Low Float Momentum"
+  },
+  {
+    "n": 435,
+    "company": "Tupperware",
+    "ticker": "TUP",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 132."
+  },
+  {
+    "n": 436,
+    "company": "Yellow Corporation",
+    "ticker": "YELL",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 133."
+  },
+  {
+    "n": 437,
+    "company": "Carvana",
+    "ticker": "CVNA",
+    "years": [
+      2023
+    ],
+    "type": "Major Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 36."
+  },
+  {
+    "n": 438,
+    "company": "Upstart",
+    "ticker": "UPST",
+    "years": [
+      2023
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 37."
+  },
+  {
+    "n": 439,
+    "company": "Wayfair",
+    "ticker": "W",
+    "years": [
+      2023
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 156."
+  },
+  {
+    "n": 440,
+    "company": "Affirm",
+    "ticker": "AFRM",
+    "years": [
+      2023
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 157."
+  },
+  {
+    "n": 441,
+    "company": "C3.ai",
+    "ticker": "AI",
+    "years": [
+      2023
+    ],
+    "type": "AI Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 159."
+  },
+  {
+    "n": 442,
+    "company": "BigBear.ai",
+    "ticker": "BBAI",
+    "years": [
+      2023
+    ],
+    "type": "AI Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 160."
+  },
+  {
+    "n": 443,
+    "company": "SoundHound AI",
+    "ticker": "SOUN",
+    "years": [
+      2024
+    ],
+    "type": "AI Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 161."
+  },
+  {
+    "n": 444,
+    "company": "Rumble",
+    "ticker": "RUM",
+    "years": [
+      2024
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 96."
+  },
+  {
+    "n": 445,
+    "company": "Digital World Acquisition",
+    "ticker": "DWAC",
+    "years": [
+      2021
+    ],
+    "type": "News Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 280."
+  },
+  {
+    "n": 446,
+    "company": "Trump Media",
+    "ticker": "DJT",
+    "years": [
+      2024
+    ],
+    "type": "High Volatility"
+  },
+  {
+    "n": 447,
+    "company": "Phunware",
+    "ticker": "PHUN",
+    "years": [
+      2024
+    ],
+    "type": "Retail Momentum"
+  },
+  {
+    "n": 448,
+    "company": "Reddit",
+    "ticker": "RDDT",
+    "years": [
+      2024
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 346."
+  },
+  {
+    "n": 449,
+    "company": "GameStop",
+    "ticker": "GME",
+    "years": [
+      2021
+    ],
+    "type": "Historic Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 2."
+  },
+  {
+    "n": 450,
+    "company": "AMC",
+    "ticker": "AMC",
+    "years": [
+      2021
+    ],
+    "type": "Historic Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 3."
+  },
+  {
+    "n": 451,
+    "company": "Tesla",
+    "ticker": "TSLA",
+    "years": [
+      2020
+    ],
+    "type": "Historic Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 33."
+  },
+  {
+    "n": 452,
+    "company": "Volkswagen",
+    "ticker": "VOW3",
+    "years": [
+      2008
+    ],
+    "type": "Historic Squeeze",
+    "yahooSymbol": "VOW.DE",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 1."
+  },
+  {
+    "n": 453,
+    "company": "Overstock",
+    "ticker": "OSTK",
+    "years": [
+      2005
+    ],
+    "type": "Historic Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 32."
+  },
+  {
+    "n": 454,
+    "company": "Herbalife",
+    "ticker": "HLF",
+    "years": [
+      2013
+    ],
+    "type": "Short Battle",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 297."
+  },
+  {
+    "n": 455,
+    "company": "DryShips",
+    "ticker": "DRYS",
+    "years": [
+      2016
+    ],
+    "type": "Extreme Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 31."
+  },
+  {
+    "n": 456,
+    "company": "KaloBios Pharmaceuticals",
+    "ticker": "KBIO",
+    "years": [
+      2015
+    ],
+    "type": "Extreme Short Squeeze",
+    "note": "Der berühmte Martin-Shkreli-Fall — KaloBios ging später als Humanigen (HGEN) weiter, alter Ticker KBIO evtl. bei Yahoo nicht mehr abrufbar."
+  },
+  {
+    "n": 457,
+    "company": "Molecular Data",
+    "ticker": "MKD",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "note": "Ticker evtl. ungenau — Unternehmen firmierte auch als MDJH."
+  },
+  {
+    "n": 458,
+    "company": "Akazoo",
+    "ticker": "SONG",
+    "years": [
+      2020
+    ],
+    "type": "Low Float",
+    "note": "Akazoo wurde 2020 wegen Betrugsvorwürfen von der Börse genommen — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 459,
+    "company": "Acasti Pharma",
+    "ticker": "ACST",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 110."
+  },
+  {
+    "n": 460,
+    "company": "Progenity",
+    "ticker": "PROG",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 101."
+  },
+  {
+    "n": 461,
+    "company": "Zevia",
+    "ticker": "ZVIA",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 462,
+    "company": "Fathom Digital",
+    "ticker": "FATH",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 128."
+  },
+  {
+    "n": 463,
+    "company": "TMC Metals",
+    "ticker": "TMC",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 104."
+  },
+  {
+    "n": 464,
+    "company": "Priveterra Acquisition",
+    "ticker": "PMGM",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 129."
+  },
+  {
+    "n": 465,
+    "company": "AGC Grab SPAC",
+    "ticker": "AGC",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 102."
+  },
+  {
+    "n": 466,
+    "company": "Meten Holding",
+    "ticker": "METX",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 124."
+  },
+  {
+    "n": 467,
+    "company": "Castor Maritime",
+    "ticker": "CTRM",
+    "years": [
+      2021
+    ],
+    "type": "Retail Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 125."
+  },
+  {
+    "n": 468,
+    "company": "Naked Brand",
+    "ticker": "NAKD",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 121."
+  },
+  {
+    "n": 469,
+    "company": "IDEX",
+    "ticker": "IDEX",
+    "years": [
+      2021
+    ],
+    "type": "Retail Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 122."
+  },
+  {
+    "n": 470,
+    "company": "HOFV",
+    "ticker": "HOFV",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 123."
+  },
+  {
+    "n": 471,
+    "company": "Sorrento Therapeutics",
+    "ticker": "SRNE",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 142."
+  },
+  {
+    "n": 472,
+    "company": "Vaxart",
+    "ticker": "VXRT",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 144."
+  },
+  {
+    "n": 473,
+    "company": "Oramed Pharmaceuticals",
+    "ticker": "ORMP",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 127."
+  },
+  {
+    "n": 474,
+    "company": "Aeterna Zentaris",
+    "ticker": "AEZS",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 146."
+  },
+  {
+    "n": 475,
+    "company": "InterCure",
+    "ticker": "INCR",
+    "years": [
+      2021
+    ],
+    "type": "Cannabis Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 147."
+  },
+  {
+    "n": 476,
+    "company": "Village Farms",
+    "ticker": "VFF",
+    "years": [
+      2021
+    ],
+    "type": "Cannabis Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 153."
+  },
+  {
+    "n": 477,
+    "company": "Green Thumb Industries",
+    "ticker": "GTBIF",
+    "years": [
+      2021
+    ],
+    "type": "Cannabis Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 154."
+  },
+  {
+    "n": 478,
+    "company": "Riot Blockchain",
+    "ticker": "RIOT",
+    "years": [
+      2020
+    ],
+    "type": "Crypto Short"
+  },
+  {
+    "n": 479,
+    "company": "Marathon Digital",
+    "ticker": "MARA",
+    "years": [
+      2020
+    ],
+    "type": "Crypto Short"
+  },
+  {
+    "n": 480,
+    "company": "MicroVision",
+    "ticker": "MVIS",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 16."
+  },
+  {
+    "n": 481,
+    "company": "3D Systems",
+    "ticker": "DDD",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 48."
+  },
+  {
+    "n": 482,
+    "company": "SunPower",
+    "ticker": "SPWR",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 53."
+  },
+  {
+    "n": 483,
+    "company": "FuboTV",
+    "ticker": "FUBO",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 38."
+  },
+  {
+    "n": 484,
+    "company": "SmileDirectClub",
+    "ticker": "SDC",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 50."
+  },
+  {
+    "n": 485,
+    "company": "Tattooed Chef",
+    "ticker": "TTCF",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 49."
+  },
+  {
+    "n": 486,
+    "company": "Lordstown Motors",
+    "ticker": "RIDE",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 336."
+  },
+  {
+    "n": 487,
+    "company": "Canoo",
+    "ticker": "GOEV",
+    "years": [
+      2021
+    ],
+    "type": "Meme Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 337."
+  },
+  {
+    "n": 488,
+    "company": "Aeva Technologies",
+    "ticker": "AEVA",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Short",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 54."
+  },
+  {
+    "n": 489,
+    "company": "BigCommerce",
+    "ticker": "BIGC",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 57."
+  },
+  {
+    "n": 490,
+    "company": "PetMed Express",
+    "ticker": "PETS",
+    "years": [
+      2021
+    ],
+    "type": "Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 51."
+  },
+  {
+    "n": 491,
+    "company": "Ligand Pharmaceuticals",
+    "ticker": "LGND",
+    "years": [
+      2021
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 58."
+  },
+  {
+    "n": 492,
+    "company": "Accelerate Diagnostics",
+    "ticker": "AXDX",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 59."
+  },
+  {
+    "n": 493,
+    "company": "Acutus Medical",
+    "ticker": "AFIB",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 60."
+  },
+  {
+    "n": 494,
+    "company": "Children's Place",
+    "ticker": "PLCE",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 52."
+  },
+  {
+    "n": 495,
+    "company": "Transocean",
+    "ticker": "RIG",
+    "years": [
+      2021
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 76."
+  },
+  {
+    "n": 496,
+    "company": "Plug Power",
+    "ticker": "PLUG",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 39."
+  },
+  {
+    "n": 497,
+    "company": "FuelCell Energy",
+    "ticker": "FCEL",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 40."
+  },
+  {
+    "n": 498,
+    "company": "Bloom Energy",
+    "ticker": "BE",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 100."
+  },
+  {
+    "n": 499,
+    "company": "Ballard Power",
+    "ticker": "BLDP",
+    "years": [
+      2020
+    ],
+    "type": "Short Cover",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 193."
+  },
+  {
+    "n": 500,
+    "company": "ChargePoint",
+    "ticker": "CHPT",
+    "years": [
+      2021
+    ],
+    "type": "EV Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 185."
+  }
 ]
