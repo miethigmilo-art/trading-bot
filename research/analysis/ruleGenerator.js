@@ -18,6 +18,18 @@ const PREDICATE_GROUPS = {
     { key: 'dtc_gt_5', label: 'Days to Cover > 5', value: (r) => r.daysToCover, test: (r) => r.daysToCover > 5 },
     { key: 'dtc_gt_10', label: 'Days to Cover > 10', value: (r) => r.daysToCover, test: (r) => r.daysToCover > 10 },
   ],
+  // Modul 2 (Chart Engine): Breakout, Trendstruktur, Kerzenmuster — siehe chartPatterns.js
+  breakout: [
+    { key: 'breakout_20d', label: '20-Tage-Breakout', value: (r) => r.breakout20d, test: (r) => r.breakout20d === true },
+    { key: 'breakout_52w', label: '52-Wochen-Breakout', value: (r) => r.breakout52w, test: (r) => r.breakout52w === true },
+  ],
+  trend: [
+    { key: 'trend_uptrend', label: 'Trendstruktur: Uptrend (HH+HL)', value: (r) => r.trendStructure, test: (r) => r.trendStructure === 'uptrend' },
+  ],
+  candlestick: [
+    { key: 'bullish_engulfing', label: 'Bullish Engulfing', value: (r) => r.isBullishEngulfing, test: (r) => r.isBullishEngulfing === true },
+    { key: 'hammer', label: 'Hammer', value: (r) => r.isHammer, test: (r) => r.isHammer === true },
+  ],
 };
 
 // Erzeugt alle Kombinationen, die aus jeder Feature-Gruppe höchstens eine

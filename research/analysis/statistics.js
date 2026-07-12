@@ -21,6 +21,13 @@ function buildSqueezeFeatureSet(db, events) {
       rvol20: tech?.rvol20 ?? (typeof manual.rvol === 'number' ? manual.rvol : null),
       emaCrossBullish: tech?.emaCrossBullish ?? null,
       daysToCover: dtcRow ? dtcRow.days_to_cover : null,
+      isHammer: tech?.isHammer ?? null,
+      isDoji: tech?.isDoji ?? null,
+      isBullishEngulfing: tech?.isBullishEngulfing ?? null,
+      isShootingStar: tech?.isShootingStar ?? null,
+      breakout20d: tech?.breakout20d ?? null,
+      breakout52w: tech?.breakout52w ?? null,
+      trendStructure: tech?.trendStructure ?? null,
     };
   });
 }
@@ -63,6 +70,13 @@ function buildControlFeatureSet(db, events) {
         rvol20: f.rvol20,
         emaCrossBullish: f.emaCrossBullish,
         daysToCover: dtcRow ? dtcRow.days_to_cover : null,
+        isHammer: f.isHammer,
+        isDoji: f.isDoji,
+        isBullishEngulfing: f.isBullishEngulfing,
+        isShootingStar: f.isShootingStar,
+        breakout20d: f.breakout20d,
+        breakout52w: f.breakout52w,
+        trendStructure: f.trendStructure,
       });
     }
   }

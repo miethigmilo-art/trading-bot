@@ -2,10 +2,12 @@
 // Braucht keinen Alpha-Vantage-Key und kein Rate-Limit — die Rohdaten liegen
 // bereits im Data Warehouse (Yahoo-Collector).
 
+const { computeChartFeatures } = require('./chartPatterns');
+
 function getPriceSeries(db, symbol, { upTo } = {}) {
   const rows = upTo
-    ? db.prepare(`SELECT date, close, volume FROM prices WHERE symbol = ? AND date <= ? ORDER BY date ASC`).all(symbol, upTo)
-    : db.prepare(`SELECT date, close, volume FROM prices WHERE symbol = ? ORDER BY date ASC`).all(symbol);
+    ? db.prepare(`SELECT date, open, high, low, close, volume FROM prices WHERE symbol = ? AND date <= ? ORDER BY date ASC`).all(symbol, upTo)
+    : db.prepare(`SELECT date, open, high, low, close, volume FROM prices WHERE symbol = ? ORDER BY date ASC`).all(symbol);
   return rows;
 }
 
@@ -46,6 +48,7 @@ function computeSeriesFeatures(rows) {
   const ema50 = computeEMA(closes, 50);
   const ema100 = computeEMA(closes, 100);
   const ema200 = computeEMA(closes, 200);
+  const chart = computeChartFeatures(rows);
 
   return rows.map((r, idx) => ({
     date: r.date,
@@ -58,6 +61,13 @@ function computeSeriesFeatures(rows) {
     emaCrossBullish: ema20[idx] != null && ema50[idx] != null ? ema20[idx] > ema50[idx] : null,
     rvol20: computeRVOL(volumes, idx, 20),
     priceChange5d: idx >= 5 && closes[idx - 5] ? (closes[idx] - closes[idx - 5]) / closes[idx - 5] : null,
+    isHammer: chart[idx].isHammer,
+    isDoji: chart[idx].isDoji,
+    isBullishEngulfing: chart[idx].isBullishEngulfing,
+    isShootingStar: chart[idx].isShootingStar,
+    breakout20d: chart[idx].breakout20d,
+    breakout52w: chart[idx].breakout52w,
+    trendStructure: chart[idx].trendStructure,
   }));
 }
 
