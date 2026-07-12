@@ -5,6 +5,7 @@ const watchlist = require('./config/watchlist');
 const { getDb } = require('./db/database');
 const { loadEvents, listEvents } = require('./knowledge/loader');
 const { runStatistics, formatReport } = require('./analysis/statistics');
+const { generateRules, storeRules, formatRulesReport } = require('./analysis/ruleGenerator');
 
 const command = process.argv[2] || 'run';
 
@@ -77,8 +78,16 @@ async function main() {
     return;
   }
 
+  if (command === 'rules:generate') {
+    const db = getDb();
+    const rules = generateRules(db);
+    storeRules(db, rules);
+    console.log(formatRulesReport(rules));
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate`
   );
   process.exit(1);
 }

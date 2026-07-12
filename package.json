@@ -12,7 +12,8 @@
     "research:knowledge:load": "node research/cli.js knowledge:load",
     "research:knowledge:list": "node research/cli.js knowledge:list",
     "research:backfill:events": "node research/cli.js backfill:events",
-    "research:stats": "node research/cli.js stats:run"
+    "research:stats": "node research/cli.js stats:run",
+    "research:rules": "node research/cli.js rules:generate"
   },
   "keywords": [],
   "author": "",

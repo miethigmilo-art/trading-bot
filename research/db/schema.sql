@@ -103,6 +103,22 @@ CREATE TABLE IF NOT EXISTS squeeze_events (
 );
 CREATE INDEX IF NOT EXISTS idx_squeeze_events_symbol ON squeeze_events(symbol);
 
+-- Modul 7: Regelgenerator — automatisch erzeugte Feature-Kombinationen mit
+-- ihrer Bewertung gegen die Modul-6-Datenbasis (squeeze_events vs. Kontrollgruppe).
+CREATE TABLE IF NOT EXISTS rules (
+  id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+  label                 TEXT NOT NULL,       -- lesbare Beschreibung, z.B. "RVOL >3 UND EMA20>EMA50"
+  conditions            TEXT NOT NULL,       -- JSON-Array der verwendeten Predicate-Keys
+  squeeze_hits          INTEGER NOT NULL,
+  squeeze_applicable    INTEGER NOT NULL,    -- Anzahl Squeeze-Fälle, für die alle Features berechenbar waren
+  control_hits          INTEGER NOT NULL,
+  control_applicable    INTEGER NOT NULL,
+  lift                  REAL,                -- (squeeze_hits/squeeze_applicable) / (control_hits/control_applicable)
+  generated_at          TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(conditions)
+);
+CREATE INDEX IF NOT EXISTS idx_rules_lift ON rules(lift);
+
 -- Beobachtbarkeit: jeder Collector-Lauf wird protokolliert
 CREATE TABLE IF NOT EXISTS collector_runs (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
