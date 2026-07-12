@@ -107,10 +107,26 @@ Screener-Übersetzung der Kapitulations-Basisregel:
 
 Ehrliche Einordnung: 7-8% Trefferquote heißt >90% Fehlalarme — als
 alleiniges Kaufsignal unbrauchbar, aber als VORWARN-Filter sinnvoll
-(Watchlist der Kapitulations-Kandidaten bilden, dann auf den Zünder warten:
-Volumen-Anstieg, News-Katalysator, erste starke grüne Kerze). Die alten
-bullischen Regeln (oben) bleiben als Bestätigungs-Signale nützlich, erkennen
-den Einstieg aber erst, wenn die Bewegung schon läuft.
+(Watchlist der Kapitulations-Kandidaten bilden, dann auf den Zünder warten).
+Die alten bullischen Regeln (oben) bleiben als Bestätigungs-Signale nützlich,
+erkennen den Einstieg aber erst, wenn die Bewegung schon läuft.
+
+### Zünder-Analyse: Zwei-Stufen-Test (`ignition:test`)
+
+Setup = "Kapitulation in den letzten 10 Handelstagen". Ergebnis:
+
+- **Das Setup allein definiert den Kandidaten-Pool: 70% aller echten
+  Anstiege starten aus diesem Zustand heraus** (5,3% Trefferquote, 1,3x
+  Basisrate, ~108.000 Signal-Tage). Das ist die Screener-Vorstufe.
+- Preisbasierte Zünder verbessern die Präzision nur moderat: bester Wert
+  ist RVOL > 3 im Setup (7,5% @ 3% Recall). Grüne Erholungstage nach der
+  Kapitulation sind KEIN Zünder (4,6% — kaum über Basisrate): die erste
+  grüne Kerze ist statistisch öfter Dead-Cat-Bounce als Start.
+- Schlussfolgerung: der eigentliche Zünder steckt offenbar NICHT im
+  Kursbild, sondern im Katalysator (News/Social) — genau das, was Modul 4
+  (Catalyst Engine) gerade an historischen Daten sammelt. Sobald die
+  News-Abdeckung vollständig ist, ist "Kapitulations-Setup + News-Spike"
+  die wichtigste zu testende Hypothese.
 
 ## Kandidaten, die man findet, danach hier prüfen
 

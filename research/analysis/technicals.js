@@ -72,6 +72,21 @@ function computeSeriesFeatures(rows) {
   const ema200 = computeEMA(closes, 200);
   const chart = computeChartFeatures(rows);
 
+  const priceChange5d = closes.map((c, idx) =>
+    idx >= 5 && closes[idx - 5] ? (c - closes[idx - 5]) / closes[idx - 5] : null
+  );
+
+  // Kapitulations-Setup: gab es in den letzten 10 Handelstagen (inkl. heute)
+  // irgendeinen Tag mit 5-Tage-Rückgang > 10%? Grundlage der Zwei-Stufen-Regel
+  // "Kapitulations-Watchlist bilden, auf Zünder warten" (siehe ignition.js).
+  const capitulated10d = closes.map((_, idx) => {
+    if (idx < 5) return null;
+    for (let k = Math.max(5, idx - 9); k <= idx; k++) {
+      if (priceChange5d[k] != null && priceChange5d[k] < -0.1) return true;
+    }
+    return false;
+  });
+
   return rows.map((r, idx) => ({
     date: r.date,
     close: closes[idx],
@@ -82,7 +97,9 @@ function computeSeriesFeatures(rows) {
     ema200: ema200[idx],
     emaCrossBullish: ema20[idx] != null && ema50[idx] != null ? ema20[idx] > ema50[idx] : null,
     rvol20: computeRVOL(volumes, idx, 20),
-    priceChange5d: idx >= 5 && closes[idx - 5] ? (closes[idx] - closes[idx - 5]) / closes[idx - 5] : null,
+    priceChange5d: priceChange5d[idx],
+    dailyChange: idx >= 1 && closes[idx - 1] ? (closes[idx] - closes[idx - 1]) / closes[idx - 1] : null,
+    capitulated10d: capitulated10d[idx],
     isHammer: chart[idx].isHammer,
     isDoji: chart[idx].isDoji,
     isBullishEngulfing: chart[idx].isBullishEngulfing,

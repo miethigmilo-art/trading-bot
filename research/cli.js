@@ -18,6 +18,7 @@ const { analyzeRiskProfile, analyzeKnowledgeBaseRiskProfile, summarizeRiskProfil
 const { scanSymbols, formatScanReport } = require('./analysis/squeezeScore');
 const { computeDNAForSymbols, formatDNAReport } = require('./analysis/dnaEngine');
 const { collectPreEventStates, formatPreEventReport } = require('./analysis/recallDiagnosis');
+const { runIgnitionTest, formatIgnitionReport } = require('./analysis/ignition');
 const { buildControlFeatureSet } = require('./analysis/statistics');
 
 const command = process.argv[2] || 'run';
@@ -247,8 +248,16 @@ async function main() {
     return;
   }
 
+  if (command === 'ignition:test') {
+    const lookaheadDays = Number(process.argv[3]) || 10;
+    const db = getDb();
+    const result = runIgnitionTest(db, { lookaheadDays });
+    console.log(formatIgnitionReport(result, { lookaheadDays }));
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | stats:pre-event | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals] | risk:knowledge-base [entryLeadDays] | scan [lookaheadDays] [minSignals] | dna`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | stats:pre-event | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals] | risk:knowledge-base [entryLeadDays] | scan [lookaheadDays] [minSignals] | dna | ignition:test [lookaheadDays]`
   );
   process.exit(1);
 }
