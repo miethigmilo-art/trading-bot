@@ -9,6 +9,7 @@ const { generateRules, storeRules, formatRulesReport } = require('./analysis/rul
 const { backfillUniverse } = require('./collectors/universeBackfill');
 const { scanAllSymbols } = require('./analysis/squeezeDetector');
 const universe = require('./config/universe');
+const { processCandidates, formatReport: formatCandidatesReport } = require('./knowledge/verifyCandidates');
 
 const command = process.argv[2] || 'run';
 
@@ -114,8 +115,15 @@ async function main() {
     return;
   }
 
+  if (command === 'knowledge:verify') {
+    console.log('[Squeeze Research] Verarbeite research/knowledge/candidates.json...');
+    const report = await processCandidates();
+    console.log(formatCandidatesReport(report));
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify`
   );
   process.exit(1);
 }

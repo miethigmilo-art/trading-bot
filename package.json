@@ -15,7 +15,8 @@
     "research:stats": "node research/cli.js stats:run",
     "research:rules": "node research/cli.js rules:generate",
     "research:universe:backfill": "node research/cli.js universe:backfill",
-    "research:knowledge:scan": "node research/cli.js knowledge:scan"
+    "research:knowledge:scan": "node research/cli.js knowledge:scan",
+    "research:knowledge:verify": "node research/cli.js knowledge:verify"
   },
   "keywords": [],
   "author": "",
