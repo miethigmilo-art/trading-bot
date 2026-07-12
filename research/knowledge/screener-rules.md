@@ -33,12 +33,35 @@ Screener-Übersetzung:
 - Trendstruktur/Uptrend: über SMA50, SMA20 > SMA50
 - **Bullish Engulfing**: auf Finviz Free NICHT als Filter verfügbar — TradingView (bezahlte Screener-Stufe) hat "Candlestick Patterns"; sonst manuell im Chart bestätigen
 
+## Stop-Loss / Take-Profit — Kalibrierung aus allen 175 kuratierten Fällen
+
+`node research/cli.js risk:knowledge-base 10` — Entry angenommen 10
+Handelstage vor dem erfassten Squeeze-Start, Basis: 172 von 175 kuratierten
+Fällen mit auswertbaren Kursdaten (manuell recherchierte + aus der
+hochgeladenen Liste verifizierte, ohne die 572 blind erkannten Fälle).
+Das ist eine viel breitere, robustere Stichprobe als die regel-spezifische
+Analyse unten (dort nur 3-6 echte Treffer je Regel).
+
+| Kennzahl | Wert |
+|---|---|
+| Median-Rückgang nach Entry vor Squeeze-Start | −13,3% |
+| Schlechteste 10% der Fälle fielen mindestens | −37,0% |
+| Schlechtester Einzelfall | −82,6% |
+| Median Handelstage bis zum Tiefpunkt | 10 |
+| Median-Gewinn vom Entry bis zum Peak | +140,0% |
+| Schwächste 10% der Fälle erreichten höchstens | +28,3% |
+| Median Handelstage bis zum Peak | 46 |
+| Längste beobachtete Zeit bis zum Peak | 60 Handelstage |
+
+**Grobe Faustregel daraus:** Stop-Loss bei ca. **35-40%** unter Entry, Take-Profit-Zone ab ca. **+28-30%** (erste Teilgewinne realistisch), mit Geduld für mehrere Wochen bis zum eigentlichen Peak (Median ~9 Wochen). Der schlechteste Einzelfall (−82,6%) zeigt: kein SL macht das Risiko vollständig beherrschbar, das bleibt spekulativ. Diese Zahlen wachsen mit jedem weiteren erfassten Fall — bei Bedarf neu laufen lassen und hier aktualisieren.
+
 ## Kandidaten, die man findet, danach hier prüfen
 
 Sobald der externe Screener Kandidaten liefert: Ticker durch
 `node research/cli.js scan` laufen lassen (falls das Symbol schon getrackt
-wird) oder `node research/cli.js risk:analyze` für die zugehörige Regel
-konsultieren, um SL/TP-Kalibrierung für den jeweiligen Regel-Typ zu sehen.
+wird), `node research/cli.js risk:knowledge-base` für die allgemeine SL/TP-
+Kalibrierung oben konsultieren, oder `node research/cli.js risk:analyze`
+für eine regel-spezifische (aber kleinere Stichprobe) Einordnung.
 
 ## Einschränkungen
 
