@@ -122,6 +122,77 @@ function analyzeRiskProfile(db, conditions, { lookaheadDays = 10, maxHoldDays = 
   return entries;
 }
 
+/**
+ * SL/TP direkt aus ALLEN kuratierten Squeeze-Fällen (manual + verified, aus
+ * der Nutzerliste bzw. events.json) statt nur aus den seltenen True-Positives
+ * einer einzelnen Regel — deutlich größere, robustere Stichprobe (bis zu
+ * ~175 statt 3-4). Entry = `entryLeadDays` Handelstage vor dem offiziell
+ * erfassten start_date (Annäherung an "wann hätte man realistisch ein
+ * frühes Signal bekommen"), Drawdown bis start_date, Gewinn bis peak_date.
+ * Fälle ohne eigene Kursdaten (SPRT, VOW3-2008, BBBY-2022 — siehe
+ * events.json-Notizen) werden übersprungen, nicht geschätzt.
+ */
+function analyzeKnowledgeBaseRiskProfile(db, { entryLeadDays = 10, maxHoldDays = 60 } = {}) {
+  const events = db
+    .prepare(
+      `SELECT symbol, event_name, start_date, peak_date, end_date FROM squeeze_events
+       WHERE detection_method IN ('manual', 'verified') ORDER BY start_date`
+    )
+    .all();
+
+  const entries = [];
+  for (const ev of events) {
+    const series = getPriceSeries(db, ev.symbol);
+    if (series.length < entryLeadDays + 2) continue;
+
+    const dates = series.map((r) => r.date);
+    const closes = series.map((r) => r.close);
+    const startIdx = dates.indexOf(ev.start_date);
+    if (startIdx < 0) continue; // keine Kursdaten für dieses Datum (delistete/pseudo-Symbole)
+
+    const entryIdx = Math.max(0, startIdx - entryLeadDays);
+    const entryClose = closes[entryIdx];
+    if (!entryClose) continue;
+
+    let minClose = entryClose;
+    let minIdx = entryIdx;
+    for (let k = entryIdx; k <= startIdx; k++) {
+      if (closes[k] < minClose) {
+        minClose = closes[k];
+        minIdx = k;
+      }
+    }
+
+    const peakIdx = dates.indexOf(ev.peak_date || ev.start_date);
+    const gainSearchEnd = Math.min(
+      peakIdx >= entryIdx ? peakIdx : entryIdx + maxHoldDays,
+      entryIdx + maxHoldDays,
+      series.length - 1
+    );
+    let maxClose = entryClose;
+    let maxIdx = entryIdx;
+    for (let k = entryIdx; k <= gainSearchEnd; k++) {
+      if (closes[k] > maxClose) {
+        maxClose = closes[k];
+        maxIdx = k;
+      }
+    }
+
+    entries.push({
+      symbol: ev.symbol,
+      eventName: ev.event_name,
+      entryDate: dates[entryIdx],
+      squeezeStartDate: ev.start_date,
+      drawdownPct: ((minClose - entryClose) / entryClose) * 100,
+      daysToWorst: minIdx - entryIdx,
+      daysToSqueezeStart: startIdx - entryIdx,
+      gainPct: ((maxClose - entryClose) / entryClose) * 100,
+      daysToPeak: maxIdx - entryIdx,
+    });
+  }
+  return entries;
+}
+
 function percentile(sortedAsc, p) {
   if (sortedAsc.length === 0) return null;
   const idx = Math.min(sortedAsc.length - 1, Math.floor((p / 100) * sortedAsc.length));
@@ -156,14 +227,14 @@ function summarizeRiskProfile(entries) {
   };
 }
 
-function formatRiskReport(ruleLabel, entries, summary) {
+function formatRiskReport(ruleLabel, entries, summary, basisLabel = 'echte Treffer (Regel feuert, danach folgt tatsächlich ein Squeeze)') {
   const lines = [];
   lines.push(`PROJECT SQUEEZE — Risikoprofil: ${ruleLabel}`);
   if (summary.n === 0) {
-    lines.push('Keine echten Treffer dieser Regel im Backtest-Zeitraum — kein Risikoprofil berechenbar.');
+    lines.push('Keine Fälle mit auswertbaren Kursdaten gefunden — kein Risikoprofil berechenbar.');
     return lines.join('\n');
   }
-  lines.push(`Basis: ${summary.n} echte Treffer (Regel feuert, danach folgt tatsächlich ein Squeeze).`);
+  lines.push(`Basis: ${summary.n} ${basisLabel}.`);
   lines.push('');
   lines.push(`  Median-Rückgang nach Entry vor Squeeze-Beginn: ${summary.medianDrawdownPct.toFixed(1)}%`);
   lines.push(`  Schlechteste 10% der Fälle fielen mindestens:  ${summary.p90DrawdownPct.toFixed(1)}%`);
@@ -188,4 +259,10 @@ function formatRiskReport(ruleLabel, entries, summary) {
   return lines.join('\n');
 }
 
-module.exports = { analyzeRiskProfile, summarizeRiskProfile, formatRiskReport, findRuleByConditions };
+module.exports = {
+  analyzeRiskProfile,
+  analyzeKnowledgeBaseRiskProfile,
+  summarizeRiskProfile,
+  formatRiskReport,
+  findRuleByConditions,
+};
