@@ -6,6 +6,9 @@ const { getDb } = require('./db/database');
 const { loadEvents, listEvents } = require('./knowledge/loader');
 const { runStatistics, formatReport } = require('./analysis/statistics');
 const { generateRules, storeRules, formatRulesReport } = require('./analysis/ruleGenerator');
+const { backfillUniverse } = require('./collectors/universeBackfill');
+const { scanAllSymbols } = require('./analysis/squeezeDetector');
+const universe = require('./config/universe');
 
 const command = process.argv[2] || 'run';
 
@@ -86,8 +89,33 @@ async function main() {
     return;
   }
 
+  if (command === 'universe:backfill') {
+    const range = process.argv[3] || '5y';
+    const symbols = [...new Set([...watchlist, ...universe])];
+    console.log(`[Squeeze Research] Backfill Langzeit-Historie (${range}) für ${symbols.length} Symbole...`);
+    const results = await backfillUniverse(symbols, { range });
+    const failed = results.filter((r) => r.status === 'error');
+    const ok = results.filter((r) => r.status === 'ok');
+    console.log(`Fertig: ${ok.length} OK, ${failed.length} Fehler (meist delistete Symbole — erwartbar).`);
+    if (failed.length) {
+      console.log('Fehlgeschlagen:', failed.map((r) => `${r.symbol}(${r.module})`).join(', '));
+    }
+    return;
+  }
+
+  if (command === 'knowledge:scan') {
+    const db = getDb();
+    console.log('[Squeeze Research] Scanne alle Symbole mit Kurshistorie nach Squeeze-Mustern...');
+    const result = scanAllSymbols(db);
+    console.log(`Gescannt: ${result.scanned} Symbole. Neu erkannt: ${result.inserted} Fälle.`);
+    for (const [symbol, count] of Object.entries(result.bySymbol)) {
+      console.log(`  ${symbol.padEnd(8)} ${count} neue(r) Fall/Fälle`);
+    }
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan`
   );
   process.exit(1);
 }

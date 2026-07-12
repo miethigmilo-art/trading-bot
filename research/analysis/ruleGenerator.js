@@ -48,8 +48,10 @@ function evaluateRule(predicates, rows) {
  * Modul 7 — testet systematisch Kombinationen der in Modul 6 verfügbaren
  * Features gegen bekannte Squeeze-Fälle vs. Kontrollgruppe und bewertet sie
  * per Lift (wie viel häufiger die Bedingung bei Squeezes zutrifft als sonst).
- * Bei n=3 bekannten Fällen ist das ein Kandidaten-Ranking für die nächste
- * Runde Datensammlung (Modul 9), keine belastbare Trefferquote fürs Trading.
+ * Die meisten Fälle in squeeze_events sind automatisch aus reinen
+ * Kursmustern erkannt (kein geprüfter Short-Squeeze-Auslöser) — das ist ein
+ * Kandidaten-Ranking für weitere Forschung, keine belastbare Trefferquote
+ * fürs Trading.
  */
 function generateRules(db) {
   const events = getSqueezeEvents(db);
@@ -115,7 +117,7 @@ function formatRulesReport(rules) {
   const lines = [];
   lines.push(`PROJECT SQUEEZE — Modul 7: Regelgenerator (${rules.length} Kandidaten mit mindestens einem Treffer)`);
   lines.push(
-    'Hinweis: Lift = wie viel häufiger die Bedingung bei Squeeze-Fällen zutrifft als an normalen Handelstagen. Bei n=3 bekannten Fällen sind das Kandidaten für weitere Forschung, keine Trading-Signale.'
+    'Hinweis: Lift = wie viel häufiger die Bedingung bei Squeeze-Fällen zutrifft als an normalen Handelstagen. Die meisten Fälle stammen aus dem automatischen Detektor (reines Kursmuster, kein geprüfter Short-Squeeze-Auslöser) — Kandidaten für weitere Forschung, keine Trading-Signale.'
   );
   lines.push('');
   rules.slice(0, 15).forEach((r, i) => {

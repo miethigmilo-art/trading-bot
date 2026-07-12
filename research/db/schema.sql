@@ -75,11 +75,15 @@ CREATE TABLE IF NOT EXISTS news (
 CREATE INDEX IF NOT EXISTS idx_news_symbol_date ON news(symbol, published_at);
 
 -- Modul 9: Wissensdatenbank — strukturiertes Wissen über historische Squeeze-Fälle.
--- Wird nicht automatisch befüllt, sondern kuratiert (siehe research/knowledge/events.json).
+-- Zwei Quellen: 'manual' = von Hand recherchiert und mit Quellenangabe belegt
+-- (siehe research/knowledge/events.json), 'auto' = vom Squeeze-Detektor
+-- (research/analysis/squeezeDetector.js) rein aus Kursverläufen erkannt, ohne
+-- geprüfte Auslöser-Story — dafür in großer Zahl, als Datenbasis für Modul 6/7.
 CREATE TABLE IF NOT EXISTS squeeze_events (
   id                    INTEGER PRIMARY KEY AUTOINCREMENT,
   symbol                TEXT NOT NULL,
   event_name            TEXT NOT NULL,
+  detection_method      TEXT NOT NULL DEFAULT 'manual', -- 'manual' | 'auto'
   start_date            TEXT NOT NULL,        -- Beginn des Squeeze
   peak_date             TEXT,                 -- Datum des Höchststands
   end_date              TEXT,                 -- Ende der Abwärtsbewegung danach
@@ -102,6 +106,7 @@ CREATE TABLE IF NOT EXISTS squeeze_events (
   UNIQUE(symbol, event_name)
 );
 CREATE INDEX IF NOT EXISTS idx_squeeze_events_symbol ON squeeze_events(symbol);
+CREATE INDEX IF NOT EXISTS idx_squeeze_events_detection ON squeeze_events(detection_method);
 
 -- Modul 7: Regelgenerator — automatisch erzeugte Feature-Kombinationen mit
 -- ihrer Bewertung gegen die Modul-6-Datenbasis (squeeze_events vs. Kontrollgruppe).

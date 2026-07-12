@@ -113,7 +113,9 @@ function formatReport(report) {
     `PROJECT SQUEEZE — Modul 6: Statistik  (${report.events.length} Squeeze-Fälle vs. ${report.controlCount} Kontroll-Handelstage)`
   );
   lines.push(
-    'Hinweis: Stichprobe ist noch sehr klein — Prozentwerte sind ein Prototyp der Methode, keine belastbare Statistik. Aussagekraft wächst mit jedem weiteren Fall in Modul 9.'
+    report.events.length < 30
+      ? 'Hinweis: Stichprobe ist noch sehr klein — Prozentwerte sind ein Prototyp der Methode, keine belastbare Statistik. Aussagekraft wächst mit jedem weiteren Fall in Modul 9.'
+      : 'Hinweis: Die meisten Fälle stammen aus dem automatischen Squeeze-Detektor (reines Kursmuster: schneller Anstieg + starker Fall danach), nicht aus geprüften Short-Squeeze-Storys — darunter können auch Pump-and-Dumps, Earnings-Spikes o.ä. mit ähnlicher Kursform sein. Zahlen sind ein Signal, keine belastbare Kausalaussage.'
   );
   lines.push('');
   for (const r of report.rows) {
