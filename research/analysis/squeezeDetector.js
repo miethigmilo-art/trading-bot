@@ -65,11 +65,40 @@ const DEFAULT_OPTIONS = {
  * unabhängig vom tatsächlichen Auslöser. Liefert damit KEINE geprüfte
  * Auslöser-Story, dafür beliebig skalierbar über viele Symbole.
  */
+/**
+ * Reverse-Split-Artefakt-Schutz: Yahoos Kursdaten sind an manchen
+ * Split-Grenzen NICHT bereinigt (auch adj_close nicht — real beobachtet bei
+ * T2 Biosystems, 1:50-Split am 12./13.10.2022, erschien als +4454%-Sprung).
+ * Fingerabdruck eines Split-Artefakts: ein einzelner extremer
+ * Übernacht-Sprung (>3x) bei gleichzeitig UNTERDURCHSCHNITTLICHEM Volumen
+ * (die Stückzahl wird ja durch den Split-Faktor geteilt). Ein echter
+ * Squeeze-Tag hat das Gegenteil: explodierendes Volumen.
+ */
+function hasSuspectedSplitArtifact(closes, volumes, i, j) {
+  let maxRatio = 1;
+  let maxK = -1;
+  for (let k = i + 1; k <= j; k++) {
+    const ratio = closes[k - 1] > 0 ? closes[k] / closes[k - 1] : 1;
+    if (ratio > maxRatio) {
+      maxRatio = ratio;
+      maxK = k;
+    }
+  }
+  if (maxRatio <= 3) return false;
+
+  const start = Math.max(0, maxK - 20);
+  const priorVols = volumes.slice(start, maxK).filter((v) => v != null);
+  if (priorVols.length === 0) return false;
+  const avgVol = priorVols.reduce((a, b) => a + b, 0) / priorVols.length;
+  return volumes[maxK] != null && volumes[maxK] < avgVol;
+}
+
 function detectSqueezeEvents(rows, options = {}) {
   const opts = { ...DEFAULT_OPTIONS, ...options };
   if (rows.length < 2 * opts.peakHalfWindow + 1) return [];
 
   const closes = rows.map((r) => r.close);
+  const volumes = rows.map((r) => r.volume);
   const peaks = dedupePeaks(closes, findLocalMaxima(closes, opts.peakHalfWindow), opts.cooldownDays);
 
   const candidates = [];
@@ -82,6 +111,8 @@ function detectSqueezeEvents(rows, options = {}) {
     const k = findRetracementEnd(closes, j, opts.maxDropWindow, opts.dropThreshold);
     const drop = (closes[j] - closes[k]) / closes[j];
     if (drop < opts.dropThreshold) continue;
+
+    if (hasSuspectedSplitArtifact(closes, volumes, i, j)) continue;
 
     candidates.push({
       startDate: rows[i].date,

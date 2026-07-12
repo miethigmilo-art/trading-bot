@@ -165,7 +165,9 @@
     "years": [
       2021
     ],
-    "type": "News Short Squeeze"
+    "type": "News Short Squeeze",
+    "confirmed": "news-rally",
+    "confirmationNote": "Per Websuche geprüft: Anstieg Feb 2021 primär durch Covaxin-Deal mit Bharat Biotech (News-Katalysator); Squeeze-Anteil diskutiert, aber nicht als Haupttreiber belegt."
   },
   {
     "n": 19,
@@ -671,7 +673,9 @@
     "years": [
       2022
     ],
-    "type": "Low Float Momentum"
+    "type": "Low Float Momentum",
+    "confirmed": "squeeze",
+    "confirmationNote": "Per Websuche bestätigt: Bloomberg nannte HKD im Aug 2022 'the mother of all shorts'; Low-Float-IPO (>95% bei AMTD Idea), dokumentierter Squeeze-Mechanismus, kurzzeitig >300 Mrd. USD Marktkapitalisierung."
   },
   {
     "n": 73,
@@ -5411,7 +5415,9 @@
     "years": [
       2021
     ],
-    "type": "Biotech Low Float"
+    "type": "Biotech Low Float",
+    "confirmed": "pump-suspected",
+    "confirmationNote": "Per Websuche geprüft: zeitgenössische Berichterstattung (Nasdaq/InvestorPlace) beschreibt Social-Media-getriebenes Daytrader-Momentum mit 'clear signs of a pump and dump' — KEIN belegter Short Squeeze."
   },
   {
     "n": 543,
@@ -5585,7 +5591,9 @@
     "years": [
       2023
     ],
-    "type": "Low Float Squeeze"
+    "type": "Low Float Squeeze",
+    "confirmed": "artifact-fixed",
+    "confirmationNote": "Wichtiger Fund: der ursprünglich erkannte +4454%-Fall (Okt 2022) war ein 1:50-Reverse-Split-Artefakt in Yahoos unbereinigt gelieferten Daten — per Volumen-Fingerabdruck-Filter im Detektor behoben. Jetzt korrekt der echte Juli-2023-Spike (+760%) erfasst, passend zum in der Liste genannten Jahr."
   },
   {
     "n": 562,
@@ -5867,7 +5875,9 @@
     "years": [
       2024
     ],
-    "type": "Low Float Squeeze"
+    "type": "Low Float Squeeze",
+    "confirmed": "retail-spike",
+    "confirmationNote": "Per Websuche bestätigt: Bloomberg dokumentierte +2650%-Meme-Spike 6.-8. Feb 2024 (nach 1:10-Reverse-Split am 2. Feb, unser Fenster liegt NACH dem Split, echtes Handelsvolumen >1,7 Mrd. USD). Retail-getrieben, Low Float."
   },
   {
     "n": 593,

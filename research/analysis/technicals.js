@@ -4,11 +4,33 @@
 
 const { computeChartFeatures } = require('./chartPatterns');
 
+/**
+ * Liefert SPLIT-BEREINIGTE Kurse: alle OHLC-Werte werden mit dem Faktor
+ * adj_close/close des jeweiligen Tages skaliert. Ohne diese Bereinigung
+ * erzeugt jeder Reverse-Split einen künstlichen Kurssprung, den der
+ * Squeeze-Detektor als "Squeeze" fehlinterpretiert — real passiert bei
+ * T2 Biosystems (TTOO): der 1:50-Reverse-Split am 12./13.10.2022 erschien
+ * in den Rohdaten als +4454%-Tagesanstieg und landete als vermeintlich
+ * verifizierter Fall in der Wissensdatenbank. Kerzenmuster bleiben von der
+ * Skalierung unberührt (alle Werte eines Tages werden mit demselben Faktor
+ * multipliziert), EMA/RVOL/Breakouts werden über Split-Grenzen konsistent.
+ */
 function getPriceSeries(db, symbol, { upTo } = {}) {
   const rows = upTo
-    ? db.prepare(`SELECT date, open, high, low, close, volume FROM prices WHERE symbol = ? AND date <= ? ORDER BY date ASC`).all(symbol, upTo)
-    : db.prepare(`SELECT date, open, high, low, close, volume FROM prices WHERE symbol = ? ORDER BY date ASC`).all(symbol);
-  return rows;
+    ? db.prepare(`SELECT date, open, high, low, close, adj_close, volume FROM prices WHERE symbol = ? AND date <= ? ORDER BY date ASC`).all(symbol, upTo)
+    : db.prepare(`SELECT date, open, high, low, close, adj_close, volume FROM prices WHERE symbol = ? ORDER BY date ASC`).all(symbol);
+
+  return rows.map((r) => {
+    const factor = r.adj_close != null && r.close ? r.adj_close / r.close : 1;
+    return {
+      date: r.date,
+      open: r.open != null ? r.open * factor : null,
+      high: r.high != null ? r.high * factor : null,
+      low: r.low != null ? r.low * factor : null,
+      close: r.adj_close ?? r.close,
+      volume: r.volume,
+    };
+  });
 }
 
 /** Exponential Moving Average. Erster Wert = SMA der ersten `period` Closes (Standard-Seeding). */
