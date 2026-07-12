@@ -124,6 +124,25 @@ CREATE TABLE IF NOT EXISTS rules (
 );
 CREATE INDEX IF NOT EXISTS idx_rules_lift ON rules(lift);
 
+-- Modul 4: Catalyst Engine — tägliche News-Artikelzahl + Sentiment-Score.
+-- Einzige uns verfügbare Quelle mit echter historischer Tiefe ist Alpha
+-- Vantage NEWS_SENTIMENT (Finnhub Free-Tier liefert nur ein rollierendes
+-- Fenster der letzten Wochen, GDELT ist in dieser Umgebung dauerhaft
+-- rate-limitiert). Teilt sich das 25-Calls/Tag-Limit mit den Indikatoren
+-- (siehe research/collectors/alphaVantage.js) — wird daher nur inkrementell
+-- befüllt (research/collectors/catalystBackfill.js verarbeitet pro Lauf so
+-- viele offene Fälle wie Quota übrig ist und merkt sich den Fortschritt).
+CREATE TABLE IF NOT EXISTS news_sentiment (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  symbol         TEXT NOT NULL,
+  date           TEXT NOT NULL,
+  article_count  INTEGER NOT NULL,
+  avg_sentiment  REAL,  -- Alpha-Vantage-Skala: <=-0.35 bearish ... >=0.35 bullish
+  source         TEXT NOT NULL DEFAULT 'alphavantage',
+  UNIQUE(symbol, date)
+);
+CREATE INDEX IF NOT EXISTS idx_news_sentiment_symbol_date ON news_sentiment(symbol, date);
+
 -- Backtesting Engine: echte Walk-Forward-Trefferquote pro Regel — im
 -- Unterschied zu `rules` (Lift am bereits bekannten Trigger-Tag) wird hier
 -- JEDER Handelstag durchlaufen und geprüft, ob die Regel feuert und ob

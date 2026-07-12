@@ -11,6 +11,8 @@ const { scanAllSymbols } = require('./analysis/squeezeDetector');
 const universe = require('./config/universe');
 const { processCandidates, formatReport: formatCandidatesReport } = require('./knowledge/verifyCandidates');
 const { runBacktest, storeBacktestResults, formatBacktestReport } = require('./analysis/backtest');
+const { backfillCatalystData } = require('./collectors/catalystBackfill');
+const { summarizeCatalystCoverage, formatCatalystSummary } = require('./analysis/catalyst');
 
 const command = process.argv[2] || 'run';
 
@@ -133,8 +135,25 @@ async function main() {
     return;
   }
 
+  if (command === 'catalyst:backfill') {
+    console.log('[Squeeze Research] Backfill News-Sentiment für offene Squeeze-Fälle (Modul 4)...');
+    const { results, stillPending } = await backfillCatalystData();
+    for (const r of results) {
+      const detail = r.status === 'ok' ? `${r.count} Tage mit News` : r.message || r.reason;
+      console.log(`  ${r.status === 'ok' ? '✔' : '✘'} ${r.symbol.padEnd(8)} ${detail}`);
+    }
+    console.log(`Diesen Lauf verarbeitet: ${results.length}. Noch offen (nächster Lauf): ${stillPending}.`);
+    return;
+  }
+
+  if (command === 'catalyst:summary') {
+    const db = getDb();
+    console.log(formatCatalystSummary(summarizeCatalystCoverage(db)));
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays]`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary`
   );
   process.exit(1);
 }

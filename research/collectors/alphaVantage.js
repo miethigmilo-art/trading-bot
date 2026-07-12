@@ -80,6 +80,72 @@ async function fetchLatestIndicators(symbol, db, { indicators = DEFAULT_INDICATO
   return results;
 }
 
+function fmtAvTimestamp(date) {
+  return new Date(date).toISOString().slice(0, 10).replace(/-/g, '') + 'T0000';
+}
+
+/**
+ * Modul 4 (Catalyst Engine): News-Artikelzahl + Sentiment pro Tag für ein
+ * Zeitfenster. Teilt sich das Tageslimit mit fetchLatestIndicators (gleiches
+ * Konto, gleicher Modulname 'alphaVantageCall' für die Quota-Zählung).
+ * Gibt { skipped: true } zurück, wenn das Tageslimit bereits erreicht ist,
+ * statt einen Call zu verschwenden.
+ */
+async function fetchNewsSentiment(symbol, { from, to }, db) {
+  const token = requireKey();
+  const dailyLimit = Number(process.env.ALPHAVANTAGE_DAILY_LIMIT || 25);
+  if (callsUsedToday(db) >= dailyLimit) return { skipped: true, reason: 'Tageslimit erreicht' };
+
+  const startedAt = new Date().toISOString();
+  const { data } = await client.get('/query', {
+    params: {
+      function: 'NEWS_SENTIMENT',
+      tickers: symbol,
+      time_from: fmtAvTimestamp(from),
+      time_to: fmtAvTimestamp(to),
+      limit: 200,
+      apikey: token,
+    },
+  });
+
+  if (!Array.isArray(data?.feed)) {
+    const msg = data?.Note || data?.Information || data?.['Error Message'] || 'Keine Daten zurückgegeben';
+    logRun('alphaVantageCall', symbol, 'error', `NEWS_SENTIMENT: ${msg}`, startedAt);
+    return { error: msg };
+  }
+  logRun('alphaVantageCall', symbol, 'ok', `NEWS_SENTIMENT: ${data.feed.length} Artikel`, startedAt);
+
+  const byDate = {};
+  for (const item of data.feed) {
+    const date = item.time_published?.slice(0, 8);
+    if (!date) continue;
+    const iso = `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`;
+    const tickerSentiment = item.ticker_sentiment?.find((t) => t.ticker === symbol);
+    const score = tickerSentiment ? Number(tickerSentiment.ticker_sentiment_score) : Number(item.overall_sentiment_score);
+    (byDate[iso] ||= []).push(score);
+  }
+
+  return Object.entries(byDate).map(([date, scores]) => ({
+    date,
+    articleCount: scores.length,
+    avgSentiment: scores.reduce((a, b) => a + b, 0) / scores.length,
+  }));
+}
+
+function storeNewsSentiment(db, symbol, rows) {
+  const insert = db.prepare(
+    `INSERT INTO news_sentiment (symbol, date, article_count, avg_sentiment)
+     VALUES (@symbol, @date, @articleCount, @avgSentiment)
+     ON CONFLICT(symbol, date) DO UPDATE SET
+       article_count = excluded.article_count, avg_sentiment = excluded.avg_sentiment`
+  );
+  const insertMany = db.transaction((data) => {
+    for (const row of data) insert.run({ symbol, ...row });
+  });
+  insertMany(rows);
+  return rows.length;
+}
+
 function storeIndicators(db, symbol, results) {
   const insert = db.prepare(
     `INSERT INTO indicators (symbol, date, name, value) VALUES (@symbol, @date, @name, @value)
@@ -97,4 +163,11 @@ function storeIndicators(db, symbol, results) {
   return stored;
 }
 
-module.exports = { fetchLatestIndicators, storeIndicators, DEFAULT_INDICATORS };
+module.exports = {
+  fetchLatestIndicators,
+  storeIndicators,
+  fetchNewsSentiment,
+  storeNewsSentiment,
+  callsUsedToday,
+  DEFAULT_INDICATORS,
+};
