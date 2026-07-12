@@ -8,7 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "research:collect": "node research/cli.js run",
     "research:backfill": "node research/cli.js backfill",
-    "research:scheduler": "node research/scheduler.js"
+    "research:scheduler": "node research/scheduler.js",
+    "research:knowledge:load": "node research/cli.js knowledge:load",
+    "research:knowledge:list": "node research/cli.js knowledge:list"
   },
   "keywords": [],
   "author": "",
