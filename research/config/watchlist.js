@@ -6,7 +6,7 @@ module.exports = [
   'GME',
   'AMC',
   'KOSS',
-  'BBBY',
+  'BBBY', // ACHTUNG: seit 2023 Ticker von "Beyond, Inc." (ex-Overstock.com), NICHT der ursprünglichen, insolventen Bed Bath & Beyond Inc. — siehe squeeze_events "BBBY-2022" für den historischen Fall.
   'ATER',
   'CVNA',
   'UPST',
