@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { logRun } = require('../db/database');
 
 const client = axios.create({
   baseURL: 'https://www.alphavantage.co',
@@ -18,14 +19,15 @@ function requireKey() {
   return key;
 }
 
-// Free-Tier: 5 Calls/Minute, 25 Calls/Tag. Jeder Indikator kostet einen eigenen Call,
-// darum zählen wir bereits erfolgreich geloggte Alpha-Vantage-Calls des heutigen Tages
-// und brechen ab, statt das Tageslimit zu sprengen.
+// Free-Tier: 5 Calls/Minute, 25 Calls/Tag. Jeder Indikator kostet einen eigenen HTTP-Call,
+// darum protokolliert fetchLatestIndicators JEDEN einzelnen Call unter dem eigenen
+// Modulnamen 'alphaVantageCall' (nicht den Sammel-Log pro Symbol aus runAll.js) und
+// zählt diese Zeilen, um das Tageslimit zuverlässig einzuhalten.
 function callsUsedToday(db) {
   const row = db
     .prepare(
       `SELECT COUNT(*) AS n FROM collector_runs
-       WHERE module = 'alphaVantage' AND status = 'ok' AND date(started_at) = date('now')`
+       WHERE module = 'alphaVantageCall' AND date(started_at) = date('now')`
     )
     .get();
   return row.n;
@@ -44,11 +46,12 @@ async function fetchLatestIndicators(symbol, db, { indicators = DEFAULT_INDICATO
   const results = [];
 
   for (const ind of indicators) {
-    if (callsUsedToday(db) + results.length >= dailyLimit) {
+    if (callsUsedToday(db) >= dailyLimit) {
       results.push({ name: ind.name, skipped: true, reason: 'Tageslimit erreicht' });
       continue;
     }
 
+    const startedAt = new Date().toISOString();
     const { data } = await client.get('/query', {
       params: {
         function: ind.func,
@@ -64,9 +67,11 @@ async function fetchLatestIndicators(symbol, db, { indicators = DEFAULT_INDICATO
     if (!series) {
       const msg = data?.Note || data?.Information || data?.['Error Message'] || 'Keine Daten zurückgegeben';
       results.push({ name: ind.name, error: msg });
+      logRun('alphaVantageCall', symbol, 'error', `${ind.name}: ${msg}`, startedAt);
     } else {
       const [date, values] = Object.entries(series)[0] || [];
       results.push({ name: ind.name, date, value: values ? Number(values[ind.func]) : null });
+      logRun('alphaVantageCall', symbol, 'ok', ind.name, startedAt);
     }
 
     if (indicators.indexOf(ind) < indicators.length - 1) await sleep(13000); // 5 Calls/Minute einhalten
