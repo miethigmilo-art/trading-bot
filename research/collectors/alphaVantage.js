@@ -162,15 +162,15 @@ async function fetchNewsSentiment(symbol, { from, to }, db) {
   }));
 }
 
-function storeNewsSentiment(db, symbol, rows) {
+function storeNewsSentiment(db, symbol, rows, source = 'alphavantage') {
   const insert = db.prepare(
-    `INSERT INTO news_sentiment (symbol, date, article_count, avg_sentiment)
-     VALUES (@symbol, @date, @articleCount, @avgSentiment)
+    `INSERT INTO news_sentiment (symbol, date, article_count, avg_sentiment, source)
+     VALUES (@symbol, @date, @articleCount, @avgSentiment, @source)
      ON CONFLICT(symbol, date) DO UPDATE SET
-       article_count = excluded.article_count, avg_sentiment = excluded.avg_sentiment`
+       article_count = excluded.article_count, avg_sentiment = excluded.avg_sentiment, source = excluded.source`
   );
   const insertMany = db.transaction((data) => {
-    for (const row of data) insert.run({ symbol, ...row });
+    for (const row of data) insert.run({ symbol, source, ...row });
   });
   insertMany(rows);
   return rows.length;

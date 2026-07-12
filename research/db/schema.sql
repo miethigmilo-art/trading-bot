@@ -143,6 +143,20 @@ CREATE TABLE IF NOT EXISTS news_sentiment (
 );
 CREATE INDEX IF NOT EXISTS idx_news_sentiment_symbol_date ON news_sentiment(symbol, date);
 
+-- Trackt, welche Kontrollgruppen-Fenster (normale Handelstage, kein Squeeze)
+-- bereits per NEWS_SENTIMENT abgefragt wurden — auch wenn das Ergebnis 0
+-- Artikel war. Ohne diese Tabelle ließe sich "abgefragt, aber keine News"
+-- nicht von "noch nie abgefragt" unterscheiden (news_sentiment bekommt nur
+-- Zeilen für Tage MIT Artikeln).
+CREATE TABLE IF NOT EXISTS control_window_coverage (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  symbol        TEXT NOT NULL,
+  window_start  TEXT NOT NULL,
+  window_end    TEXT NOT NULL,
+  queried_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(symbol, window_start)
+);
+
 -- Backtesting Engine: echte Walk-Forward-Trefferquote pro Regel — im
 -- Unterschied zu `rules` (Lift am bereits bekannten Trigger-Tag) wird hier
 -- JEDER Handelstag durchlaufen und geprüft, ob die Regel feuert und ob

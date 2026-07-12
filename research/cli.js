@@ -13,6 +13,7 @@ const { processCandidates, formatReport: formatCandidatesReport } = require('./k
 const { runBacktest, storeBacktestResults, formatBacktestReport } = require('./analysis/backtest');
 const { backfillCatalystData } = require('./collectors/catalystBackfill');
 const { summarizeCatalystCoverage, formatCatalystSummary } = require('./analysis/catalyst');
+const { backfillControlWindows } = require('./collectors/catalystControlBackfill');
 
 const command = process.argv[2] || 'run';
 
@@ -152,8 +153,19 @@ async function main() {
     return;
   }
 
+  if (command === 'catalyst:control-backfill') {
+    console.log('[Squeeze Research] Backfill News-Sentiment für Kontrollgruppen-Fenster (Modul 4)...');
+    const { results, totalCovered, target } = await backfillControlWindows();
+    for (const r of results) {
+      const detail = r.status === 'ok' ? `${r.count} Tage mit News` : r.message || r.reason;
+      console.log(`  ${r.status === 'ok' ? '✔' : '✘'} ${r.symbol.padEnd(8)} ${detail}`);
+    }
+    console.log(`Diesen Lauf verarbeitet: ${results.length}. Kontrollfenster insgesamt: ${totalCovered}/${target}.`);
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill`
   );
   process.exit(1);
 }

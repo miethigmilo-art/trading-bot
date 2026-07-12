@@ -19,7 +19,8 @@
     "research:knowledge:verify": "node research/cli.js knowledge:verify",
     "research:backtest": "node research/cli.js backtest:run",
     "research:catalyst:backfill": "node research/cli.js catalyst:backfill",
-    "research:catalyst:summary": "node research/cli.js catalyst:summary"
+    "research:catalyst:summary": "node research/cli.js catalyst:summary",
+    "research:catalyst:control-backfill": "node research/cli.js catalyst:control-backfill"
   },
   "keywords": [],
   "author": "",

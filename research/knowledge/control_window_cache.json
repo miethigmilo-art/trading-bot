@@ -1,0 +1,250 @@
+{
+  "coverage": [
+    {
+      "symbol": "AAPL",
+      "windowStart": "2010-02-24",
+      "windowEnd": "2010-03-16"
+    },
+    {
+      "symbol": "AAPL",
+      "windowStart": "2010-07-02",
+      "windowEnd": "2010-07-23"
+    },
+    {
+      "symbol": "AAPL",
+      "windowStart": "2010-11-09",
+      "windowEnd": "2010-11-30"
+    },
+    {
+      "symbol": "ACB",
+      "windowStart": "2017-01-03",
+      "windowEnd": "2017-01-24"
+    },
+    {
+      "symbol": "ACB",
+      "windowStart": "2017-05-12",
+      "windowEnd": "2017-06-02"
+    },
+    {
+      "symbol": "ACB",
+      "windowStart": "2017-09-20",
+      "windowEnd": "2017-10-10"
+    },
+    {
+      "symbol": "ACB",
+      "windowStart": "2018-01-30",
+      "windowEnd": "2018-02-20"
+    },
+    {
+      "symbol": "ACB",
+      "windowStart": "2018-06-08",
+      "windowEnd": "2018-06-28"
+    },
+    {
+      "symbol": "ACB",
+      "windowStart": "2019-02-27",
+      "windowEnd": "2019-03-19"
+    },
+    {
+      "symbol": "ACB",
+      "windowStart": "2019-07-08",
+      "windowEnd": "2019-07-26"
+    },
+    {
+      "symbol": "ACB",
+      "windowStart": "2019-11-12",
+      "windowEnd": "2019-12-03"
+    },
+    {
+      "symbol": "AEMD",
+      "windowStart": "2021-07-12",
+      "windowEnd": "2021-07-30"
+    },
+    {
+      "symbol": "AEMD",
+      "windowStart": "2021-11-16",
+      "windowEnd": "2021-12-07"
+    },
+    {
+      "symbol": "AEMD",
+      "windowStart": "2022-03-28",
+      "windowEnd": "2022-04-18"
+    },
+    {
+      "symbol": "AEMD",
+      "windowStart": "2022-08-05",
+      "windowEnd": "2022-08-25"
+    },
+    {
+      "symbol": "AEMD",
+      "windowStart": "2022-12-13",
+      "windowEnd": "2023-01-04"
+    },
+    {
+      "symbol": "AEMD",
+      "windowStart": "2023-04-25",
+      "windowEnd": "2023-05-15"
+    },
+    {
+      "symbol": "AEMD",
+      "windowStart": "2023-09-01",
+      "windowEnd": "2023-09-22"
+    },
+    {
+      "symbol": "AEMD",
+      "windowStart": "2024-01-11",
+      "windowEnd": "2024-02-01"
+    },
+    {
+      "symbol": "AEVA",
+      "windowStart": "2020-02-27",
+      "windowEnd": "2020-03-18"
+    }
+  ],
+  "newsSentiment": [
+    {
+      "symbol": "AAPL",
+      "date": "2010-03-10",
+      "articleCount": 1,
+      "avgSentiment": 0.41754
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-03-08",
+      "articleCount": 1,
+      "avgSentiment": 0.319511
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-03-05",
+      "articleCount": 1,
+      "avgSentiment": 0.223933
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-03-01",
+      "articleCount": 1,
+      "avgSentiment": -0.323827
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-02-25",
+      "articleCount": 2,
+      "avgSentiment": 0.24681999999999998
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-02-24",
+      "articleCount": 1,
+      "avgSentiment": 0.111079
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-07-20",
+      "articleCount": 3,
+      "avgSentiment": 0.2898543333333334
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-07-17",
+      "articleCount": 3,
+      "avgSentiment": -0.11390733333333332
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-07-16",
+      "articleCount": 4,
+      "avgSentiment": -0.0544
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-07-15",
+      "articleCount": 2,
+      "avgSentiment": -0.051759
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-07-14",
+      "articleCount": 1,
+      "avgSentiment": 0.007769
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-07-13",
+      "articleCount": 2,
+      "avgSentiment": -0.0020409999999999873
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-07-12",
+      "articleCount": 1,
+      "avgSentiment": -0.344784
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-07-07",
+      "articleCount": 1,
+      "avgSentiment": -0.203469
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-07-02",
+      "articleCount": 1,
+      "avgSentiment": -0.212694
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-11-29",
+      "articleCount": 1,
+      "avgSentiment": 0.346732
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-11-26",
+      "articleCount": 1,
+      "avgSentiment": 0.328926
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-11-17",
+      "articleCount": 1,
+      "avgSentiment": 0.284401
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-11-16",
+      "articleCount": 4,
+      "avgSentiment": 0.2115695
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-11-10",
+      "articleCount": 1,
+      "avgSentiment": 0.148029
+    },
+    {
+      "symbol": "AAPL",
+      "date": "2010-11-09",
+      "articleCount": 2,
+      "avgSentiment": 0.2252785
+    },
+    {
+      "symbol": "ACB",
+      "date": "2017-10-02",
+      "articleCount": 2,
+      "avgSentiment": 0.2650195
+    },
+    {
+      "symbol": "ACB",
+      "date": "2019-03-13",
+      "articleCount": 2,
+      "avgSentiment": 0.411096
+    },
+    {
+      "symbol": "ACB",
+      "date": "2019-03-05",
+      "articleCount": 1,
+      "avgSentiment": 0.427609
+    }
+  ]
+}
