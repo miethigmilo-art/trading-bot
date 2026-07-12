@@ -14,6 +14,7 @@ const { runBacktest, storeBacktestResults, formatBacktestReport } = require('./a
 const { backfillCatalystData } = require('./collectors/catalystBackfill');
 const { summarizeCatalystCoverage, formatCatalystSummary } = require('./analysis/catalyst');
 const { backfillControlWindows } = require('./collectors/catalystControlBackfill');
+const { analyzeRiskProfile, summarizeRiskProfile, formatRiskReport } = require('./analysis/riskProfile');
 
 const command = process.argv[2] || 'run';
 
@@ -164,8 +165,40 @@ async function main() {
     return;
   }
 
+  if (command === 'risk:analyze') {
+    const lookaheadDays = Number(process.argv[3]) || 10;
+    const minSignals = Number(process.argv[4]) || 15;
+    const db = getDb();
+
+    const candidates = db
+      .prepare(
+        `SELECT label, conditions, true_positives + false_positives AS signals, precision_pct
+         FROM backtest_results
+         WHERE lookahead_days = ? AND (true_positives + false_positives) >= ?
+         ORDER BY precision_pct DESC
+         LIMIT 3`
+      )
+      .all(lookaheadDays, minSignals);
+
+    if (candidates.length === 0) {
+      console.log(
+        `Keine Regel mit >=${minSignals} Signalen bei Lookahead=${lookaheadDays} gefunden. Erst "backtest:run ${lookaheadDays}" laufen lassen, oder minSignals senken: risk:analyze ${lookaheadDays} <minSignals>`
+      );
+      return;
+    }
+
+    for (const c of candidates) {
+      const conditions = JSON.parse(c.conditions);
+      const entries = analyzeRiskProfile(db, conditions, { lookaheadDays });
+      const summary = summarizeRiskProfile(entries);
+      console.log(formatRiskReport(c.label, entries, summary));
+      console.log('');
+    }
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals]`
   );
   process.exit(1);
 }
