@@ -1,8 +1,43 @@
+const fs = require('fs');
+const path = require('path');
 const { getDb } = require('../db/database');
 const alphaVantage = require('./alphaVantage');
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const CACHE_PATH = path.join(__dirname, '..', 'knowledge', 'news_sentiment_cache.json');
+
+/**
+ * Die SQLite-DB liegt nur lokal im (ephemeren) Container und ist bewusst
+ * nicht in Git — ohne Sync würde jeder Tageslauf der geplanten Routine bei
+ * Null anfangen, statt an der Warteschlange weiterzumachen. Deshalb wird
+ * news_sentiment vor jedem Lauf aus diesem git-versionierten Snapshot
+ * importiert und danach wieder exportiert.
+ */
+function importCache(db) {
+  if (!fs.existsSync(CACHE_PATH)) return 0;
+  const rows = JSON.parse(fs.readFileSync(CACHE_PATH, 'utf8'));
+  const insert = db.prepare(
+    `INSERT INTO news_sentiment (symbol, date, article_count, avg_sentiment, source)
+     VALUES (@symbol, @date, @articleCount, @avgSentiment, @source)
+     ON CONFLICT(symbol, date) DO UPDATE SET
+       article_count = excluded.article_count, avg_sentiment = excluded.avg_sentiment`
+  );
+  const insertMany = db.transaction((data) => {
+    for (const r of data) insert.run(r);
+  });
+  insertMany(rows);
+  return rows.length;
+}
+
+function exportCache(db) {
+  const rows = db
+    .prepare(`SELECT symbol, date, article_count AS articleCount, avg_sentiment AS avgSentiment, source FROM news_sentiment ORDER BY symbol, date`)
+    .all();
+  fs.writeFileSync(CACHE_PATH, JSON.stringify(rows, null, 2) + '\n');
+  return rows.length;
+}
 
 /**
  * Fälle, für die noch keine News-Sentiment-Daten im relevanten Zeitfenster
@@ -35,6 +70,8 @@ function pendingEvents(db, limit) {
  */
 async function backfillCatalystData() {
   const db = getDb();
+  importCache(db);
+
   const dailyLimit = Number(process.env.ALPHAVANTAGE_DAILY_LIMIT || 25);
   const remaining = Math.max(0, dailyLimit - alphaVantage.callsUsedToday(db));
   const todo = pendingEvents(db, remaining);
@@ -72,7 +109,9 @@ async function backfillCatalystData() {
     )
     .get().n;
 
-  return { results, stillPending };
+  const exported = exportCache(db);
+
+  return { results, stillPending, exported };
 }
 
-module.exports = { backfillCatalystData, pendingEvents };
+module.exports = { backfillCatalystData, pendingEvents, importCache, exportCache, CACHE_PATH };
