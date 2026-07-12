@@ -28,6 +28,7 @@ function buildSqueezeFeatureSet(db, events) {
       breakout20d: tech?.breakout20d ?? null,
       breakout52w: tech?.breakout52w ?? null,
       trendStructure: tech?.trendStructure ?? null,
+      priceChange5d: tech?.priceChange5d ?? null,
     };
   });
 }
@@ -77,6 +78,7 @@ function buildControlFeatureSet(db, events) {
         breakout20d: f.breakout20d,
         breakout52w: f.breakout52w,
         trendStructure: f.trendStructure,
+        priceChange5d: f.priceChange5d,
       });
     }
   }

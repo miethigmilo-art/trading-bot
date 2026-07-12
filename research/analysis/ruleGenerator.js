@@ -10,6 +10,10 @@ const PREDICATE_GROUPS = {
   rvol: [
     { key: 'rvol_gt_3', label: 'RVOL > 3', value: (r) => r.rvol20, test: (r) => r.rvol20 > 3 },
     { key: 'rvol_gt_5', label: 'RVOL > 5', value: (r) => r.rvol20, test: (r) => r.rvol20 > 5 },
+    // "Dry Volume" aus der ursprünglichen Modul-2-Liste: die Ruhe vor dem
+    // Sturm — Recall-Diagnose zeigte, dass die Vorphase echter Fälle oft
+    // durch Abwärtstrend + austrocknendes Volumen geprägt ist.
+    { key: 'rvol_lt_0_7', label: 'Dry Volume (RVOL < 0.7)', value: (r) => r.rvol20, test: (r) => r.rvol20 < 0.7 },
   ],
   emaCross: [
     { key: 'ema20_gt_ema50', label: 'EMA20 > EMA50', value: (r) => r.emaCrossBullish, test: (r) => r.emaCrossBullish === true },
@@ -25,6 +29,10 @@ const PREDICATE_GROUPS = {
   ],
   trend: [
     { key: 'trend_uptrend', label: 'Trendstruktur: Uptrend (HH+HL)', value: (r) => r.trendStructure, test: (r) => r.trendStructure === 'uptrend' },
+    { key: 'trend_downtrend', label: 'Trendstruktur: Downtrend (LH+LL)', value: (r) => r.trendStructure, test: (r) => r.trendStructure === 'downtrend' },
+  ],
+  momentum: [
+    { key: 'down5d_gt_10', label: '5-Tage-Rückgang > 10% (Kapitulation)', value: (r) => r.priceChange5d, test: (r) => r.priceChange5d < -0.1 },
   ],
   candlestick: [
     { key: 'bullish_engulfing', label: 'Bullish Engulfing', value: (r) => r.isBullishEngulfing, test: (r) => r.isBullishEngulfing === true },

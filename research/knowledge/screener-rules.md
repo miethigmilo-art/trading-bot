@@ -56,6 +56,62 @@ Analyse oben (dort nur 5-124 echte Signale je Regel).
 
 **Grobe Faustregel daraus:** Stop-Loss bei ca. **35-40%** unter Entry, Take-Profit-Zone ab ca. **+29-30%** (erste Teilgewinne realistisch), mit Geduld für mehrere Wochen bis zum eigentlichen Peak (Median ~9 Wochen). Der schlechteste Einzelfall (−82,6%) zeigt: kein SL macht das Risiko vollständig beherrschbar, das bleibt spekulativ. Diese Zahlen sind bereits über zwei Ausbaustufen der Wissensdatenbank (175 → 235 kuratierte Fälle) auffällig stabil geblieben — ein gutes Zeichen für echte Konvergenz statt Zufall. Wachsen weiter mit jedem neuen Fall — bei Bedarf neu laufen lassen und hier aktualisieren.
 
+## Recall-Diagnose: Wie sieht der Tag VOR dem Anstieg aus? (230 Fälle)
+
+`node research/cli.js stats:pre-event` — misst die Feature-Verteilung am
+Handelstag unmittelbar vor dem erfassten Anstiegs-Beginn, verglichen mit
+normalen Handelstagen. Erklärt das Recall-Problem der bullischen Regeln:
+
+| Merkmal am Vortag | Echte Fälle | Normale Tage | Lift |
+|---|---|---|---|
+| 5-Tage-Rückgang > 10% (Kapitulation) | 37% | 17% | **2,2x** |
+| RVOL > 2 (Volumen zieht schon an) | 13% | 7% | **1,9x** |
+| EMA20 > EMA50 (bullisch) | 44% | 32% | 1,4x |
+| Trendstruktur: Uptrend | 30% | 21% | 1,4x |
+| Trendstruktur: Downtrend | 29% | 34% | 0,9x |
+| Dry Volume (RVOL < 0.7) | 36% | 39% | 0,9x |
+| Days to Cover > 5 | 38% | 49% | 0,8x |
+
+**Kernerkenntnisse:**
+- Das stärkste Vorlauf-Signal ist die **Kapitulation** — ein scharfer
+  5-Tage-Absturz von >10% ging 37% der echten Fälle unmittelbar voraus
+  (2,2x häufiger als an normalen Tagen). Das deckt sich mit der
+  SL-Analyse (Median −13,7% in den 10 Tagen vor dem Start).
+- "Dry Volume" allein ist entgegen der Intuition KEIN Signal (0,9x) —
+  aber bei 13% der Fälle zieht das Volumen schon am Vortag an (1,9x).
+- Days to Cover am Vortag ist sogar leicht UNTER Baseline — der hohe
+  Short-Interest-Wert allein sagt nichts über das Timing.
+- Es gibt offenbar (mind.) zwei Vorphasen-Typen: Kapitulations-Reversal
+  (Absturz → V-förmige Explosion) und Momentum-Fortsetzung (Anstieg beginnt
+  aus bestehendem Uptrend mit anziehendem Volumen).
+
+## Präzision-Recall-Spektrum: die Kapitulations-Regeln (Backtest, Lookahead 10 Tage)
+
+Konsequenz aus der Recall-Diagnose oben — mit den neuen Kapitulations-Features
+gibt es erstmals Regeln, die einen nennenswerten Anteil der echten Anstiege
+IM VORAUS erfassen. Man wählt auf diesem Spektrum zwischen "viele Fälle
+erwischen, viele Fehlalarme" und "wenig Fehlalarme, fast alles verpassen":
+
+| Regel | Trefferquote | Recall | Signale |
+|---|---|---|---|
+| 5-Tage-Rückgang > 10% (allein) | 7,0% (1,7x Basis) | **31%** | 35.769 |
+| Downtrend (LH+LL) + Kapitulation | 7,8% (1,9x) | 12,5% | 12.599 |
+| Days to Cover > 5 + Kapitulation | 7,2% (1,7x) | 13,5% | 7.955 |
+| RVOL > 3 + Kapitulation | 8,7% (2,1x) | 1,6% | 1.459 |
+| RVOL > 3 + DTC > 5 + Downtrend + Kapitulation | **12,0% (2,9x)** | 0,4% | 133 |
+
+Screener-Übersetzung der Kapitulations-Basisregel:
+- **Performance (Woche)**: unter −10% (Finviz: "Performance" → "Week -10%")
+- Optional Downtrend: Kurs unter SMA50 (Annäherung an unsere LH+LL-Struktur)
+- Optional Short Interest Ratio > 5 für die DTC-Variante
+
+Ehrliche Einordnung: 7-8% Trefferquote heißt >90% Fehlalarme — als
+alleiniges Kaufsignal unbrauchbar, aber als VORWARN-Filter sinnvoll
+(Watchlist der Kapitulations-Kandidaten bilden, dann auf den Zünder warten:
+Volumen-Anstieg, News-Katalysator, erste starke grüne Kerze). Die alten
+bullischen Regeln (oben) bleiben als Bestätigungs-Signale nützlich, erkennen
+den Einstieg aber erst, wenn die Bewegung schon läuft.
+
 ## Kandidaten, die man findet, danach hier prüfen
 
 Sobald der externe Screener Kandidaten liefert: Ticker durch

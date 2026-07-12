@@ -17,6 +17,8 @@ const { backfillControlWindows } = require('./collectors/catalystControlBackfill
 const { analyzeRiskProfile, analyzeKnowledgeBaseRiskProfile, summarizeRiskProfile, formatRiskReport } = require('./analysis/riskProfile');
 const { scanSymbols, formatScanReport } = require('./analysis/squeezeScore');
 const { computeDNAForSymbols, formatDNAReport } = require('./analysis/dnaEngine');
+const { collectPreEventStates, formatPreEventReport } = require('./analysis/recallDiagnosis');
+const { buildControlFeatureSet } = require('./analysis/statistics');
 
 const command = process.argv[2] || 'run';
 
@@ -236,8 +238,17 @@ async function main() {
     return;
   }
 
+  if (command === 'stats:pre-event') {
+    const db = getDb();
+    const states = collectPreEventStates(db);
+    const events = db.prepare(`SELECT symbol, event_name, start_date, end_date, metrics_at_trigger FROM squeeze_events`).all();
+    const controlRows = buildControlFeatureSet(db, events);
+    console.log(formatPreEventReport(states, controlRows));
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals] | risk:knowledge-base [entryLeadDays] | scan [lookaheadDays] [minSignals] | dna`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | stats:pre-event | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals] | risk:knowledge-base [entryLeadDays] | scan [lookaheadDays] [minSignals] | dna`
   );
   process.exit(1);
 }
