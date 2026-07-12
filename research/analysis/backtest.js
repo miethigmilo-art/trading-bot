@@ -38,7 +38,7 @@ function alignDaysToCover(dates, settlementRows) {
  * — wir testen, ob die Regel den EINSTIEG in einen neuen Squeeze erkennt,
  * nicht ob sie während eines laufenden Squeeze "bullisch" aussieht.
  */
-function runBacktest(db, { lookaheadDays = 10 } = {}) {
+function runBacktest(db, { lookaheadDays = 10, fromDate = null, toDate = null } = {}) {
   const windowsBySymbol = squeezeWindowsBySymbol(db);
   const symbols = db.prepare(`SELECT DISTINCT symbol FROM prices`).all().map((r) => r.symbol);
   const combos = generateCombinations();
@@ -70,6 +70,8 @@ function runBacktest(db, { lookaheadDays = 10 } = {}) {
 
     for (let i = 0; i < series.length; i++) {
       const date = dates[i];
+      if (fromDate && date < fromDate) continue; // Zeitraum-Filter für die Universalitäts-Validierung
+      if (toDate && date > toDate) continue;
       const insideSqueeze = windows.some((w) => date >= w.start && date <= w.end);
       if (insideSqueeze) continue;
 
