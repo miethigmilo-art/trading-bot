@@ -23,7 +23,8 @@
     "research:catalyst:control-backfill": "node research/cli.js catalyst:control-backfill",
     "research:risk:analyze": "node research/cli.js risk:analyze",
     "research:scan": "node research/cli.js scan",
-    "research:risk:knowledge-base": "node research/cli.js risk:knowledge-base"
+    "research:risk:knowledge-base": "node research/cli.js risk:knowledge-base",
+    "research:dna": "node research/cli.js dna"
   },
   "keywords": [],
   "author": "",
