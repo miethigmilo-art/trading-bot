@@ -10,6 +10,7 @@ const { backfillUniverse } = require('./collectors/universeBackfill');
 const { scanAllSymbols } = require('./analysis/squeezeDetector');
 const universe = require('./config/universe');
 const { processCandidates, formatReport: formatCandidatesReport } = require('./knowledge/verifyCandidates');
+const { runBacktest, storeBacktestResults, formatBacktestReport } = require('./analysis/backtest');
 
 const command = process.argv[2] || 'run';
 
@@ -122,8 +123,18 @@ async function main() {
     return;
   }
 
+  if (command === 'backtest:run') {
+    const lookaheadDays = Number(process.argv[3]) || 10;
+    const db = getDb();
+    console.log(`[Squeeze Research] Backtest über alle Handelstage (Lookahead ${lookaheadDays} Tage)...`);
+    const results = runBacktest(db, { lookaheadDays });
+    storeBacktestResults(db, results, lookaheadDays);
+    console.log(formatBacktestReport(results, { lookaheadDays }));
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays]`
   );
   process.exit(1);
 }

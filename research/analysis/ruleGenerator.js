@@ -129,4 +129,4 @@ function formatRulesReport(rules) {
   return lines.join('\n');
 }
 
-module.exports = { generateRules, storeRules, formatRulesReport, PREDICATE_GROUPS };
+module.exports = { generateRules, storeRules, formatRulesReport, PREDICATE_GROUPS, generateCombinations };

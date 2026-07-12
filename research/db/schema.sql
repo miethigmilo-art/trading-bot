@@ -124,6 +124,28 @@ CREATE TABLE IF NOT EXISTS rules (
 );
 CREATE INDEX IF NOT EXISTS idx_rules_lift ON rules(lift);
 
+-- Backtesting Engine: echte Walk-Forward-Trefferquote pro Regel — im
+-- Unterschied zu `rules` (Lift am bereits bekannten Trigger-Tag) wird hier
+-- JEDER Handelstag durchlaufen und geprüft, ob die Regel feuert und ob
+-- danach tatsächlich ein neuer Squeeze folgt. Das ergibt eine echte
+-- Precision ("Trefferquote") statt nur eine relative Häufigkeit.
+CREATE TABLE IF NOT EXISTS backtest_results (
+  id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+  label              TEXT NOT NULL,
+  conditions         TEXT NOT NULL,
+  lookahead_days     INTEGER NOT NULL,
+  true_positives     INTEGER NOT NULL,
+  false_positives    INTEGER NOT NULL,
+  false_negatives    INTEGER NOT NULL,
+  true_negatives     INTEGER NOT NULL,
+  precision_pct      REAL,   -- TP / (TP + FP) — "Trefferquote": wenn die Regel feuert, wie oft folgt wirklich ein Squeeze
+  recall_pct         REAL,   -- TP / (TP + FN) — wie viel % der echten Squeezes hätte die Regel erkannt
+  base_rate_pct      REAL,   -- Anteil aller Tage, an denen überhaupt ein Squeeze binnen Lookahead folgte (Vergleichsmaßstab)
+  run_at             TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(conditions, lookahead_days)
+);
+CREATE INDEX IF NOT EXISTS idx_backtest_precision ON backtest_results(precision_pct);
+
 -- Beobachtbarkeit: jeder Collector-Lauf wird protokolliert
 CREATE TABLE IF NOT EXISTS collector_runs (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
