@@ -2,9 +2,15 @@ const { getPriceSeries, computeSeriesFeatures } = require('./technicals');
 const { generateCombinations } = require('./ruleGenerator');
 
 function squeezeWindowsBySymbol(db) {
-  const rows = db.prepare(`SELECT symbol, start_date, end_date FROM squeeze_events ORDER BY symbol, start_date`).all();
+  const rows = db.prepare(`SELECT symbol, start_date, peak_date, end_date FROM squeeze_events ORDER BY symbol, start_date`).all();
   const bySymbol = {};
-  for (const r of rows) (bySymbol[r.symbol] ||= []).push({ start: r.start_date, end: r.end_date || r.start_date });
+  for (const r of rows) {
+    (bySymbol[r.symbol] ||= []).push({
+      start: r.start_date,
+      peak: r.peak_date || r.start_date,
+      end: r.end_date || r.peak_date || r.start_date,
+    });
+  }
   return bySymbol;
 }
 
@@ -85,6 +91,20 @@ function analyzeRiskProfile(db, conditions, { lookaheadDays = 10, maxHoldDays = 
         }
       }
 
+      // Take-Profit-Seite: höchster Schlusskurs zwischen Entry und dem
+      // tatsächlichen Peak des Squeeze (mit etwas Spielraum via maxHoldDays,
+      // falls peak_date fehlt/vor dem Entry liegt).
+      const peakIdx = dates.indexOf(matchedWindow.peak);
+      const gainSearchEnd = Math.max(endIdx, peakIdx >= i ? Math.min(peakIdx, i + maxHoldDays, series.length - 1) : endIdx);
+      let maxClose = closes[i];
+      let maxIdx = i;
+      for (let k = i; k <= gainSearchEnd; k++) {
+        if (closes[k] > maxClose) {
+          maxClose = closes[k];
+          maxIdx = k;
+        }
+      }
+
       const entryClose = closes[i];
       entries.push({
         symbol,
@@ -93,6 +113,8 @@ function analyzeRiskProfile(db, conditions, { lookaheadDays = 10, maxHoldDays = 
         drawdownPct: ((minClose - entryClose) / entryClose) * 100,
         daysToWorst: minIdx - i,
         daysToSqueezeStart: squeezeStartIdx >= 0 ? squeezeStartIdx - i : null,
+        gainPct: ((maxClose - entryClose) / entryClose) * 100,
+        daysToPeak: maxIdx - i,
       });
     }
   }
@@ -111,6 +133,8 @@ function summarizeRiskProfile(entries) {
   const drawdowns = entries.map((e) => e.drawdownPct).sort((a, b) => a - b); // aufsteigend, negativste zuerst
   const daysToWorst = entries.map((e) => e.daysToWorst).sort((a, b) => a - b);
   const daysToSqueeze = entries.map((e) => e.daysToSqueezeStart).filter((d) => d != null).sort((a, b) => a - b);
+  const gains = entries.map((e) => e.gainPct).sort((a, b) => a - b); // aufsteigend, kleinste Gewinne zuerst
+  const daysToPeak = entries.map((e) => e.daysToPeak).sort((a, b) => a - b);
 
   return {
     n: entries.length,
@@ -120,6 +144,15 @@ function summarizeRiskProfile(entries) {
     medianDaysToWorst: percentile(daysToWorst, 50),
     medianDaysToSqueezeStart: percentile(daysToSqueeze, 50),
     maxDaysToSqueezeStart: daysToSqueeze[daysToSqueeze.length - 1] ?? null,
+    // Take-Profit-Seite: p10GainPct = die schwächsten 10% der echten Treffer
+    // erreichten NICHT mehr als diesen Gewinn — ein TP darüber hätte diese
+    // Fälle verpasst (zu spät verkauft bzw. gar nicht erst ausgelöst).
+    minGainPct: gains[0],
+    p10GainPct: percentile(gains, 10),
+    medianGainPct: percentile(gains, 50),
+    maxGainPct: gains[gains.length - 1],
+    medianDaysToPeak: percentile(daysToPeak, 50),
+    maxDaysToPeak: daysToPeak[daysToPeak.length - 1] ?? null,
   };
 }
 
@@ -140,7 +173,17 @@ function formatRiskReport(ruleLabel, entries, summary) {
   lines.push(`  Längste beobachtete Wartezeit:                  ${summary.maxDaysToSqueezeStart} Handelstage`);
   lines.push('');
   lines.push(
-    `Grobe Einordnung: ein Stop-Loss bei ${Math.abs(summary.p90DrawdownPct).toFixed(0)}% hätte ~90% dieser echten Treffer NICHT vorzeitig ausgestoppt. Ein engerer SL erhöht das Risiko, genau die Fälle zu verpassen, die man eigentlich erwischen wollte. n=${summary.n} ist klein — als grobe Kalibrierung zu verstehen, nicht als feste Regel.`
+    `Grobe Einordnung SL: ein Stop-Loss bei ${Math.abs(summary.p90DrawdownPct).toFixed(0)}% hätte ~90% dieser echten Treffer NICHT vorzeitig ausgestoppt. Ein engerer SL erhöht das Risiko, genau die Fälle zu verpassen, die man eigentlich erwischen wollte.`
+  );
+  lines.push('');
+  lines.push(`  Median-Gewinn vom Entry bis zum Peak:           +${summary.medianGainPct.toFixed(1)}%`);
+  lines.push(`  Schwächste 10% der Fälle erreichten höchstens:  +${summary.p10GainPct.toFixed(1)}%`);
+  lines.push(`  Bester Einzelfall:                              +${summary.maxGainPct.toFixed(1)}%`);
+  lines.push(`  Median Handelstage bis zum Peak:                ${summary.medianDaysToPeak}`);
+  lines.push(`  Längste beobachtete Zeit bis zum Peak:          ${summary.maxDaysToPeak} Handelstage`);
+  lines.push('');
+  lines.push(
+    `Grobe Einordnung TP: ein Take-Profit bei +${summary.p10GainPct.toFixed(0)}% hätte ~90% dieser echten Treffer erfasst, bevor der Kurs wieder drehte. Ein höheres TP-Ziel hätte in den schwächeren Fällen Gewinn liegen gelassen (Peak schon erreicht/überschritten). n=${summary.n} ist klein — als grobe Kalibrierung zu verstehen, nicht als feste Regel.`
   );
   return lines.join('\n');
 }
