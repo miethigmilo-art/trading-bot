@@ -62,18 +62,18 @@ function pendingEvents(db, limit) {
 }
 
 /**
- * Verarbeitet pro Lauf so viele offene Fälle wie das Alpha-Vantage-Tageslimit
- * (geteilt mit den Indikator-Calls) noch hergibt. Bei 25 Calls/Tag und ~174
- * kuratierten Fällen braucht das mehrere Tage — die NOT-EXISTS-Abfrage oben
- * sorgt dafür, dass jeder Lauf automatisch dort weitermacht, wo der letzte
- * aufgehört hat.
+ * Verarbeitet pro Lauf so viele offene Fälle wie die Alpha-Vantage-Tageskapazität
+ * (geteilt mit den Indikator-Calls, über alle rotierenden Keys summiert — siehe
+ * ALPHAVANTAGE_API_KEYS) noch hergibt. Bei 25 Calls/Tag/Key und ~175 kuratierten
+ * Fällen braucht das mit einem Key mehrere Tage, mit mehreren Keys entsprechend
+ * weniger — die NOT-EXISTS-Abfrage oben sorgt dafür, dass jeder Lauf automatisch
+ * dort weitermacht, wo der letzte aufgehört hat.
  */
 async function backfillCatalystData() {
   const db = getDb();
   importCache(db);
 
-  const dailyLimit = Number(process.env.ALPHAVANTAGE_DAILY_LIMIT || 25);
-  const remaining = Math.max(0, dailyLimit - alphaVantage.callsUsedToday(db));
+  const remaining = Math.max(0, alphaVantage.totalDailyCapacity() - alphaVantage.callsUsedToday(db));
   const todo = pendingEvents(db, remaining);
   const results = [];
 

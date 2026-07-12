@@ -13,24 +13,54 @@ const DEFAULT_INDICATORS = [
   { name: 'EMA200', func: 'EMA', time_period: 200 },
 ];
 
-function requireKey() {
-  const key = process.env.ALPHAVANTAGE_API_KEY;
-  if (!key) throw new Error('ALPHAVANTAGE_API_KEY fehlt in der Umgebung');
-  return key;
+// Mehrere kostenlose Alpha-Vantage-Keys lassen sich zu je 25 Calls/Tag
+// registrieren — ALPHAVANTAGE_API_KEYS (kommagetrennt) rotiert automatisch
+// durch alle, ALPHAVANTAGE_API_KEY bleibt als Fallback für einen einzelnen Key.
+function getKeys() {
+  const multi = process.env.ALPHAVANTAGE_API_KEYS;
+  if (multi) {
+    const keys = multi.split(',').map((k) => k.trim()).filter(Boolean);
+    if (keys.length) return keys;
+  }
+  const single = process.env.ALPHAVANTAGE_API_KEY;
+  return single ? [single] : [];
 }
 
-// Free-Tier: 5 Calls/Minute, 25 Calls/Tag. Jeder Indikator kostet einen eigenen HTTP-Call,
-// darum protokolliert fetchLatestIndicators JEDEN einzelnen Call unter dem eigenen
-// Modulnamen 'alphaVantageCall' (nicht den Sammel-Log pro Symbol aus runAll.js) und
-// zählt diese Zeilen, um das Tageslimit zuverlässig einzuhalten.
-function callsUsedToday(db) {
+function requireKeys() {
+  const keys = getKeys();
+  if (keys.length === 0) throw new Error('ALPHAVANTAGE_API_KEY(S) fehlt in der Umgebung');
+  return keys;
+}
+
+const PER_KEY_DAILY_LIMIT = () => Number(process.env.ALPHAVANTAGE_DAILY_LIMIT || 25);
+const moduleNameForKey = (index) => `alphaVantageCall#${index}`;
+
+// Jeder Call wird unter einem eigenen Modulnamen PRO KEY-INDEX protokolliert
+// (nicht dem Sammel-Log pro Symbol aus runAll.js), damit sich das Tageslimit
+// pro Key zuverlässig und unabhängig von den anderen Keys einhalten lässt.
+function callsUsedTodayForKey(db, index) {
   const row = db
-    .prepare(
-      `SELECT COUNT(*) AS n FROM collector_runs
-       WHERE module = 'alphaVantageCall' AND date(started_at) = date('now')`
-    )
-    .get();
+    .prepare(`SELECT COUNT(*) AS n FROM collector_runs WHERE module = ? AND date(started_at) = date('now')`)
+    .get(moduleNameForKey(index));
   return row.n;
+}
+
+function callsUsedToday(db) {
+  return getKeys().reduce((sum, _key, i) => sum + callsUsedTodayForKey(db, i), 0);
+}
+
+function totalDailyCapacity() {
+  return getKeys().length * PER_KEY_DAILY_LIMIT();
+}
+
+/** Ersten Key mit noch freiem Tageskontingent finden, oder null wenn alle ausgeschöpft sind. */
+function pickAvailableKey(db) {
+  const keys = requireKeys();
+  const limit = PER_KEY_DAILY_LIMIT();
+  for (let i = 0; i < keys.length; i++) {
+    if (callsUsedTodayForKey(db, i) < limit) return { key: keys[i], index: i };
+  }
+  return null;
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -41,13 +71,13 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  * zwischen Calls, um das 5/Minute-Limit einzuhalten.
  */
 async function fetchLatestIndicators(symbol, db, { indicators = DEFAULT_INDICATORS } = {}) {
-  const token = requireKey();
-  const dailyLimit = Number(process.env.ALPHAVANTAGE_DAILY_LIMIT || 25);
+  requireKeys();
   const results = [];
 
   for (const ind of indicators) {
-    if (callsUsedToday(db) >= dailyLimit) {
-      results.push({ name: ind.name, skipped: true, reason: 'Tageslimit erreicht' });
+    const picked = pickAvailableKey(db);
+    if (!picked) {
+      results.push({ name: ind.name, skipped: true, reason: 'Tageslimit erreicht (alle Keys)' });
       continue;
     }
 
@@ -59,7 +89,7 @@ async function fetchLatestIndicators(symbol, db, { indicators = DEFAULT_INDICATO
         interval: 'daily',
         time_period: ind.time_period,
         series_type: 'close',
-        apikey: token,
+        apikey: picked.key,
       },
     });
 
@@ -67,14 +97,14 @@ async function fetchLatestIndicators(symbol, db, { indicators = DEFAULT_INDICATO
     if (!series) {
       const msg = data?.Note || data?.Information || data?.['Error Message'] || 'Keine Daten zurückgegeben';
       results.push({ name: ind.name, error: msg });
-      logRun('alphaVantageCall', symbol, 'error', `${ind.name}: ${msg}`, startedAt);
+      logRun(moduleNameForKey(picked.index), symbol, 'error', `${ind.name}: ${msg}`, startedAt);
     } else {
       const [date, values] = Object.entries(series)[0] || [];
       results.push({ name: ind.name, date, value: values ? Number(values[ind.func]) : null });
-      logRun('alphaVantageCall', symbol, 'ok', ind.name, startedAt);
+      logRun(moduleNameForKey(picked.index), symbol, 'ok', ind.name, startedAt);
     }
 
-    if (indicators.indexOf(ind) < indicators.length - 1) await sleep(13000); // 5 Calls/Minute einhalten
+    if (indicators.indexOf(ind) < indicators.length - 1) await sleep(13000); // 5 Calls/Minute pro Key einhalten
   }
 
   return results;
@@ -92,9 +122,9 @@ function fmtAvTimestamp(date) {
  * statt einen Call zu verschwenden.
  */
 async function fetchNewsSentiment(symbol, { from, to }, db) {
-  const token = requireKey();
-  const dailyLimit = Number(process.env.ALPHAVANTAGE_DAILY_LIMIT || 25);
-  if (callsUsedToday(db) >= dailyLimit) return { skipped: true, reason: 'Tageslimit erreicht' };
+  requireKeys();
+  const picked = pickAvailableKey(db);
+  if (!picked) return { skipped: true, reason: 'Tageslimit erreicht (alle Keys)' };
 
   const startedAt = new Date().toISOString();
   const { data } = await client.get('/query', {
@@ -104,16 +134,16 @@ async function fetchNewsSentiment(symbol, { from, to }, db) {
       time_from: fmtAvTimestamp(from),
       time_to: fmtAvTimestamp(to),
       limit: 200,
-      apikey: token,
+      apikey: picked.key,
     },
   });
 
   if (!Array.isArray(data?.feed)) {
     const msg = data?.Note || data?.Information || data?.['Error Message'] || 'Keine Daten zurückgegeben';
-    logRun('alphaVantageCall', symbol, 'error', `NEWS_SENTIMENT: ${msg}`, startedAt);
+    logRun(moduleNameForKey(picked.index), symbol, 'error', `NEWS_SENTIMENT: ${msg}`, startedAt);
     return { error: msg };
   }
-  logRun('alphaVantageCall', symbol, 'ok', `NEWS_SENTIMENT: ${data.feed.length} Artikel`, startedAt);
+  logRun(moduleNameForKey(picked.index), symbol, 'ok', `NEWS_SENTIMENT: ${data.feed.length} Artikel`, startedAt);
 
   const byDate = {};
   for (const item of data.feed) {
@@ -169,5 +199,7 @@ module.exports = {
   fetchNewsSentiment,
   storeNewsSentiment,
   callsUsedToday,
+  totalDailyCapacity,
+  getKeys,
   DEFAULT_INDICATORS,
 };
