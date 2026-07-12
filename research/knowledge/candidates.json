@@ -5021,5 +5021,927 @@
     "type": "EV Short Interest",
     "skip": true,
     "skipReason": "Gleiches Symbol/Jahr wie Nr. 185."
+  },
+  {
+    "n": 501,
+    "company": "Sphere 3D",
+    "ticker": "ANY",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 502,
+    "company": "Exela Technologies",
+    "ticker": "XELA",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 503,
+    "company": "Vinco Ventures",
+    "ticker": "BBIGV",
+    "years": [
+      2021
+    ],
+    "type": "Short Squeeze",
+    "yahooSymbol": "BBIG",
+    "skip": true,
+    "skipReason": "Ticker 'BBIGV*' unklar (Fußnote im Original) — Vinco Ventures ist bereits als BBIG 2021 erfasst (Nr. 10/413)."
+  },
+  {
+    "n": 504,
+    "company": "Torchlight Energy",
+    "ticker": "TRCH",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze",
+    "note": "Torchlight fusionierte 2022 mit Meta Materials zu MMAT — Ticker TRCH evtl. bei Yahoo nicht mehr abrufbar."
+  },
+  {
+    "n": 505,
+    "company": "Meta Materials",
+    "ticker": "MMAT",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 506,
+    "company": "Reliance Global Group",
+    "ticker": "RELI",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 507,
+    "company": "Alzamend Neuro",
+    "ticker": "ALZN",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 508,
+    "company": "Citius Pharmaceuticals",
+    "ticker": "CTXR",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 509,
+    "company": "Acasti Pharma",
+    "ticker": "ACST",
+    "years": [
+      2021
+    ],
+    "type": "Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 110."
+  },
+  {
+    "n": 510,
+    "company": "Provention Bio",
+    "ticker": "PRVB",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Squeeze"
+  },
+  {
+    "n": 511,
+    "company": "GeoVax Labs",
+    "ticker": "GOVX",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 512,
+    "company": "Humanigen",
+    "ticker": "HGEN",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Squeeze"
+  },
+  {
+    "n": 513,
+    "company": "Altimmune",
+    "ticker": "ALT",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Momentum"
+  },
+  {
+    "n": 514,
+    "company": "Inovio Pharmaceuticals",
+    "ticker": "INO",
+    "years": [
+      2020
+    ],
+    "type": "Biotech Momentum"
+  },
+  {
+    "n": 515,
+    "company": "NanoViricides",
+    "ticker": "NNVC",
+    "years": [
+      2020
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 516,
+    "company": "Tonix Pharmaceuticals",
+    "ticker": "TNXP",
+    "years": [
+      2020
+    ],
+    "type": "Biotech Low Float",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 145 (Kandidatenliste Teil 1-5)."
+  },
+  {
+    "n": 517,
+    "company": "Jaguar Health",
+    "ticker": "JAGX",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 518,
+    "company": "Zosano Pharma",
+    "ticker": "ZSAN",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Low Float",
+    "note": "Zosano meldete 2022 Insolvenz an — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 519,
+    "company": "Aurinia Pharma",
+    "ticker": "AUPH",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Momentum"
+  },
+  {
+    "n": 520,
+    "company": "Ocuphire Pharma",
+    "ticker": "OCUP",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 521,
+    "company": "Molecular Templates",
+    "ticker": "MTEM",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 522,
+    "company": "GeoVax",
+    "ticker": "GOVX",
+    "years": [
+      2022
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 523,
+    "company": "Cemtrex",
+    "ticker": "CETX",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 524,
+    "company": "Digital Ally",
+    "ticker": "DGLY",
+    "years": [
+      2020
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 525,
+    "company": "Ideanomics",
+    "ticker": "IDEX",
+    "years": [
+      2020
+    ],
+    "type": "Low Float Squeeze",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 122."
+  },
+  {
+    "n": 526,
+    "company": "Electrameccanica",
+    "ticker": "SOLO",
+    "years": [
+      2020
+    ],
+    "type": "EV Low Float"
+  },
+  {
+    "n": 527,
+    "company": "Ayro",
+    "ticker": "AYRO",
+    "years": [
+      2020
+    ],
+    "type": "EV Low Float"
+  },
+  {
+    "n": 528,
+    "company": "Blink Charging",
+    "ticker": "BLNK",
+    "years": [
+      2019
+    ],
+    "type": "EV Short Squeeze"
+  },
+  {
+    "n": 529,
+    "company": "Polar Power",
+    "ticker": "POLA",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 530,
+    "company": "Orbital Infrastructure",
+    "ticker": "OIG",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 531,
+    "company": "Hall of Fame Resort",
+    "ticker": "HOFV",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 532,
+    "company": "Powerbridge",
+    "ticker": "PBTS",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 533,
+    "company": "Bit Brother",
+    "ticker": "BETS",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 534,
+    "company": "SOS Ltd.",
+    "ticker": "SOS",
+    "years": [
+      2022
+    ],
+    "type": "Crypto Low Float"
+  },
+  {
+    "n": 535,
+    "company": "E-Home Household",
+    "ticker": "EJH",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 536,
+    "company": "Top Financial",
+    "ticker": "TOP",
+    "years": [
+      2023
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 537,
+    "company": "Mullen Automotive",
+    "ticker": "MULN",
+    "years": [
+      2023
+    ],
+    "type": "Retail Squeeze"
+  },
+  {
+    "n": 538,
+    "company": "Helbiz",
+    "ticker": "HLBZ",
+    "years": [
+      2023
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 539,
+    "company": "VinFast",
+    "ticker": "VFS",
+    "years": [
+      2023
+    ],
+    "type": "Low Float Momentum",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 434."
+  },
+  {
+    "n": 540,
+    "company": "Kaival Brands",
+    "ticker": "KAVL",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 541,
+    "company": "Nuvve",
+    "ticker": "NVVE",
+    "years": [
+      2021
+    ],
+    "type": "EV Low Float"
+  },
+  {
+    "n": 542,
+    "company": "Creative Medical",
+    "ticker": "CELZ",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 543,
+    "company": "Allarity Therapeutics",
+    "ticker": "ALLR",
+    "years": [
+      2022
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 544,
+    "company": "Minim",
+    "ticker": "MINM",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 545,
+    "company": "BioNano Genomics",
+    "ticker": "BNGO",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Momentum"
+  },
+  {
+    "n": 546,
+    "company": "NLS Pharmaceutics",
+    "ticker": "NLSP",
+    "years": [
+      2022
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 547,
+    "company": "Cano Health",
+    "ticker": "CANO",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze",
+    "note": "Cano Health meldete 2024 Insolvenz an — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 548,
+    "company": "ContextLogic",
+    "ticker": "WISH",
+    "years": [
+      2022
+    ],
+    "type": "Meme Squeeze"
+  },
+  {
+    "n": 549,
+    "company": "Silvergate Capital",
+    "ticker": "SI",
+    "years": [
+      2023
+    ],
+    "type": "Short Squeeze",
+    "note": "Silvergate stellte 2023 den Betrieb ein — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 550,
+    "company": "Tingo Group",
+    "ticker": "TIO",
+    "years": [
+      2023
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 551,
+    "company": "Verb Technology",
+    "ticker": "VERB",
+    "years": [
+      2023
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 552,
+    "company": "Applied UV",
+    "ticker": "AUVI",
+    "years": [
+      2023
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 553,
+    "company": "Troika Media",
+    "ticker": "TRKA",
+    "years": [
+      2023
+    ],
+    "type": "Low Float Squeeze",
+    "note": "Troika Media meldete 2024 Insolvenz an — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 554,
+    "company": "Mogo",
+    "ticker": "MOGO",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Momentum"
+  },
+  {
+    "n": 555,
+    "company": "Context Therapeutics",
+    "ticker": "CNTX",
+    "years": [
+      2022
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 556,
+    "company": "Athira Pharma",
+    "ticker": "ATHA",
+    "years": [
+      2022
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 557,
+    "company": "BioXcel Therapeutics",
+    "ticker": "BTAI",
+    "years": [
+      2022
+    ],
+    "type": "Biotech Squeeze"
+  },
+  {
+    "n": 558,
+    "company": "Beam Global",
+    "ticker": "BEEM",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 559,
+    "company": "Rekor Systems",
+    "ticker": "REKR",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 560,
+    "company": "Lottery.com",
+    "ticker": "LTRY",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 561,
+    "company": "T2 Biosystems",
+    "ticker": "TTOO",
+    "years": [
+      2023
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 562,
+    "company": "Aehr Test Systems",
+    "ticker": "AEHR",
+    "years": [
+      2023
+    ],
+    "type": "Momentum Squeeze"
+  },
+  {
+    "n": 563,
+    "company": "Cingulate",
+    "ticker": "CING",
+    "years": [
+      2023
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 564,
+    "company": "Sidus Space",
+    "ticker": "SIDU",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 565,
+    "company": "Nerdy",
+    "ticker": "NRDY",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 566,
+    "company": "Microvast",
+    "ticker": "MVST",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 567,
+    "company": "Quantum Corp",
+    "ticker": "QMCO",
+    "years": [
+      2023
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 568,
+    "company": "Redbox Entertainment",
+    "ticker": "RDBX",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze",
+    "note": "Redbox wurde 2024 von Chicken Soup for the Soul übernommen, die selbst insolvent gingen — Ticker bei Yahoo evtl. nicht mehr abrufbar."
+  },
+  {
+    "n": 569,
+    "company": "Getty Images",
+    "ticker": "GETY",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 570,
+    "company": "System1",
+    "ticker": "SST",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 571,
+    "company": "Allbirds",
+    "ticker": "BIRD",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 572,
+    "company": "BuzzFeed",
+    "ticker": "BZFD",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 573,
+    "company": "AirSculpt Technologies",
+    "ticker": "AIRS",
+    "years": [
+      2022
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 574,
+    "company": "BigBear.ai",
+    "ticker": "BBAI",
+    "years": [
+      2024
+    ],
+    "type": "AI Short Interest",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 160/349 (2023 bereits erfasst) — 2024 als neues Fenster dennoch verarbeitet."
+  },
+  {
+    "n": 575,
+    "company": "Guardforce AI",
+    "ticker": "GFAI",
+    "years": [
+      2024
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 576,
+    "company": "Applied Digital",
+    "ticker": "APLD",
+    "years": [
+      2024
+    ],
+    "type": "Crypto/AI Low Float"
+  },
+  {
+    "n": 577,
+    "company": "Bit Digital",
+    "ticker": "BTBT",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 578,
+    "company": "Bitfarms",
+    "ticker": "BITF",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Short"
+  },
+  {
+    "n": 579,
+    "company": "Cipher Mining",
+    "ticker": "CIFR",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 580,
+    "company": "Iris Energy",
+    "ticker": "IREN",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 581,
+    "company": "Argo Blockchain",
+    "ticker": "ARBK",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Low Float"
+  },
+  {
+    "n": 582,
+    "company": "Stronghold Digital",
+    "ticker": "SDIG",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Low Float"
+  },
+  {
+    "n": 583,
+    "company": "Marathon Digital",
+    "ticker": "MARA",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Squeeze"
+  },
+  {
+    "n": 584,
+    "company": "Riot Platforms",
+    "ticker": "RIOT",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Squeeze"
+  },
+  {
+    "n": 585,
+    "company": "Beyond Air",
+    "ticker": "XAIR",
+    "years": [
+      2024
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 586,
+    "company": "Enovix",
+    "ticker": "ENVX",
+    "years": [
+      2023
+    ],
+    "type": "Low Float Momentum"
+  },
+  {
+    "n": 587,
+    "company": "Rigetti Computing",
+    "ticker": "RGTI",
+    "years": [
+      2024
+    ],
+    "type": "Quantum Short Interest"
+  },
+  {
+    "n": 588,
+    "company": "D-Wave Quantum",
+    "ticker": "QBTS",
+    "years": [
+      2024
+    ],
+    "type": "Quantum Low Float"
+  },
+  {
+    "n": 589,
+    "company": "Quantum Computing Inc.",
+    "ticker": "QUBT",
+    "years": [
+      2024
+    ],
+    "type": "Quantum Low Float"
+  },
+  {
+    "n": 590,
+    "company": "SEALSQ",
+    "ticker": "LAES",
+    "years": [
+      2024
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 591,
+    "company": "Rezolve AI",
+    "ticker": "RZLV",
+    "years": [
+      2024
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 592,
+    "company": "MicroCloud Hologram",
+    "ticker": "HOLO",
+    "years": [
+      2024
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 593,
+    "company": "WiMi Hologram",
+    "ticker": "WIMI",
+    "years": [
+      2024
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 594,
+    "company": "Nano Labs",
+    "ticker": "NA",
+    "years": [
+      2024
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 595,
+    "company": "AGBA Group",
+    "ticker": "AGBA",
+    "years": [
+      2024
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 596,
+    "company": "Trump Media",
+    "ticker": "DJT",
+    "years": [
+      2024
+    ],
+    "type": "High Volatility",
+    "skip": true,
+    "skipReason": "Gleiches Symbol/Jahr wie Nr. 446."
+  },
+  {
+    "n": 597,
+    "company": "Bolt Projects",
+    "ticker": "BSLK",
+    "years": [
+      2024
+    ],
+    "type": "Low Float Squeeze",
+    "note": "SPAC-Merger-IPO 2024 — Ticker/Kursverlauf ggf. erst ab Merger-Datum verfügbar."
+  },
+  {
+    "n": 598,
+    "company": "Gaxos.ai",
+    "ticker": "GXAI",
+    "years": [
+      2024
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 599,
+    "company": "CISO Global",
+    "ticker": "CISO",
+    "years": [
+      2024
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 600,
+    "company": "Lytus Technologies",
+    "ticker": "LYT",
+    "years": [
+      2024
+    ],
+    "type": "Low Float Squeeze"
   }
 ]
