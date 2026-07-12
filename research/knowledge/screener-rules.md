@@ -128,6 +128,29 @@ Setup = "Kapitulation in den letzten 10 Handelstagen". Ergebnis:
   News-Abdeckung vollständig ist, ist "Kapitulations-Setup + News-Spike"
   die wichtigste zu testende Hypothese.
 
+## Universalitäts-Validierung: hält die Regel in jedem Marktregime?
+
+`node research/cli.js validate:rules` — die Kernregeln getrennt in drei
+Marktregimen getestet (Meme-Ära bis 2021, Bärenmarkt 2022–2023,
+KI/Quantum-Ära 2024+). Maßstab ist der Lift gegenüber der Basisrate der
+jeweiligen Ära:
+
+| Regel | bis 2021 | 2022–23 | 2024+ | Urteil |
+|---|---|---|---|---|
+| Kapitulation (5d < −10%) | 1,8x | 1,7x | 1,6x | **universell** |
+| Downtrend + Kapitulation | 2,0x | 2,0x | 1,6x | **universell** |
+| Days to Cover > 5 + Kapitulation | 1,5x | 1,9x | 1,5x | **universell** |
+| RVOL>5 + 20d-Breakout + Uptrend | 2,4x (n=50) | 1,9x (n=27) | 3,7x (n=47) | positiv, aber n klein |
+| DTC>10 + 52w-Breakout + Uptrend | n=3 | n=0 | n=20 | **nicht belastbar** |
+
+**Fazit:** Die Kapitulations-Familie ist regime-unabhängig — der Lift
+schwankt nur zwischen 1,5x und 2,0x über drei völlig verschiedene
+Marktphasen. Das ist die bislang beste Annäherung an eine "universelle
+Regel", die diese Plattform belegen kann. Die bullischen
+Hochpräzisions-Regeln sind dagegen selten und era-abhängig (im Bärenmarkt
+2022–23 feuerte die 52-Wochen-Hoch-Regel exakt null Mal) — als
+Bestätigungs-Signal brauchbar, als universelle Regel nicht.
+
 ## Kandidaten, die man findet, danach hier prüfen
 
 Sobald der externe Screener Kandidaten liefert: Ticker durch
