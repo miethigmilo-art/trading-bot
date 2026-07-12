@@ -12,12 +12,21 @@ const client = axios.create({
 
 /**
  * Fetch daily OHLCV bars for a symbol.
- * range: '5d' for the daily collector run, larger ranges (e.g. '2y') for backfill.
+ * Either pass `range` ('5d' for the daily collector run, '2y' etc. for backfill —
+ * Yahoo silently degrades interval=1d to weekly/monthly beyond ~5y when using range),
+ * or pass explicit `from`/`to` (Date or 'YYYY-MM-DD') to get true daily bars for an
+ * arbitrary historical window, e.g. around a known squeeze event from 2021.
  */
-async function fetchDailyBars(symbol, { range = '5d' } = {}) {
-  const { data } = await client.get(`/v8/finance/chart/${encodeURIComponent(symbol)}`, {
-    params: { interval: '1d', range, includePrePost: false },
-  });
+async function fetchDailyBars(symbol, { range = '5d', from, to } = {}) {
+  const params = { interval: '1d', includePrePost: false };
+  if (from || to) {
+    params.period1 = Math.floor(new Date(from).getTime() / 1000);
+    params.period2 = Math.floor((to ? new Date(to) : new Date()).getTime() / 1000);
+  } else {
+    params.range = range;
+  }
+
+  const { data } = await client.get(`/v8/finance/chart/${encodeURIComponent(symbol)}`, { params });
 
   const result = data?.chart?.result?.[0];
   if (!result) {

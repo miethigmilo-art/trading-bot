@@ -1,8 +1,10 @@
 require('dotenv').config();
 const { runDailyCollection } = require('./collectors/runAll');
+const { backfillEventWindows } = require('./collectors/backfillEvents');
 const watchlist = require('./config/watchlist');
 const { getDb } = require('./db/database');
 const { loadEvents, listEvents } = require('./knowledge/loader');
+const { runStatistics, formatReport } = require('./analysis/statistics');
 
 const command = process.argv[2] || 'run';
 
@@ -57,8 +59,26 @@ async function main() {
     return;
   }
 
+  if (command === 'backfill:events') {
+    console.log('[Squeeze Research] Backfill Kurshistorie rund um alle erfassten Squeeze-Events...');
+    const results = await backfillEventWindows();
+    for (const r of results) {
+      const label = r.module === 'finra' ? 'finra' : 'yahooFinance';
+      const detail = r.status === 'ok' ? `${r.count} Datensätze` : r.message;
+      console.log(`  ${r.status === 'ok' ? '✔' : '✘'} ${label.padEnd(14)} ${r.symbol.padEnd(6)} ${detail}`);
+    }
+    return;
+  }
+
+  if (command === 'stats:run') {
+    const db = getDb();
+    const report = runStatistics(db);
+    console.log(formatReport(report));
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | knowledge:load | knowledge:list`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run`
   );
   process.exit(1);
 }
