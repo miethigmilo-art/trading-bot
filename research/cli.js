@@ -15,6 +15,7 @@ const { backfillCatalystData } = require('./collectors/catalystBackfill');
 const { summarizeCatalystCoverage, formatCatalystSummary } = require('./analysis/catalyst');
 const { backfillControlWindows } = require('./collectors/catalystControlBackfill');
 const { analyzeRiskProfile, summarizeRiskProfile, formatRiskReport } = require('./analysis/riskProfile');
+const { scanSymbols, formatScanReport } = require('./analysis/squeezeScore');
 
 const command = process.argv[2] || 'run';
 
@@ -197,8 +198,19 @@ async function main() {
     return;
   }
 
+  if (command === 'scan') {
+    const lookaheadDays = Number(process.argv[3]) || 10;
+    const minSignals = Number(process.argv[4]) || 15;
+    const minLiftFactor = Number(process.argv[5]) || 1.5;
+    const db = getDb();
+    const symbols = [...new Set([...watchlist, ...universe])];
+    const scan = scanSymbols(db, symbols, { lookaheadDays, minSignals, minLiftFactor });
+    console.log(formatScanReport(scan));
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals]`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals] | scan [lookaheadDays] [minSignals]`
   );
   process.exit(1);
 }
