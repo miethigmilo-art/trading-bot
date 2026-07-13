@@ -5953,5 +5953,1229 @@
       2024
     ],
     "type": "Low Float Squeeze"
+  },
+  {
+    "n": 601,
+    "company": "Vaxart",
+    "ticker": "VXRT",
+    "years": [
+      2020
+    ],
+    "type": "Biotech News Squeeze"
+  },
+  {
+    "n": 602,
+    "company": "Novavax",
+    "ticker": "NVAX",
+    "years": [
+      2021
+    ],
+    "type": "Biotech Momentum"
+  },
+  {
+    "n": 603,
+    "company": "iBio",
+    "ticker": "IBIO",
+    "years": [
+      2020
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 604,
+    "company": "Co-Diagnostics",
+    "ticker": "CODX",
+    "years": [
+      2020
+    ],
+    "type": "Biotech Momentum"
+  },
+  {
+    "n": 605,
+    "company": "Chembio Diagnostics",
+    "ticker": "CEMI",
+    "years": [
+      2020
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 606,
+    "company": "Cellect Biotech",
+    "ticker": "APOP",
+    "years": [
+      2020
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 607,
+    "company": "Enzon Pharmaceuticals",
+    "ticker": "ENZN",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 608,
+    "company": "CytoDyn",
+    "ticker": "CYDY",
+    "years": [
+      2020
+    ],
+    "type": "Biotech Momentum"
+  },
+  {
+    "n": 609,
+    "company": "Aytu BioPharma",
+    "ticker": "AYTU",
+    "years": [
+      2020
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 610,
+    "company": "Genius Brands",
+    "ticker": "GNUS",
+    "years": [
+      2020
+    ],
+    "type": "Retail Momentum"
+  },
+  {
+    "n": 611,
+    "company": "Hall of Fame Resort",
+    "ticker": "HOFV",
+    "years": [
+      2020
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 612,
+    "company": "XL Fleet",
+    "ticker": "XL",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Momentum"
+  },
+  {
+    "n": 613,
+    "company": "Romeo Power",
+    "ticker": "RMO",
+    "years": [
+      2020
+    ],
+    "type": "SPAC Momentum"
+  },
+  {
+    "n": 614,
+    "company": "Churchill Capital IV",
+    "ticker": "CCIV",
+    "years": [
+      2021
+    ],
+    "type": "SPAC Squeeze"
+  },
+  {
+    "n": 615,
+    "company": "Corsair Gaming",
+    "ticker": "CRSR",
+    "years": [
+      2021
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 616,
+    "company": "fuelCell",
+    "ticker": "FCEL",
+    "years": [
+      2021
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 617,
+    "company": "Root Insurance",
+    "ticker": "ROOT",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Squeeze"
+  },
+  {
+    "n": 618,
+    "company": "Support.com/Greenidge",
+    "ticker": "GREE",
+    "years": [
+      2021
+    ],
+    "type": "Squeeze"
+  },
+  {
+    "n": 619,
+    "company": "Cenntro Electric",
+    "ticker": "CENN",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 620,
+    "company": "Vinco",
+    "ticker": "BBIG",
+    "years": [
+      2022
+    ],
+    "type": "Squeeze"
+  },
+  {
+    "n": 621,
+    "company": "UTStarcom",
+    "ticker": "UTSI",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 622,
+    "company": "Recon Technology",
+    "ticker": "RCON",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Pump"
+  },
+  {
+    "n": 623,
+    "company": "Ucommune",
+    "ticker": "UK",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 624,
+    "company": "Color Star",
+    "ticker": "CSCW",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 625,
+    "company": "Greenland Acquisition",
+    "ticker": "GLAC",
+    "years": [
+      2020
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 626,
+    "company": "Luokung Technology",
+    "ticker": "LKCO",
+    "years": [
+      2021
+    ],
+    "type": "Low Float Momentum"
+  },
+  {
+    "n": 627,
+    "company": "China SXT Pharma",
+    "ticker": "SXTC",
+    "years": [
+      2019
+    ],
+    "type": "Low Float Pump"
+  },
+  {
+    "n": 628,
+    "company": "iFresh",
+    "ticker": "IFMK",
+    "years": [
+      2020
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 629,
+    "company": "Wah Fu Education",
+    "ticker": "WAFU",
+    "years": [
+      2019
+    ],
+    "type": "Low Float Pump"
+  },
+  {
+    "n": 630,
+    "company": "Jiuzi Holdings",
+    "ticker": "JZXN",
+    "years": [
+      2021
+    ],
+    "type": "IPO Low Float"
+  },
+  {
+    "n": 631,
+    "company": "MEGA Matrix",
+    "ticker": "MPU",
+    "years": [
+      2022
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 632,
+    "company": "Golden Sun Education",
+    "ticker": "GSUN",
+    "years": [
+      2023
+    ],
+    "type": "IPO Low Float"
+  },
+  {
+    "n": 633,
+    "company": "Jayud Global",
+    "ticker": "JYD",
+    "years": [
+      2023
+    ],
+    "type": "IPO Low Float"
+  },
+  {
+    "n": 634,
+    "company": "Lichen China",
+    "ticker": "LICN",
+    "years": [
+      2023
+    ],
+    "type": "IPO Low Float"
+  },
+  {
+    "n": 635,
+    "company": "Baiya International",
+    "ticker": "BIYA",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 636,
+    "company": "Global Arena",
+    "ticker": "GAHC",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 637,
+    "company": "Chanson International",
+    "ticker": "CHSN",
+    "years": [
+      2023
+    ],
+    "type": "IPO Low Float"
+  },
+  {
+    "n": 638,
+    "company": "iQSTEL",
+    "ticker": "IQST",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 639,
+    "company": "Hong Kong Aerospace",
+    "ticker": "AATC",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 640,
+    "company": "Ostin Technology",
+    "ticker": "OST",
+    "years": [
+      2022
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 641,
+    "company": "Meta Materials Pref",
+    "ticker": "MMTLP",
+    "years": [
+      2022
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 642,
+    "company": "Genesis Unicorn",
+    "ticker": "GENQ",
+    "years": [
+      2023
+    ],
+    "type": "SPAC Low Float"
+  },
+  {
+    "n": 643,
+    "company": "Bright Green",
+    "ticker": "BGXX",
+    "years": [
+      2022
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 644,
+    "company": "Interactive Strength",
+    "ticker": "TRNR",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 645,
+    "company": "Tuscan Holdings",
+    "ticker": "GBX",
+    "years": [
+      2023
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 646,
+    "company": "Gorilla Technology",
+    "ticker": "GRRR",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 647,
+    "company": "SurgePays",
+    "ticker": "SURG",
+    "years": [
+      2022
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 648,
+    "company": "Nuvectra",
+    "ticker": "MICT",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 649,
+    "company": "Greenland Acquisition",
+    "ticker": "GLAC",
+    "years": [
+      2021
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 650,
+    "company": "Nuzee",
+    "ticker": "NUZE",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 651,
+    "company": "Snow Lake Resources",
+    "ticker": "LITM",
+    "years": [
+      2023
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 652,
+    "company": "Blue Star Foods",
+    "ticker": "BSFC",
+    "years": [
+      2022
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 653,
+    "company": "Coeptis Therapeutics",
+    "ticker": "COEP",
+    "years": [
+      2023
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 654,
+    "company": "Minerva Surgical",
+    "ticker": "UTRS",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 655,
+    "company": "Banzai International",
+    "ticker": "BNZI",
+    "years": [
+      2024
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 656,
+    "company": "Fresh2 Group",
+    "ticker": "FRES",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 657,
+    "company": "Intelligent Bio Solutions",
+    "ticker": "INBS",
+    "years": [
+      2024
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 658,
+    "company": "ShengFeng Development",
+    "ticker": "SFWL",
+    "years": [
+      2024
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 659,
+    "company": "Bit Origin",
+    "ticker": "BTOG",
+    "years": [
+      2023
+    ],
+    "type": "Crypto Low Float"
+  },
+  {
+    "n": 660,
+    "company": "Zhong Yuan Bio",
+    "ticker": "PBM",
+    "years": [
+      2024
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 661,
+    "company": "CN Energy",
+    "ticker": "CNEY",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 662,
+    "company": "Yoshiharu Global",
+    "ticker": "YOSH",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 663,
+    "company": "Reborn Coffee",
+    "ticker": "REBN",
+    "years": [
+      2023
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 664,
+    "company": "Rekor",
+    "ticker": "REKR",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 665,
+    "company": "Faraday Future",
+    "ticker": "FFIE",
+    "years": [
+      2024
+    ],
+    "type": "Meme Squeeze"
+  },
+  {
+    "n": 666,
+    "company": "ZAPP EV",
+    "ticker": "ZAPP",
+    "years": [
+      2024
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 667,
+    "company": "Nuvei",
+    "ticker": "NVEI",
+    "years": [
+      2024
+    ],
+    "type": "Buyout"
+  },
+  {
+    "n": 668,
+    "company": "Nano-X Imaging",
+    "ticker": "NNOX",
+    "years": [
+      2020
+    ],
+    "type": "News Squeeze"
+  },
+  {
+    "n": 669,
+    "company": "Ault/BitNile",
+    "ticker": "DPW",
+    "years": [
+      2021
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 670,
+    "company": "Greenidge Generation",
+    "ticker": "GREE",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 671,
+    "company": "Serve Robotics",
+    "ticker": "SERV",
+    "years": [
+      2024
+    ],
+    "type": "AI Momentum"
+  },
+  {
+    "n": 672,
+    "company": "GigaCloud",
+    "ticker": "GCT",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 673,
+    "company": "Root Inc",
+    "ticker": "ROOT",
+    "years": [
+      2024
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 674,
+    "company": "Carvana",
+    "ticker": "CVNA",
+    "years": [
+      2024
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 675,
+    "company": "Symbotic",
+    "ticker": "SYM",
+    "years": [
+      2023
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 676,
+    "company": "IonQ",
+    "ticker": "IONQ",
+    "years": [
+      2025
+    ],
+    "type": "Quantum Momentum"
+  },
+  {
+    "n": 677,
+    "company": "Rigetti",
+    "ticker": "RGTI",
+    "years": [
+      2025
+    ],
+    "type": "Quantum Momentum"
+  },
+  {
+    "n": 678,
+    "company": "Quantum Computing",
+    "ticker": "QUBT",
+    "years": [
+      2025
+    ],
+    "type": "Quantum Momentum"
+  },
+  {
+    "n": 679,
+    "company": "D-Wave",
+    "ticker": "QBTS",
+    "years": [
+      2025
+    ],
+    "type": "Quantum Momentum"
+  },
+  {
+    "n": 680,
+    "company": "Richtech Robotics",
+    "ticker": "RR",
+    "years": [
+      2025
+    ],
+    "type": "AI Low Float"
+  },
+  {
+    "n": 681,
+    "company": "BullFrog AI",
+    "ticker": "BFRG",
+    "years": [
+      2024
+    ],
+    "type": "AI Low Float"
+  },
+  {
+    "n": 682,
+    "company": "Janux Therapeutics",
+    "ticker": "JANX",
+    "years": [
+      2024
+    ],
+    "type": "Biotech News"
+  },
+  {
+    "n": 683,
+    "company": "Cassava Sciences",
+    "ticker": "SAVA",
+    "years": [
+      2024
+    ],
+    "type": "Biotech Volatility"
+  },
+  {
+    "n": 684,
+    "company": "Viking Therapeutics",
+    "ticker": "VKTX",
+    "years": [
+      2024
+    ],
+    "type": "Biotech News"
+  },
+  {
+    "n": 685,
+    "company": "Summit Therapeutics",
+    "ticker": "SMMT",
+    "years": [
+      2024
+    ],
+    "type": "Biotech News"
+  },
+  {
+    "n": 686,
+    "company": "Structure Therapeutics",
+    "ticker": "GPCR",
+    "years": [
+      2023
+    ],
+    "type": "Biotech News"
+  },
+  {
+    "n": 687,
+    "company": "Longeveron",
+    "ticker": "LGVN",
+    "years": [
+      2024
+    ],
+    "type": "Biotech Low Float"
+  },
+  {
+    "n": 688,
+    "company": "Tempus AI",
+    "ticker": "TEM",
+    "years": [
+      2025
+    ],
+    "type": "AI Momentum"
+  },
+  {
+    "n": 689,
+    "company": "Newsmax",
+    "ticker": "NMAX",
+    "years": [
+      2025
+    ],
+    "type": "IPO Low Float"
+  },
+  {
+    "n": 690,
+    "company": "Webull",
+    "ticker": "BULL",
+    "years": [
+      2025
+    ],
+    "type": "SPAC Momentum"
+  },
+  {
+    "n": 691,
+    "company": "MicroCloud Hologram",
+    "ticker": "HOLO",
+    "years": [
+      2025
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 692,
+    "company": "SEALSQ",
+    "ticker": "LAES",
+    "years": [
+      2025
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 693,
+    "company": "Rezolve AI",
+    "ticker": "RZLV",
+    "years": [
+      2025
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 694,
+    "company": "Unusual Machines",
+    "ticker": "UMAC",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 695,
+    "company": "Ondas Holdings",
+    "ticker": "ONDS",
+    "years": [
+      2025
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 696,
+    "company": "Red Cat Holdings",
+    "ticker": "RCAT",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 697,
+    "company": "AeroVironment",
+    "ticker": "AVAV",
+    "years": [
+      2025
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 698,
+    "company": "Kraig Biocraft",
+    "ticker": "KBLB",
+    "years": [
+      2024
+    ],
+    "type": "Low Float"
+  },
+  {
+    "n": 699,
+    "company": "ProKidney",
+    "ticker": "PROK",
+    "years": [
+      2025
+    ],
+    "type": "Biotech News"
+  },
+  {
+    "n": 700,
+    "company": "Wolfspeed",
+    "ticker": "WOLF",
+    "years": [
+      2024
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 701,
+    "company": "Nikola",
+    "ticker": "NKLA",
+    "years": [
+      2024
+    ],
+    "type": "Meme Squeeze"
+  },
+  {
+    "n": 702,
+    "company": "Lucid",
+    "ticker": "LCID",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 703,
+    "company": "ChargePoint",
+    "ticker": "CHPT",
+    "years": [
+      2024
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 704,
+    "company": "Plug Power",
+    "ticker": "PLUG",
+    "years": [
+      2024
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 705,
+    "company": "Canopy Growth",
+    "ticker": "CGC",
+    "years": [
+      2024
+    ],
+    "type": "Cannabis Squeeze"
+  },
+  {
+    "n": 706,
+    "company": "Tilray",
+    "ticker": "TLRY",
+    "years": [
+      2024
+    ],
+    "type": "Cannabis Squeeze"
+  },
+  {
+    "n": 707,
+    "company": "Aurora Cannabis",
+    "ticker": "ACB",
+    "years": [
+      2024
+    ],
+    "type": "Cannabis Squeeze"
+  },
+  {
+    "n": 708,
+    "company": "Sundial/SNDL",
+    "ticker": "SNDL",
+    "years": [
+      2024
+    ],
+    "type": "Cannabis"
+  },
+  {
+    "n": 709,
+    "company": "Hut 8",
+    "ticker": "HUT",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 710,
+    "company": "Bitdeer",
+    "ticker": "BTDR",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 711,
+    "company": "Core Scientific",
+    "ticker": "CORZ",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 712,
+    "company": "TeraWulf",
+    "ticker": "WULF",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 713,
+    "company": "Cipher Mining",
+    "ticker": "CIFR",
+    "years": [
+      2025
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 714,
+    "company": "Iris Energy",
+    "ticker": "IREN",
+    "years": [
+      2025
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 715,
+    "company": "Bit Digital",
+    "ticker": "BTBT",
+    "years": [
+      2025
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 716,
+    "company": "Applied Digital",
+    "ticker": "APLD",
+    "years": [
+      2025
+    ],
+    "type": "AI/Crypto Momentum"
+  },
+  {
+    "n": 717,
+    "company": "MARA Holdings",
+    "ticker": "MARA",
+    "years": [
+      2025
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 718,
+    "company": "Riot Platforms",
+    "ticker": "RIOT",
+    "years": [
+      2025
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 719,
+    "company": "Strategy/MicroStrategy",
+    "ticker": "MSTR",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 720,
+    "company": "Coinbase",
+    "ticker": "COIN",
+    "years": [
+      2024
+    ],
+    "type": "Crypto Momentum"
+  },
+  {
+    "n": 721,
+    "company": "Robinhood",
+    "ticker": "HOOD",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 722,
+    "company": "Palantir",
+    "ticker": "PLTR",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 723,
+    "company": "AppLovin",
+    "ticker": "APP",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 724,
+    "company": "Root",
+    "ticker": "ROOT",
+    "years": [
+      2025
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 725,
+    "company": "Beyond Meat",
+    "ticker": "BYND",
+    "years": [
+      2025
+    ],
+    "type": "Meme Squeeze"
+  },
+  {
+    "n": 726,
+    "company": "Camping World",
+    "ticker": "CWH",
+    "years": [
+      2025
+    ],
+    "type": "Short Interest"
+  },
+  {
+    "n": 727,
+    "company": "Wendy’s",
+    "ticker": "WEN",
+    "years": [
+      2025
+    ],
+    "type": "Retail Momentum"
+  },
+  {
+    "n": 728,
+    "company": "Rocket Companies",
+    "ticker": "RKT",
+    "years": [
+      2025
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 729,
+    "company": "First Solar",
+    "ticker": "FSLR",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 730,
+    "company": "Sunrun",
+    "ticker": "RUN",
+    "years": [
+      2024
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 731,
+    "company": "Enphase",
+    "ticker": "ENPH",
+    "years": [
+      2024
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 732,
+    "company": "Lemonade",
+    "ticker": "LMND",
+    "years": [
+      2024
+    ],
+    "type": "Short Squeeze"
+  },
+  {
+    "n": 733,
+    "company": "Upstart",
+    "ticker": "UPST",
+    "years": [
+      2024
+    ],
+    "type": "Short Cover"
+  },
+  {
+    "n": 734,
+    "company": "SoFi",
+    "ticker": "SOFI",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 735,
+    "company": "DraftKings",
+    "ticker": "DKNG",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
+  },
+  {
+    "n": 736,
+    "company": "Affirm",
+    "ticker": "AFRM",
+    "years": [
+      2024
+    ],
+    "type": "Momentum"
   }
 ]

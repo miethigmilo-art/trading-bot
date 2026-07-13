@@ -7,8 +7,8 @@ aber nur die ~86 selbst getrackten Symbole scannen, keinen ganzen Markt. Für
 die tägliche Suche über alle Aktien braucht es einen externen Screener mit
 diesen Kriterien.
 
-Stand: Backtest-Lauf mit Lookahead 10 Handelstage, 924 Fälle in der
-Wissensdatenbank (235 kuratiert + 689 automatisch erkannt). Basisrate (wie
+Stand: Backtest-Lauf mit Lookahead 10 Handelstage, 1.120 Fälle in der
+Wissensdatenbank (335 kuratiert + 785 automatisch erkannt). Basisrate (wie
 oft irgendwann ohnehin ein Squeeze folgt): ~4,2% aller Tage. Alle Werte sind
 Trefferquoten aus historischem Backtest, keine Garantie — bei kleinen
 Stichproben (n) entsprechend vorsichtig gewichten.
@@ -43,18 +43,20 @@ hochgeladenen Listen verifizierte, ohne die 689 blind erkannten Fälle).
 Das ist eine viel breitere, robustere Stichprobe als die regel-spezifische
 Analyse oben (dort nur 5-124 echte Signale je Regel).
 
+Basis: 332 von 335 kuratierten Fällen mit auswertbaren Kursdaten.
+
 | Kennzahl | Wert |
 |---|---|
-| Median-Rückgang nach Entry vor Squeeze-Start | −13,7% |
-| Schlechteste 10% der Fälle fielen mindestens | −37,3% |
+| Median-Rückgang nach Entry vor Squeeze-Start | −13,1% |
+| Schlechteste 10% der Fälle fielen mindestens | −40,3% |
 | Schlechtester Einzelfall | −82,6% |
 | Median Handelstage bis zum Tiefpunkt | 10 |
-| Median-Gewinn vom Entry bis zum Peak | +150,7% |
-| Schwächste 10% der Fälle erreichten höchstens | +29,0% |
-| Median Handelstage bis zum Peak | 45 |
+| Median-Gewinn vom Entry bis zum Peak | +148,0% |
+| Schwächste 10% der Fälle erreichten höchstens | +27,5% |
+| Median Handelstage bis zum Peak | 44 |
 | Längste beobachtete Zeit bis zum Peak | 60 Handelstage |
 
-**Grobe Faustregel daraus:** Stop-Loss bei ca. **35-40%** unter Entry, Take-Profit-Zone ab ca. **+29-30%** (erste Teilgewinne realistisch), mit Geduld für mehrere Wochen bis zum eigentlichen Peak (Median ~9 Wochen). Der schlechteste Einzelfall (−82,6%) zeigt: kein SL macht das Risiko vollständig beherrschbar, das bleibt spekulativ. Diese Zahlen sind bereits über zwei Ausbaustufen der Wissensdatenbank (175 → 235 kuratierte Fälle) auffällig stabil geblieben — ein gutes Zeichen für echte Konvergenz statt Zufall. Wachsen weiter mit jedem neuen Fall — bei Bedarf neu laufen lassen und hier aktualisieren.
+**Grobe Faustregel daraus:** Stop-Loss bei ca. **35-40%** unter Entry, Take-Profit-Zone ab ca. **+28-30%** (erste Teilgewinne realistisch), mit Geduld für mehrere Wochen bis zum eigentlichen Peak (Median ~9 Wochen). Der schlechteste Einzelfall (−82,6%) zeigt: kein SL macht das Risiko vollständig beherrschbar, das bleibt spekulativ. Diese Zahlen sind über DREI Ausbaustufen der Wissensdatenbank (172 → 232 → 332 auswertbare kuratierte Fälle) auffällig stabil geblieben (Median-Rückgang −13,7/−13,6/−13,1%, Median-Gewinn +150,7/+150,5/+148,0%) — ein starker Beleg für echte Konvergenz statt Zufall.
 
 ## Recall-Diagnose: Wie sieht der Tag VOR dem Anstieg aus? (230 Fälle)
 
@@ -135,21 +137,25 @@ Marktregimen getestet (Meme-Ära bis 2021, Bärenmarkt 2022–2023,
 KI/Quantum-Ära 2024+). Maßstab ist der Lift gegenüber der Basisrate der
 jeweiligen Ära:
 
+Stand: 1.120 Fälle in der Wissensdatenbank.
+
 | Regel | bis 2021 | 2022–23 | 2024+ | Urteil |
 |---|---|---|---|---|
-| Kapitulation (5d < −10%) | 1,8x | 1,7x | 1,6x | **universell** |
-| Downtrend + Kapitulation | 2,0x | 2,0x | 1,6x | **universell** |
-| Days to Cover > 5 + Kapitulation | 1,5x | 1,9x | 1,5x | **universell** |
-| RVOL>5 + 20d-Breakout + Uptrend | 2,4x (n=50) | 1,9x (n=27) | 3,7x (n=47) | positiv, aber n klein |
-| DTC>10 + 52w-Breakout + Uptrend | n=3 | n=0 | n=20 | **nicht belastbar** |
+| Kapitulation (5d < −10%) | 1,7x | 1,7x | 1,6x | **universell** |
+| Downtrend + Kapitulation | 1,9x | 2,0x | 1,7x | **universell** |
+| Days to Cover > 5 + Kapitulation | 1,3x | 1,4x | 1,4x | **universell** |
+| RVOL>5 + 20d-Breakout + Uptrend | 2,5x (n=55) | 1,4x (n=36) | 2,9x (n=62) | positiv, aber n klein |
+| DTC>10 + 52w-Breakout + Uptrend | 3,3x (n=14) | n=0 | 0,0x (n=19) | **nicht belastbar** |
 
 **Fazit:** Die Kapitulations-Familie ist regime-unabhängig — der Lift
-schwankt nur zwischen 1,5x und 2,0x über drei völlig verschiedene
-Marktphasen. Das ist die bislang beste Annäherung an eine "universelle
-Regel", die diese Plattform belegen kann. Die bullischen
-Hochpräzisions-Regeln sind dagegen selten und era-abhängig (im Bärenmarkt
-2022–23 feuerte die 52-Wochen-Hoch-Regel exakt null Mal) — als
-Bestätigungs-Signal brauchbar, als universelle Regel nicht.
+schwankt nur zwischen 1,3x und 2,0x über drei völlig verschiedene
+Marktphasen, und dieses Bild ist über den Ausbau der Wissensdatenbank
+(924 → 1.120 Fälle) praktisch unverändert geblieben. Das ist die bislang
+beste Annäherung an eine "universelle Regel", die diese Plattform belegen
+kann. Die bullischen Hochpräzisions-Regeln sind dagegen selten und
+era-abhängig (im Bärenmarkt 2022–23 feuerte die 52-Wochen-Hoch-Regel exakt
+null Mal, 2024+ null Treffer bei 19 Signalen) — als Bestätigungs-Signal
+brauchbar, als universelle Regel nicht.
 
 ## Kandidaten, die man findet, danach hier prüfen
 
