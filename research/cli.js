@@ -19,6 +19,7 @@ const { scanSymbols, formatScanReport } = require('./analysis/squeezeScore');
 const { computeDNAForSymbols, formatDNAReport } = require('./analysis/dnaEngine');
 const { collectPreEventStates, formatPreEventReport } = require('./analysis/recallDiagnosis');
 const { runIgnitionTest, formatIgnitionReport } = require('./analysis/ignition');
+const { runValidation, formatValidationReport } = require('./analysis/validation');
 const { buildControlFeatureSet } = require('./analysis/statistics');
 
 const command = process.argv[2] || 'run';
@@ -256,8 +257,17 @@ async function main() {
     return;
   }
 
+  if (command === 'validate:rules') {
+    const lookaheadDays = Number(process.argv[3]) || 10;
+    const db = getDb();
+    console.log('[Squeeze Research] Validiere Kernregeln über getrennte Marktregime (dauert je Ära einen Backtest-Lauf)...');
+    const eras = runValidation(db, { lookaheadDays });
+    console.log(formatValidationReport(eras, { lookaheadDays }));
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | stats:pre-event | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals] | risk:knowledge-base [entryLeadDays] | scan [lookaheadDays] [minSignals] | dna | ignition:test [lookaheadDays]`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | stats:pre-event | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals] | risk:knowledge-base [entryLeadDays] | scan [lookaheadDays] [minSignals] | dna | ignition:test [lookaheadDays] | validate:rules [lookaheadDays]`
   );
   process.exit(1);
 }
