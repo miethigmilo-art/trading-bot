@@ -21,6 +21,8 @@ const { collectPreEventStates, formatPreEventReport } = require('./analysis/reca
 const { runIgnitionTest, formatIgnitionReport } = require('./analysis/ignition');
 const { runValidation, formatValidationReport } = require('./analysis/validation');
 const { buildControlFeatureSet } = require('./analysis/statistics');
+const { backfillFloat, applyPercentOfFloat } = require('./collectors/floatData');
+const { runFloatAnalysis, formatFloatReport } = require('./analysis/floatAnalysis');
 
 const command = process.argv[2] || 'run';
 
@@ -266,8 +268,27 @@ async function main() {
     return;
   }
 
+  if (command === 'float:backfill') {
+    const force = process.argv.includes('--force');
+    const symbols = [...new Set([...watchlist, ...universe])];
+    console.log(`[Squeeze Research] Hole Float (Yahoo) für ${symbols.length} Symbole → knowledge/float_cache.json ...`);
+    const res = await backfillFloat(symbols, { force });
+    console.log(`Fertig: ${res.ok} neu geholt, ${res.skipped} gecacht, ${res.empty} ohne Float (delisted/fusioniert), ${res.error} Fehler.`);
+    return;
+  }
+
+  if (command === 'float:analyze') {
+    const db = getDb();
+    const applied = applyPercentOfFloat(db);
+    console.log(`[Squeeze Research] Short-Float-% aus Cache berechnet: ${applied.rowsUpdated} short_interest-Zeilen (${applied.symbols} Symbole).`);
+    const analysis = runFloatAnalysis(db);
+    console.log('');
+    console.log(formatFloatReport(analysis));
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | stats:pre-event | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals] | risk:knowledge-base [entryLeadDays] | scan [lookaheadDays] [minSignals] | dna | ignition:test [lookaheadDays] | validate:rules [lookaheadDays]`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | stats:pre-event | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals] | risk:knowledge-base [entryLeadDays] | scan [lookaheadDays] [minSignals] | dna | ignition:test [lookaheadDays] | validate:rules [lookaheadDays] | float:backfill [--force] | float:analyze`
   );
   process.exit(1);
 }

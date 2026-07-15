@@ -157,6 +157,45 @@ era-abhängig (im Bärenmarkt 2022–23 feuerte die 52-Wochen-Hoch-Regel exakt
 null Mal, 2024+ null Treffer bei 19 Signalen) — als Bestätigungs-Signal
 brauchbar, als universelle Regel nicht.
 
+## Leerverkaufsanteil (Short-Float-%) — trennt er Pump von echtem Squeeze?
+
+`node research/cli.js float:analyze` — direkte Antwort auf die Frage, ob der
+prozentuale Leerverkaufsanteil (Short Interest ÷ frei handelbarer Float, engl.
+"short float %") echte Short-Squeezes von reinen Pumps trennt. FINRA liefert
+nur die absolute Short-Menge, nicht den Float; der Float kommt hier aus Yahoo
+(`defaultKeyStatistics.floatShares`, keylos, echter Float statt nur Shares
+Outstanding) und wird pro FINRA-Settlement zu `percent_of_float` verrechnet.
+
+**⚠ Näherung:** Yahoo liefert den HEUTIGEN Float, nicht den historischen. Bei
+verwässernden Penny-Stocks (ständige Kapitalerhöhungen) ist der heutige Float
+oft viel größer als damals → der berechnete historische Short-Float-% ist zu
+niedrig; nach Reverse-Splits umgekehrt zu hoch (6 Fälle kamen rechnerisch über
+100% — real unmöglich, reines Artefakt). Für AKTUELLE Aktien im Screener ist
+der Wert dagegen korrekt.
+
+Ergebnis über 81 auswertbare kuratierte Fälle (Median Short-Float-% 6,1%):
+
+| Short-Float-Klasse | Fälle | Median-Anstieg |
+|---|---|---|
+| < 5% (kaum Shorts → eher Pump) | 34 | **+474%** |
+| 5–10% | 17 | +227% |
+| 10–20% | 14 | +194% |
+| 20–40% | 5 | +263% |
+| ≥ 40% (extrem → klassischer Squeeze) | 11 | +219% |
+
+Korrelation Short-Float-% ↔ Anstiegshöhe: **r = −0,13 (praktisch null)**.
+
+**Fazit:** Der Leerverkaufsanteil trennt die Anstiegshöhe NICHT — die Fälle mit
+dem GERINGSTEN Short-Float (< 5%) hatten sogar den größten Median-Anstieg. Das
+bestätigt die frühere Recall-Diagnose (Days-to-Cover am Vortag unter Baseline):
+ein hoher Short-Anteil ist ein netter Verstärker, aber kein Prädiktor für das
+OB und WIE STARK eines schnellen Anstiegs. Reine Pumps (News/Social-Momentum
+ohne nennenswerte Shorts) steigen genauso weit. Für die universelle Regel bleibt
+die Kapitulations-Familie der bessere Filter; der Short-Float-% ist bestenfalls
+ein zusätzliches Merkmal für die Unterkategorie "klassischer Short-Squeeze",
+nicht für "schneller Anstieg" allgemein. Im Screener also optional, nicht als
+Kernkriterium (TradingView: "Short interest ratio" / "Float short %").
+
 ## Kandidaten, die man findet, danach hier prüfen
 
 Sobald der externe Screener Kandidaten liefert: Ticker durch
