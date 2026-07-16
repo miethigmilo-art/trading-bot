@@ -1,1 +1,4 @@
 node_modules
+.env
+research/db/squeeze.db
+research/db/squeeze.db-*

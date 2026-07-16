@@ -1,0 +1,123 @@
+[
+  {
+    "symbol": "GME",
+    "eventName": "GameStop Short Squeeze Jan 2021",
+    "startDate": "2021-01-04",
+    "peakDate": "2021-01-28",
+    "endDate": "2021-02-19",
+    "triggerType": "Social / Short-Squeeze-Mechanik",
+    "triggerDescription": "Reddit-Community r/wallstreetbets (u.a. Keith Gill/DeepFuckingValue) machte auf den extrem hohen, von S3 Partners gemeldeten Short-Interest (zeitweise >100% des Float) aufmerksam; koordinierte Retail-Käufe plus ein Gamma-Squeeze durch Optionsmarktmacher trieben den Kurs parabolisch nach oben.",
+    "chartPattern": "Keine klassische Breakout-Formation; mehrwöchige Akkumulationsbasis seit Dez 2020, danach parabolischer Anstieg ohne technisches Setup.",
+    "metricsAtTrigger": {
+      "shortFloatPercent": 140,
+      "floatSharesMillion": 50,
+      "borrowFeePercent": "20-50 (stark schwankend)",
+      "daysToCover": "5+"
+    },
+    "priceBefore": 17.25,
+    "pricePeak": 483,
+    "riseDurationDays": 17,
+    "priceAfter": 40,
+    "dropDurationDays": 14,
+    "ruleWouldDetect": "Short Float >100% UND RVOL >5 UND parabolischer Breakout — hätte den Fall erkannt, aber erst NACH Beginn des Anstiegs. Der eigentliche Auslöser war ein Social-Katalysator, kein klassisches Chartsignal.",
+    "ruleFalsePositiveRisk": "Eine reine 'Short Float hoch + Ascending Triangle'-Regel hätte GME schon Monate vorher (Sommer/Herbst 2020) fälschlich als Signal markiert, ohne dass der Squeeze eintrat — der Social-Katalysator fehlte als Bedingung.",
+    "source": "Öffentliche Berichterstattung (Reuters, Bloomberg, S3 Partners) Jan/Feb 2021 — Näherungswerte, vor Verwendung in Backtests gegen Primärquellen (SEC, FINRA) verifizieren.",
+    "notes": "GME vollzog im Juli 2022 einen 4:1-Aktiensplit. Die Kurse hier sind NICHT split-bereinigt (Original-Nominalwerte von Jan 2021); die von diesem Collector via Yahoo abgerufenen historischen Kurse können split-bereinigt sein — beim Abgleich beachten."
+  },
+  {
+    "symbol": "AMC",
+    "eventName": "AMC \"Ape\" Squeeze Mai/Juni 2021",
+    "startDate": "2021-05-24",
+    "peakDate": "2021-06-02",
+    "endDate": "2021-06-21",
+    "triggerType": "Social / Retail-Koordination",
+    "triggerDescription": "Koordinierte Kaufwelle der Reddit-Community (r/amcstock, r/wallstreetbets) auf Basis von weiterhin hohem Short Interest (~20% des Float) nach der GME-Bewegung im Januar; zusätzlich befeuert durch die Kontroverse um eine geplante Aktienkapitalerhöhung (Mudrick Capital) Ende Mai 2021.",
+    "chartPattern": "Bull Flag / Ascending Triangle Ausbruch Ende Mai 2021, von Retail-Chartisten vielfach als Setup genannt.",
+    "metricsAtTrigger": {
+      "shortFloatPercent": 20,
+      "borrowFeePercent": "5-15",
+      "rvol": "10+ an Spitzentagen"
+    },
+    "priceBefore": 13.05,
+    "pricePeak": 72.62,
+    "riseDurationDays": 7,
+    "priceAfter": 30,
+    "dropDurationDays": 12,
+    "ruleWouldDetect": "RVOL >8 UND Kursanstieg >50% in 3 Tagen UND Short Float >15% — hätte den Ausbruch ab ca. 27./28. Mai 2021 erkannt.",
+    "ruleFalsePositiveRisk": "AMC hatte bereits im Januar 2021 einen kleineren, ähnlich aussehenden Spike (Short Float + Meme-Aufmerksamkeit), der sich nicht annähernd so stark fortsetzte wie im Juni — eine Regel ohne Volumen-/Momentum-Bestätigung hätte im Januar einen Fehlalarm ausgelöst.",
+    "source": "Öffentliche Berichterstattung (CNBC, Reuters) Mai/Juni 2021 — Näherungswerte, vor Verwendung in Backtests verifizieren.",
+    "notes": ""
+  },
+  {
+    "symbol": "SPRT",
+    "eventName": "Support.com / Greenidge-Merger-Squeeze Aug/Sep 2021",
+    "startDate": "2021-08-05",
+    "peakDate": "2021-09-01",
+    "endDate": "2021-09-24",
+    "triggerType": "M&A / Short-Squeeze-Mechanik",
+    "triggerDescription": "Die im Juni 2021 angekündigte Fusion mit Greenidge Generation (Krypto-Mining) traf auf extrem hohen Short Interest bei sehr kleinem Float; Merger-Arbitrage-Mechanik plus Reddit-Aufmerksamkeit verstärkten die Bewegung.",
+    "chartPattern": "Ascending Triangle vor dem Breakout; EMA20 kreuzte EMA50 von unten kurz vor dem stärksten Anstieg.",
+    "metricsAtTrigger": {
+      "shortFloatPercent": 63,
+      "floatSharesMillion": 26,
+      "borrowFeePercent": 140,
+      "rvol": 8
+    },
+    "priceBefore": 8.5,
+    "pricePeak": 50,
+    "riseDurationDays": 19,
+    "priceAfter": 12,
+    "dropDurationDays": 15,
+    "ruleWouldDetect": "Short Float >35% UND RVOL >4 UND Ascending Triangle UND Borrow Fee >30% — genau das in Modul 7 skizzierte Regel-Set (Version 1-2) hätte diesen Fall erkannt.",
+    "ruleFalsePositiveRisk": "Small-Cap-Aktien mit hohem Borrow Fee ohne Katalysator (hier: die Merger-Ankündigung) bleiben oft lange illiquide, ohne zu squeezen — eine Regel ohne Katalysator-Bedingung hätte viele ähnliche Fälle fälschlich markiert.",
+    "source": "Öffentliche Berichterstattung (Bloomberg, MarketWatch) Aug/Sep 2021 — entsprechen den in der ursprünglichen Projektbeschreibung genannten Referenzwerten; vor Backtests verifizieren.",
+    "notes": "SPRT wurde nach Abschluss der Greenidge-Fusion im Januar 2022 zu GREE. Unter dem Ticker SPRT sind bei Yahoo Finance daher keine aktuellen Kursdaten mehr abrufbar."
+  },
+  {
+    "symbol": "BBBY-2022",
+    "eventName": "Bed Bath & Beyond Ryan-Cohen-Squeeze Aug 2022",
+    "startDate": "2022-07-29",
+    "peakDate": "2022-08-17",
+    "endDate": "2022-08-23",
+    "triggerType": "Social / Aktivisten-Investor",
+    "triggerDescription": "Aktivisten-Investor Ryan Cohen (bekannt von GameStop) hatte im März 2022 einen 9,8%-Anteil offengelegt und baute im August 2022 zusätzlich Call-Optionen auf; kombiniert mit sehr hohem Short Interest (47,2% des Float laut Ortex/S3-Daten, Days to Cover 2,3) trieb Retail-Hype den Kurs in drei Wochen mehr als vervierfacht. Der Crash kam, als eine Pflichtmitteilung offenlegte, dass Cohen genau in dieser Phase seine gesamte Position verkauft hatte.",
+    "chartPattern": "Kein dokumentiertes klassisches Chartmuster vor dem Ausbruch — primär news-/social-getrieben, nicht technisch vorbereitet.",
+    "metricsAtTrigger": {
+      "shortFloatPercent": 47.2,
+      "daysToCover": 2.3
+    },
+    "priceBefore": 5.03,
+    "pricePeak": 23.08,
+    "riseDurationDays": 13,
+    "priceAfter": 8.78,
+    "dropDurationDays": 4,
+    "ruleWouldDetect": "Short Float >35% UND RVOL-Spike UND Insider-/Aktivisten-Kauf als Katalysator — hätte den Ausbruch ab Anfang August 2022 erkannt. Der Crash selbst (Cohens Verkauf) wäre durch keine unserer aktuellen Regeln vorhersehbar gewesen, da er auf einer nicht-öffentlichen Insider-Entscheidung beruhte, die erst per Pflichtmitteilung bekannt wurde.",
+    "ruleFalsePositiveRisk": "Extrem kurze Rise/Drop-Dauer (Peak zu -60% in nur 4 Handelstagen) zeigt: Regeln ohne Ausstiegs-/Risikologik hätten hier zwar den Einstieg erkannt, aber keinen Schutz vor dem ebenso plötzlichen Kollaps geboten.",
+    "source": "Bloomberg (\"Ryan Cohen's Fans Lose Millions...\"), Benzinga, CNBC, Forbes — Aug 2022.",
+    "notes": "WICHTIG (Datenintegrität): Der Ticker BBBY gehört seit 2023 zu einer ANDEREN Gesellschaft — Overstock.com kaufte die Markenrechte aus der Insolvenz und benannte sich selbst in 'Bed Bath & Beyond Inc.' um, inkl. Übernahme des Tickers BBBY. Die von diesem Collector unter 'BBBY' abgerufenen Kursdaten (unsere Watchlist) sind die von Overstock/Beyond Inc. und haben NICHTS mit diesem historischen Fall zu tun — verifiziert durch eigenen Testabruf (Yahoo zeigt für 'BBBY' im Sommer 2022 durchgehend ~$30, nicht den hier beschriebenen Anstieg von $5 auf $23). Die Original-Gesellschaft ist unter Yahoo Finance nicht mehr abrufbar (auch nicht unter BBBYQ, 404). Deshalb bewusst das Pseudo-Symbol 'BBBY-2022' verwendet, das mit keinem echten Ticker kollidiert — ein backfill:events-Lauf schlägt dafür kontrolliert fehl (404) statt die prices-Tabelle mit falschen Daten zu verunreinigen. Alle Werte hier sind ausschließlich manuell recherchiert, siehe source."
+  },
+  {
+    "symbol": "VOW3-2008",
+    "eventName": "Volkswagen/Porsche Short Squeeze Okt 2008",
+    "startDate": "2008-10-24",
+    "peakDate": "2008-10-28",
+    "endDate": "2008-11-07",
+    "triggerType": "Übernahme-Mechanik / Extremer Float-Squeeze",
+    "triggerDescription": "Porsche legte in einer Pflichtmitteilung offen, über Aktien und Optionen bereits ca. 74% der VW-Stammaktien zu kontrollieren; zusammen mit dem 20%-Anteil des Landes Niedersachsen schrumpfte der frei handelbare Float von zuvor ~45% auf ca. 1% des Grundkapitals. Gleichzeitig waren rund 12,8% der Aktien leerverkauft — Shortseller fanden praktisch keine Aktien mehr zum Eindecken und mussten zu jedem Preis kaufen.",
+    "chartPattern": "Kein technisches Setup — ausgelöst durch eine regulatorische Pflichtmitteilung zur Aktionärsstruktur, nicht durch einen Chart-Breakout oder Momentum-Aufbau.",
+    "metricsAtTrigger": {
+      "shortFloatPercent": 12.8,
+      "freeFloatPercent": 1,
+      "porscheStakePercent": 74
+    },
+    "priceBefore": 210,
+    "pricePeak": 1005,
+    "riseDurationDays": 3,
+    "priceAfter": 300,
+    "dropDurationDays": 8,
+    "ruleWouldDetect": "Kein auf Kursmustern oder klassischem Short-Float basierendes Regel-Set hätte dies erkannt — der nominale Short Float (12,8%) war für sich genommen unauffällig. Der eigentliche Risikofaktor war die plötzliche Float-Verknappung durch eine Übernahme-Offenlegung, eine Kennzahl, die keines unserer aktuellen Module erfasst.",
+    "ruleFalsePositiveRisk": "Zeigt eine strukturelle Lücke: jede Regel, die nur auf Short Float schaut, hätte diesen bis heute größten Short Squeeze der Geschichte komplett verpasst. Für zukünftige Module wäre eine 'Free Float Änderung' bzw. 'Insider-/Großaktionärs-Meldungen'-Kennzahl nötig, die wir aktuell nicht sammeln.",
+    "source": "TradingSim, IMD Business School Case Study, International Banker, ScienceDirect/Harvard Law School Forum on Corporate Governance (\"Market Efficiency and Limits to Arbitrage: Evidence from the Volkswagen Short Squeeze\") — Okt 2008.",
+    "notes": "Deutsche Aktie (XETRA, reale Kennung wäre VOW3.DE), kein US-Titel — unsere FINRA-Short-Interest-Daten und der Yahoo-Backfill decken diesen Markt/Zeitraum nicht sinnvoll ab (andere Börse, andere Währung, kein FINRA-Short-Interest für nicht-US-Titel). Bewusst das Pseudo-Symbol 'VOW3-2008' verwendet, das mit keinem in dieser Plattform aktiv getrackten Ticker kollidiert; backfill:events schlägt dafür kontrolliert fehl statt falsche Daten zu erzeugen. Alle Werte manuell recherchiert, siehe source. Preise in Euro, alle anderen Fälle in dieser Datenbank in USD."
+  }
+]

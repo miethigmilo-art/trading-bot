@@ -1,0 +1,695 @@
+[
+  {
+    "symbol": "AI",
+    "date": "2023-04-25",
+    "articleCount": 2,
+    "avgSentiment": 0.3443965,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "AI",
+    "date": "2023-06-02",
+    "articleCount": 1,
+    "avgSentiment": -0.694949,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "AMC",
+    "date": "2022-12-14",
+    "articleCount": 1,
+    "avgSentiment": 0.469774,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "AMC",
+    "date": "2023-01-01",
+    "articleCount": 1,
+    "avgSentiment": 0.450802,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "AMC",
+    "date": "2023-02-06",
+    "articleCount": 1,
+    "avgSentiment": 0.261993,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "AMC",
+    "date": "2023-02-22",
+    "articleCount": 1,
+    "avgSentiment": 0.442771,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "AMC",
+    "date": "2024-04-26",
+    "articleCount": 1,
+    "avgSentiment": 0.112586,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "BB",
+    "date": "2025-02-19",
+    "articleCount": 1,
+    "avgSentiment": 0.480111,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "BBAI",
+    "date": "2023-01-12",
+    "articleCount": 2,
+    "avgSentiment": 0.8237734999999999,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "BBAI",
+    "date": "2023-01-19",
+    "articleCount": 2,
+    "avgSentiment": 0.476338,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2022-12-21",
+    "articleCount": 1,
+    "avgSentiment": -0.641452,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2022-12-22",
+    "articleCount": 2,
+    "avgSentiment": -0.11349700000000001,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2022-12-23",
+    "articleCount": 2,
+    "avgSentiment": -0.314268,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2022-12-28",
+    "articleCount": 2,
+    "avgSentiment": 0.140316,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2022-12-29",
+    "articleCount": 1,
+    "avgSentiment": -0.33495,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2022-12-30",
+    "articleCount": 2,
+    "avgSentiment": 0.05501500000000001,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2022-12-31",
+    "articleCount": 3,
+    "avgSentiment": 0.09336133333333334,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-03",
+    "articleCount": 1,
+    "avgSentiment": 0.148254,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-04",
+    "articleCount": 2,
+    "avgSentiment": -0.326567,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-05",
+    "articleCount": 1,
+    "avgSentiment": -0.10078,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-06",
+    "articleCount": 1,
+    "avgSentiment": 0.119559,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-09",
+    "articleCount": 1,
+    "avgSentiment": -0.328686,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-11",
+    "articleCount": 2,
+    "avgSentiment": 0.0436725,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-12",
+    "articleCount": 2,
+    "avgSentiment": -0.09069650000000001,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-17",
+    "articleCount": 1,
+    "avgSentiment": 0.228967,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-18",
+    "articleCount": 2,
+    "avgSentiment": 0.03961700000000001,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-19",
+    "articleCount": 2,
+    "avgSentiment": 0.206119,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-20",
+    "articleCount": 2,
+    "avgSentiment": -0.056726,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-23",
+    "articleCount": 1,
+    "avgSentiment": -0.313751,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-24",
+    "articleCount": 2,
+    "avgSentiment": -0.025887500000000008,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-25",
+    "articleCount": 2,
+    "avgSentiment": 0.33666549999999995,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-26",
+    "articleCount": 2,
+    "avgSentiment": -0.038232000000000016,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-01-27",
+    "articleCount": 2,
+    "avgSentiment": -0.13629950000000002,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-02-01",
+    "articleCount": 2,
+    "avgSentiment": 0.2628505,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-02-02",
+    "articleCount": 2,
+    "avgSentiment": 0.493108,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-02-03",
+    "articleCount": 2,
+    "avgSentiment": -0.262232,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-02-06",
+    "articleCount": 2,
+    "avgSentiment": 0.1248545,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-02-07",
+    "articleCount": 1,
+    "avgSentiment": 0.204272,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "COIN",
+    "date": "2023-02-09",
+    "articleCount": 2,
+    "avgSentiment": -0.3866345,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "CVNA",
+    "date": "2023-05-15",
+    "articleCount": 1,
+    "avgSentiment": 0.452591,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "CVNA",
+    "date": "2023-05-26",
+    "articleCount": 1,
+    "avgSentiment": -0.635559,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "CVNA",
+    "date": "2023-06-30",
+    "articleCount": 1,
+    "avgSentiment": -0.712176,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "CVNA",
+    "date": "2023-07-12",
+    "articleCount": 1,
+    "avgSentiment": 0.427481,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "CVNA",
+    "date": "2023-07-19",
+    "articleCount": 1,
+    "avgSentiment": 0.506799,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "DJT",
+    "date": "2024-09-20",
+    "articleCount": 1,
+    "avgSentiment": -0.731016,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "DJT",
+    "date": "2024-09-26",
+    "articleCount": 1,
+    "avgSentiment": -0.388808,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "DJT",
+    "date": "2024-10-02",
+    "articleCount": 1,
+    "avgSentiment": 0.115242,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "DJT",
+    "date": "2024-10-23",
+    "articleCount": 1,
+    "avgSentiment": -0.333512,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "DNUT",
+    "date": "2025-06-24",
+    "articleCount": 4,
+    "avgSentiment": -0.45439850000000004,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "DNUT",
+    "date": "2025-06-27",
+    "articleCount": 1,
+    "avgSentiment": -0.227224,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "DNUT",
+    "date": "2025-07-23",
+    "articleCount": 3,
+    "avgSentiment": 0.2983766666666667,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "DNUT",
+    "date": "2025-07-24",
+    "articleCount": 1,
+    "avgSentiment": 0.100904,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "GPRO",
+    "date": "2025-07-23",
+    "articleCount": 1,
+    "avgSentiment": -0.260165,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "GPRO",
+    "date": "2025-08-05",
+    "articleCount": 2,
+    "avgSentiment": -0.064742,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "GPRO",
+    "date": "2025-09-04",
+    "articleCount": 1,
+    "avgSentiment": 0.077391,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "GPRO",
+    "date": "2025-09-11",
+    "articleCount": 1,
+    "avgSentiment": -0.243316,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "GPRO",
+    "date": "2025-09-23",
+    "articleCount": 1,
+    "avgSentiment": 0.731304,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "GPRO",
+    "date": "2025-09-26",
+    "articleCount": 1,
+    "avgSentiment": -0.189596,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "GPRO",
+    "date": "2025-10-03",
+    "articleCount": 1,
+    "avgSentiment": 0.228761,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KOSS",
+    "date": "2024-05-13",
+    "articleCount": 1,
+    "avgSentiment": 0.322065,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KOSS",
+    "date": "2024-07-03",
+    "articleCount": 2,
+    "avgSentiment": 0.6502025,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KOSS",
+    "date": "2024-07-05",
+    "articleCount": 1,
+    "avgSentiment": 0.431786,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KSS",
+    "date": "2025-04-29",
+    "articleCount": 1,
+    "avgSentiment": -0.445105,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KSS",
+    "date": "2025-05-01",
+    "articleCount": 1,
+    "avgSentiment": -0.38124,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KSS",
+    "date": "2025-05-02",
+    "articleCount": 2,
+    "avgSentiment": -0.186024,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KSS",
+    "date": "2025-05-09",
+    "articleCount": 2,
+    "avgSentiment": -0.5077765,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KSS",
+    "date": "2025-05-29",
+    "articleCount": 1,
+    "avgSentiment": -0.339544,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KSS",
+    "date": "2025-06-02",
+    "articleCount": 1,
+    "avgSentiment": 0.039086,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KSS",
+    "date": "2025-06-05",
+    "articleCount": 1,
+    "avgSentiment": -0.422784,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KSS",
+    "date": "2025-06-06",
+    "articleCount": 3,
+    "avgSentiment": -0.3075856666666667,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KSS",
+    "date": "2025-06-16",
+    "articleCount": 1,
+    "avgSentiment": 0.125749,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "KSS",
+    "date": "2025-07-22",
+    "articleCount": 3,
+    "avgSentiment": 0.3515003333333333,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "MEGL",
+    "date": "2023-01-05",
+    "articleCount": 1,
+    "avgSentiment": 0.190248,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "OPEN",
+    "date": "2025-07-08",
+    "articleCount": 1,
+    "avgSentiment": 0.00948,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "OPEN",
+    "date": "2025-08-06",
+    "articleCount": 1,
+    "avgSentiment": 0.003751,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "OPEN",
+    "date": "2025-08-18",
+    "articleCount": 1,
+    "avgSentiment": 0.64695,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "OPEN",
+    "date": "2025-08-21",
+    "articleCount": 1,
+    "avgSentiment": 0.513699,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "OPEN",
+    "date": "2025-09-15",
+    "articleCount": 1,
+    "avgSentiment": 0.423017,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "PSNY",
+    "date": "2024-08-28",
+    "articleCount": 1,
+    "avgSentiment": 0.030786,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "PSNY",
+    "date": "2024-08-29",
+    "articleCount": 2,
+    "avgSentiment": -0.101845,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "PSNY",
+    "date": "2024-09-28",
+    "articleCount": 1,
+    "avgSentiment": -0.746949,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "RDDT",
+    "date": "2024-10-01",
+    "articleCount": 1,
+    "avgSentiment": 0.031674,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "RDDT",
+    "date": "2024-11-13",
+    "articleCount": 1,
+    "avgSentiment": 0.33997,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "RDDT",
+    "date": "2024-11-21",
+    "articleCount": 1,
+    "avgSentiment": 0.108211,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "RDDT",
+    "date": "2025-01-04",
+    "articleCount": 1,
+    "avgSentiment": 0.199352,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "RDDT",
+    "date": "2025-02-12",
+    "articleCount": 1,
+    "avgSentiment": 0.413616,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "RDDT",
+    "date": "2025-02-13",
+    "articleCount": 3,
+    "avgSentiment": -0.140328,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "RUM",
+    "date": "2024-11-06",
+    "articleCount": 1,
+    "avgSentiment": -0.436304,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "RUM",
+    "date": "2024-11-11",
+    "articleCount": 1,
+    "avgSentiment": -0.821739,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "RUM",
+    "date": "2024-12-23",
+    "articleCount": 2,
+    "avgSentiment": 0.5380515,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "RUM",
+    "date": "2024-12-26",
+    "articleCount": 1,
+    "avgSentiment": 0.025721,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "SOUN",
+    "date": "2024-01-26",
+    "articleCount": 1,
+    "avgSentiment": 0.408503,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "SOUN",
+    "date": "2024-03-01",
+    "articleCount": 1,
+    "avgSentiment": 0.129069,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "SOUN",
+    "date": "2024-03-04",
+    "articleCount": 1,
+    "avgSentiment": -0.398196,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "UPST",
+    "date": "2023-06-14",
+    "articleCount": 1,
+    "avgSentiment": 0.635684,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "VFS",
+    "date": "2023-07-11",
+    "articleCount": 1,
+    "avgSentiment": 0.457784,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "VFS",
+    "date": "2023-07-28",
+    "articleCount": 1,
+    "avgSentiment": 0.88481,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "VFS",
+    "date": "2023-07-29",
+    "articleCount": 1,
+    "avgSentiment": 0.027799,
+    "source": "alphavantage"
+  },
+  {
+    "symbol": "VFS",
+    "date": "2023-08-25",
+    "articleCount": 1,
+    "avgSentiment": 0.426494,
+    "source": "alphavantage"
+  }
+]

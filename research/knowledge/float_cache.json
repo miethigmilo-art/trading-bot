@@ -1,0 +1,417 @@
+{
+  "ACB": {
+    "floatShares": 61543239,
+    "sharesOutstanding": 61942146,
+    "fetchedAt": "2026-07-15"
+  },
+  "AEMD": {
+    "floatShares": 2351382,
+    "sharesOutstanding": 2633560,
+    "fetchedAt": "2026-07-15"
+  },
+  "AMC": {
+    "floatShares": 570258963,
+    "sharesOutstanding": 892604638,
+    "fetchedAt": "2026-07-15"
+  },
+  "ASTS": {
+    "floatShares": 265964942,
+    "sharesOutstanding": 298746383,
+    "fetchedAt": "2026-07-15"
+  },
+  "ATER": {
+    "floatShares": 6547836,
+    "sharesOutstanding": 10818910,
+    "fetchedAt": "2026-07-15"
+  },
+  "ATOS": {
+    "floatShares": 8576571,
+    "sharesOutstanding": 9974997,
+    "fetchedAt": "2026-07-15"
+  },
+  "AVXL": {
+    "floatShares": 89783179,
+    "sharesOutstanding": 92671758,
+    "fetchedAt": "2026-07-15"
+  },
+  "BB": {
+    "floatShares": 584611736,
+    "sharesOutstanding": 586100431,
+    "fetchedAt": "2026-07-15"
+  },
+  "BBAI": {
+    "floatShares": 474705958,
+    "sharesOutstanding": 478949450,
+    "fetchedAt": "2026-07-15"
+  },
+  "BBIG": {
+    "floatShares": 11665321,
+    "sharesOutstanding": 13000000,
+    "fetchedAt": "2026-07-15"
+  },
+  "BCTX": {
+    "floatShares": 7859562,
+    "sharesOutstanding": 8699787,
+    "fetchedAt": "2026-07-15"
+  },
+  "BKKT": {
+    "floatShares": 35272292,
+    "sharesOutstanding": 44706924,
+    "fetchedAt": "2026-07-15"
+  },
+  "BKSY": {
+    "floatShares": 31585719,
+    "sharesOutstanding": 37109026,
+    "fetchedAt": "2026-07-15"
+  },
+  "BLNK": {
+    "floatShares": 141550014,
+    "sharesOutstanding": 143682259,
+    "fetchedAt": "2026-07-15"
+  },
+  "BNGO": {
+    "floatShares": 10342532,
+    "sharesOutstanding": 11475000,
+    "fetchedAt": "2026-07-15"
+  },
+  "BTAI": {
+    "floatShares": 26355271,
+    "sharesOutstanding": 30877605,
+    "fetchedAt": "2026-07-15"
+  },
+  "BTBT": {
+    "floatShares": 341399982,
+    "sharesOutstanding": 353400000,
+    "fetchedAt": "2026-07-15"
+  },
+  "BYND": {
+    "floatShares": 499366778,
+    "sharesOutstanding": 515342392,
+    "fetchedAt": "2026-07-15"
+  },
+  "CAN": {
+    "floatShares": 552607335,
+    "sharesOutstanding": 724729417,
+    "fetchedAt": "2026-07-15"
+  },
+  "CGC": {
+    "floatShares": 421745402,
+    "sharesOutstanding": 422154892,
+    "fetchedAt": "2026-07-15"
+  },
+  "CHPT": {
+    "floatShares": 23889788,
+    "sharesOutstanding": 25897631,
+    "fetchedAt": "2026-07-15"
+  },
+  "CIFR": {
+    "floatShares": 335641228,
+    "sharesOutstanding": 409049197,
+    "fetchedAt": "2026-07-15"
+  },
+  "CLOV": {
+    "floatShares": 408454227,
+    "sharesOutstanding": 430969398,
+    "fetchedAt": "2026-07-15"
+  },
+  "CLSK": {
+    "floatShares": 247704287,
+    "sharesOutstanding": 256608606,
+    "fetchedAt": "2026-07-15"
+  },
+  "CRON": {
+    "floatShares": 192237909,
+    "sharesOutstanding": 373662039,
+    "fetchedAt": "2026-07-15"
+  },
+  "CTRM": {
+    "floatShares": 9651146,
+    "sharesOutstanding": 9662354,
+    "fetchedAt": "2026-07-15"
+  },
+  "CVNA": {
+    "floatShares": 702843652,
+    "sharesOutstanding": 716288385,
+    "fetchedAt": "2026-07-15"
+  },
+  "CYTK": {
+    "floatShares": 123870130,
+    "sharesOutstanding": 135770593,
+    "fetchedAt": "2026-07-15"
+  },
+  "EBON": {
+    "floatShares": 4613934,
+    "sharesOutstanding": 4726424,
+    "fetchedAt": "2026-07-15"
+  },
+  "ENVB": {
+    "floatShares": 3543887,
+    "sharesOutstanding": 4028477,
+    "fetchedAt": "2026-07-15"
+  },
+  "EVGO": {
+    "floatShares": 133185431,
+    "sharesOutstanding": 141059365,
+    "fetchedAt": "2026-07-15"
+  },
+  "FAMI": {
+    "floatShares": 5329493,
+    "sharesOutstanding": 37434077,
+    "fetchedAt": "2026-07-15"
+  },
+  "FCEL": {
+    "floatShares": 67475661,
+    "sharesOutstanding": 79929602,
+    "fetchedAt": "2026-07-15"
+  },
+  "GFAI": {
+    "floatShares": 28566945,
+    "sharesOutstanding": 31250418,
+    "fetchedAt": "2026-07-15"
+  },
+  "GLBS": {
+    "floatShares": 12747154,
+    "sharesOutstanding": 21582301,
+    "fetchedAt": "2026-07-15"
+  },
+  "GME": {
+    "floatShares": 408807091,
+    "sharesOutstanding": 448691257,
+    "fetchedAt": "2026-07-15"
+  },
+  "GREE": {
+    "floatShares": 11898208,
+    "sharesOutstanding": 15286349,
+    "fetchedAt": "2026-07-15"
+  },
+  "GSAT": {
+    "floatShares": 51646937,
+    "sharesOutstanding": 128788931,
+    "fetchedAt": "2026-07-15"
+  },
+  "HIVE": {
+    "floatShares": 264978480,
+    "sharesOutstanding": 267430821,
+    "fetchedAt": "2026-07-15"
+  },
+  "HUT": {
+    "floatShares": 86843839,
+    "sharesOutstanding": 112594112,
+    "fetchedAt": "2026-07-15"
+  },
+  "HYLN": {
+    "floatShares": 125554860,
+    "sharesOutstanding": 178327240,
+    "fetchedAt": "2026-07-15"
+  },
+  "IBIO": {
+    "floatShares": 45473768,
+    "sharesOutstanding": 49678561,
+    "fetchedAt": "2026-07-15"
+  },
+  "INDO": {
+    "floatShares": 9922512,
+    "sharesOutstanding": 15386840,
+    "fetchedAt": "2026-07-15"
+  },
+  "INO": {
+    "floatShares": 81883262,
+    "sharesOutstanding": 82273237,
+    "fetchedAt": "2026-07-15"
+  },
+  "INVZ": {
+    "floatShares": 201885185,
+    "sharesOutstanding": 221365334,
+    "fetchedAt": "2026-07-15"
+  },
+  "IONQ": {
+    "floatShares": 370504018,
+    "sharesOutstanding": 373269948,
+    "fetchedAt": "2026-07-15"
+  },
+  "KOSS": {
+    "floatShares": 5498391,
+    "sharesOutstanding": 9466438,
+    "fetchedAt": "2026-07-15"
+  },
+  "LIDR": {
+    "floatShares": 44853587,
+    "sharesOutstanding": 46314820,
+    "fetchedAt": "2026-07-15"
+  },
+  "MARA": {
+    "floatShares": 372981682,
+    "sharesOutstanding": 381270503,
+    "fetchedAt": "2026-07-15"
+  },
+  "MIGI": {
+    "floatShares": 3594960,
+    "sharesOutstanding": 5486730,
+    "fetchedAt": "2026-07-15"
+  },
+  "MVIS": {
+    "floatShares": 326253066,
+    "sharesOutstanding": 344645965,
+    "fetchedAt": "2026-07-15"
+  },
+  "NOK": {
+    "floatShares": 4441396370,
+    "sharesOutstanding": 5582534171,
+    "fetchedAt": "2026-07-15"
+  },
+  "OCGN": {
+    "floatShares": 316842916,
+    "sharesOutstanding": 338521856,
+    "fetchedAt": "2026-07-15"
+  },
+  "OGI": {
+    "floatShares": 98207471,
+    "sharesOutstanding": 140775022,
+    "fetchedAt": "2026-07-15"
+  },
+  "OUST": {
+    "floatShares": 61501701,
+    "sharesOutstanding": 67294825,
+    "fetchedAt": "2026-07-15"
+  },
+  "PHIO": {
+    "floatShares": 11538137,
+    "sharesOutstanding": 11617250,
+    "fetchedAt": "2026-07-15"
+  },
+  "PHUN": {
+    "floatShares": 19683708,
+    "sharesOutstanding": 20447419,
+    "fetchedAt": "2026-07-15"
+  },
+  "PL": {
+    "floatShares": 294402743,
+    "sharesOutstanding": 332908730,
+    "fetchedAt": "2026-07-15"
+  },
+  "PLUG": {
+    "floatShares": 1330316295,
+    "sharesOutstanding": 1395069082,
+    "fetchedAt": "2026-07-15"
+  },
+  "QS": {
+    "floatShares": 504726535,
+    "sharesOutstanding": 578338434,
+    "fetchedAt": "2026-07-15"
+  },
+  "QUBT": {
+    "floatShares": 200414900,
+    "sharesOutstanding": 225534987,
+    "fetchedAt": "2026-07-15"
+  },
+  "RDW": {
+    "floatShares": 195588977,
+    "sharesOutstanding": 238825345,
+    "fetchedAt": "2026-07-15"
+  },
+  "RGTI": {
+    "floatShares": 327662124,
+    "sharesOutstanding": 332398807,
+    "fetchedAt": "2026-07-15"
+  },
+  "RIOT": {
+    "floatShares": 348765098,
+    "sharesOutstanding": 378151230,
+    "fetchedAt": "2026-07-15"
+  },
+  "SBLK": {
+    "floatShares": 66868367,
+    "sharesOutstanding": 111530926,
+    "fetchedAt": "2026-07-15"
+  },
+  "SENS": {
+    "floatShares": 38471891,
+    "sharesOutstanding": 52202965,
+    "fetchedAt": "2026-07-15"
+  },
+  "SHIP": {
+    "floatShares": 14402964,
+    "sharesOutstanding": 21668198,
+    "fetchedAt": "2026-07-15"
+  },
+  "SLGL": {
+    "floatShares": 546771,
+    "sharesOutstanding": 3268991,
+    "fetchedAt": "2026-07-15"
+  },
+  "SNDL": {
+    "floatShares": 225820662,
+    "sharesOutstanding": 260300000,
+    "fetchedAt": "2026-07-15"
+  },
+  "SNOA": {
+    "floatShares": 4765796,
+    "sharesOutstanding": 4785801,
+    "fetchedAt": "2026-07-15"
+  },
+  "SOS": {
+    "floatShares": 12978813,
+    "sharesOutstanding": 13235873,
+    "fetchedAt": "2026-07-15"
+  },
+  "SOUN": {
+    "floatShares": 393205835,
+    "sharesOutstanding": 403138772,
+    "fetchedAt": "2026-07-15"
+  },
+  "SPCE": {
+    "floatShares": 100020941,
+    "sharesOutstanding": 128537275,
+    "fetchedAt": "2026-07-15"
+  },
+  "STEM": {
+    "floatShares": 8657432,
+    "sharesOutstanding": 8956953,
+    "fetchedAt": "2026-07-15"
+  },
+  "TLRY": {
+    "floatShares": 444060762,
+    "sharesOutstanding": 123456750,
+    "fetchedAt": "2026-07-15"
+  },
+  "TNXP": {
+    "floatShares": 15012249,
+    "sharesOutstanding": 15940801,
+    "fetchedAt": "2026-07-15"
+  },
+  "TOPS": {
+    "floatShares": 1811711,
+    "sharesOutstanding": 5541670,
+    "fetchedAt": "2026-07-15"
+  },
+  "TTOO": {
+    "floatShares": 11899158,
+    "sharesOutstanding": 28045417,
+    "fetchedAt": "2026-07-15"
+  },
+  "UPST": {
+    "floatShares": 82190396,
+    "sharesOutstanding": 95711569,
+    "fetchedAt": "2026-07-15"
+  },
+  "VXRT": {
+    "floatShares": 238355514,
+    "sharesOutstanding": 242044838,
+    "fetchedAt": "2026-07-15"
+  },
+  "WKHS": {
+    "floatShares": 3715521,
+    "sharesOutstanding": 10893400,
+    "fetchedAt": "2026-07-15"
+  },
+  "WULF": {
+    "floatShares": 382055669,
+    "sharesOutstanding": 495532645,
+    "fetchedAt": "2026-07-15"
+  },
+  "XELA": {
+    "floatShares": 2294140,
+    "sharesOutstanding": 27751057,
+    "fetchedAt": "2026-07-15"
+  }
+}
