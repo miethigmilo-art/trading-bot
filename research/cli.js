@@ -23,6 +23,7 @@ const { runValidation, formatValidationReport } = require('./analysis/validation
 const { buildControlFeatureSet } = require('./analysis/statistics');
 const { backfillFloat, applyPercentOfFloat } = require('./collectors/floatData');
 const { runFloatAnalysis, formatFloatReport } = require('./analysis/floatAnalysis');
+const { runScoreModel, formatScoreReport } = require('./analysis/scoreModel');
 
 const command = process.argv[2] || 'run';
 
@@ -287,8 +288,19 @@ async function main() {
     return;
   }
 
+  if (command === 'score:model') {
+    const lookaheadDays = Number(process.argv[3]) || 10;
+    const db = getDb();
+    // percent_of_float aus dem Float-Cache sicherstellen, damit das Feature verfügbar ist.
+    applyPercentOfFloat(db);
+    console.log(`[Squeeze Research] Trainiere Score-Modell walk-forward (Lookahead ${lookaheadDays} Tage)...`);
+    const res = runScoreModel(db, { lookaheadDays });
+    console.log(formatScoreReport(res));
+    return;
+  }
+
   console.error(
-    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | stats:pre-event | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals] | risk:knowledge-base [entryLeadDays] | scan [lookaheadDays] [minSignals] | dna | ignition:test [lookaheadDays] | validate:rules [lookaheadDays] | float:backfill [--force] | float:analyze`
+    `Unbekanntes Kommando: ${command}\nVerfügbar: run | backfill <SYMBOL> [range] | backfill:events | knowledge:load | knowledge:list | stats:run | stats:pre-event | rules:generate | universe:backfill [range] | knowledge:scan | knowledge:verify | backtest:run [lookaheadDays] | catalyst:backfill | catalyst:summary | catalyst:control-backfill | risk:analyze [lookaheadDays] [minSignals] | risk:knowledge-base [entryLeadDays] | scan [lookaheadDays] [minSignals] | dna | ignition:test [lookaheadDays] | validate:rules [lookaheadDays] | float:backfill [--force] | float:analyze | score:model [lookaheadDays]`
   );
   process.exit(1);
 }

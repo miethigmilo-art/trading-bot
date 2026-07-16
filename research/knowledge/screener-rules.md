@@ -196,6 +196,46 @@ ein zusätzliches Merkmal für die Unterkategorie "klassischer Short-Squeeze",
 nicht für "schneller Anstieg" allgemein. Im Screener also optional, nicht als
 Kernkriterium (TradingView: "Short interest ratio" / "Float short %").
 
+## Score-Modell: schlägt ein Gesamt-Modell die einzelnen UND-Regeln?
+
+`node research/cli.js score:model` — statt harter UND-Regeln eine Logistische
+Regression über ALLE Features gleichzeitig (Kapitulation, RVOL, Trend, EMA-Abstand,
+Days-to-Cover, Short-Float-%, Float-Größe, Kerzenmuster). Jeder Handelstag bekommt
+eine Squeeze-Wahrscheinlichkeit; man handelt nur die höchstbewerteten. Bewertung
+strikt **walk-forward out-of-sample** (5 chronologische Folds, Training immer nur
+auf der Vergangenheit) über ~179.000 ungesehene Tag-Vorhersagen. News-Sentiment
+ist bewusst ausgeschlossen (Sammel-Bias um Event-Fenster → Leakage).
+
+| Handle nur die Top … | Trefferquote | Recall | Lift vs. Basisrate (4,0%) |
+|---|---|---|---|
+| Top 0,5 % der Tage | **8,8 %** | 1 % | 2,2x |
+| Top 1 % | 7,9 % | 2 % | 2,0x |
+| Top 2 % | 7,8 % | 4 % | 2,0x |
+| Top 5 % | 6,9 % | 9 % | 1,7x |
+| Top 10 % | 6,4 % | 16 % | 1,6x |
+
+**Fazit:** Das Gesamt-Modell schlägt die einfache Kapitulations-Regel **NICHT**
+nennenswert — es landet out-of-sample bei denselben ~8–9 % Trefferquote / 2x Lift.
+Das ist der entscheidende, ehrliche Befund: **die kursbasierten Features haben ihre
+Decke erreicht.** Mehr Rechen-Raffinesse auf denselben Daten bringt nichts mehr.
+
+Die Feature-Gewichte (was das Modell selbst für wichtig hält) bestätigen alle
+früheren Einzel-Befunde datengetrieben:
+
+| Feature | Gewicht | Deutung |
+|---|---|---|
+| `kapituliert_10d` | **+0,20** | mit Abstand stärkstes Signal — die Kapitulation ist der echte Kern |
+| `kapitulation_tiefe` | −0,16 | je tiefer der 5-Tage-Absturz, desto höher die Wahrscheinlichkeit |
+| `short_float_log` | **−0,14** | hoher Leerverkaufsanteil SENKT die Wahrscheinlichkeit sogar leicht (deckt sich mit r = −0,13) |
+| `abstand_ema50` | −0,13 | unter dem EMA50 (überverkauft) = höher |
+| `ema20_über_ema50` | +0,12 | bullische EMA-Struktur hilft zusätzlich |
+| `days_to_cover`, `float_klein` | ≈ 0 | tragen praktisch nichts bei |
+
+Praktische Konsequenz: Der große Hebel liegt nicht mehr im Kursbild, sondern im
+**Katalysator** (News/Social am Zünder-Tag) — genau das, was Modul 4 gerade an
+historischen Daten sammelt. Bis dahin bleibt „Kapitulation + auf News warten" das
+Beste, was die Datenlage hergibt (~2x besser als Zufall, aber >90% Fehlalarme).
+
 ## Kandidaten, die man findet, danach hier prüfen
 
 Sobald der externe Screener Kandidaten liefert: Ticker durch
